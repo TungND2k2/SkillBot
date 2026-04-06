@@ -1,0 +1,36 @@
+{
+  "name": "skillbot",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "db:migrate": "tsx src/db/migrate-standalone.ts",
+    "db:seed": "tsx src/db/seed.ts",
+    "db:migrate-ids": "tsx src/db/migrate-ids.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:bot": "tsx src/testing/run-tests.ts",
+    "test:pdf": "tsx src/testing/run-pdf-test.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.2.84",
+    "@aws-sdk/client-s3": "^3.1024.0",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "dotenv": "^17.4.1",
+    "mammoth": "^1.12.0",
+    "mongodb": "^7.1.1",
+    "mupdf": "^1.27.0",
+    "pdf-parse": "^2.4.5",
+    "ulid": "^2.3.0",
+    "xlsx": "^0.18.5",
+    "zod": "^3.25.11"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.3"
+  }
+}
