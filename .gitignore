@@ -13,6 +13,10 @@ dist/
 *.log
 test-output.log
 
+# DB dumps
+db-dump.json
+*.dump
+
 # OS
 .DS_Store
 Thumbs.db
