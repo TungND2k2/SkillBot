@@ -7,9 +7,10 @@ import { nowMs } from "../../utils/clock.js";
 const skill: SkillDef = {
   name: "create_workflow",
   description:
-    "Tạo quy trình mới. Args: name, description?, domain?, stages[{id,name,type}]",
+    "Tạo quy trình mới. Args: name, description?, domain?, stages[{id,name,type}]. Chỉ admin/manager.",
   category: "workflows",
   mutating: true,
+  requiredRoles: ["admin", "manager"],
   inputSchema: {
     name: z.string().describe("Tên workflow"),
     description: z.string().optional().describe("Mô tả workflow"),

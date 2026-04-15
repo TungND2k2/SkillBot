@@ -31,6 +31,9 @@ const configSchema = z.object({
 
   // Cron
   CRON_TICK_MS: z.coerce.number().default(5000),
+
+  // MarkItDown file extraction service
+  MARKITDOWN_URL: z.string().default("http://localhost:8080"),
 });
 
 export type Config = z.infer<typeof configSchema>;
