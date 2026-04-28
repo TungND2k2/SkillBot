@@ -51,6 +51,7 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
         maxTurns: config.MAX_TOOL_LOOPS,
         model: config.CLAUDE_MODEL,
         persistSession: false,
+        ...(config.CLAUDE_BIN ? { pathToClaudeCodeExecutable: config.CLAUDE_BIN } : {}),
       },
     });
 

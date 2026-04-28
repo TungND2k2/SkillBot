@@ -8,6 +8,9 @@ const ConfigSchema = z.object({
 
   // Claude — claude-agent-sdk dùng OAuth Claude Max subscription, không cần key.
   CLAUDE_MODEL: z.string().default("claude-sonnet-4-5-20250929"),
+  /** Đường dẫn tới `claude` native binary. Khi để trống, SDK tự dò.
+   *  Trên Linux glibc (vd: Ubuntu) thường cần set rõ "/usr/bin/claude". */
+  CLAUDE_BIN: z.string().optional(),
 
   // MarkItDown — file → markdown
   MARKITDOWN_URL: z.string().url().default("http://localhost:8080"),
