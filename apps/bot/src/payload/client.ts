@@ -125,6 +125,44 @@ class PayloadClient {
 
     return data as T;
   }
+
+  /**
+   * Upload binary file vào Payload media collection (slug: "media").
+   * Payload trả về { doc: { id, filename, url, mimeType, ... } }.
+   */
+  async uploadMedia(input: {
+    buffer: Buffer;
+    filename: string;
+    mimeType: string;
+    alt?: string;
+  }): Promise<{ id: string; filename: string; url?: string; mimeType: string; filesize: number }> {
+    const token = await this.ensureToken();
+    const form = new FormData();
+    form.append(
+      "file",
+      new Blob([new Uint8Array(input.buffer)], { type: input.mimeType }),
+      input.filename,
+    );
+    if (input.alt) {
+      form.append("_payload", JSON.stringify({ alt: input.alt }));
+    }
+
+    const res = await fetch(`${this.baseUrl}/api/media`, {
+      method: "POST",
+      headers: { Authorization: `JWT ${token}` },
+      body: form,
+    });
+
+    const data = await res.json().catch(() => null);
+    if (!res.ok) {
+      const msg =
+        (data && typeof data === "object" && "errors" in data && Array.isArray((data as any).errors))
+          ? (data as any).errors[0]?.message ?? `HTTP ${res.status}`
+          : `HTTP ${res.status}`;
+      throw new PayloadError(res.status, "upload_failed", `Upload media thất bại: ${msg}`, data);
+    }
+    return (data as { doc: { id: string; filename: string; url?: string; mimeType: string; filesize: number } }).doc;
+  }
 }
 
 export const payload = new PayloadClient();

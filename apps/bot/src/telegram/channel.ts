@@ -2,17 +2,22 @@
  * Telegram channel — long-poll Telegram Bot API, push messages onto
  * the queue, run pipeline, send reply back.
  *
- * Trimmed from the previous implementation — removed multi-tenant
- * lookup (Payload handles user identity now) and file extractor
- * coupling (will re-add when Payload media is wired up).
+ * File handling:
+ *  - Document (PDF/DOCX/...) → upload Payload media (S3/disk) +
+ *    chuyển sang text qua MarkItDown service → đính text vào message AI.
+ *  - Photo (image) → upload Payload media + gửi thẳng buffer cho Claude
+ *    vision.
+ *  - Text-only → bỏ qua bước tải file.
  */
 import type { Config } from "../config.js";
 import { logger } from "../utils/logger.js";
 import { newId } from "../utils/id.js";
 import { MessageQueue, type QueueJob } from "../queue/message-queue.js";
-import { runPipeline } from "../pipeline/pipeline.js";
+import { runPipeline, type PipelineAttachment } from "../pipeline/pipeline.js";
 import { mdToTelegramHtml, splitMessage } from "./format.js";
 import { describeToolCall } from "./tool-labels.js";
+import { convertToMarkdown, MarkItDownError } from "../extraction/markitdown.js";
+import { payload, PayloadError } from "../payload/client.js";
 
 interface TgUser {
   id: number;
@@ -20,15 +25,63 @@ interface TgUser {
   last_name?: string;
   username?: string;
 }
+interface TgDocument {
+  file_id: string;
+  file_unique_id: string;
+  file_name?: string;
+  mime_type?: string;
+  file_size?: number;
+}
+interface TgPhotoSize {
+  file_id: string;
+  file_unique_id: string;
+  file_size?: number;
+  width: number;
+  height: number;
+}
 interface TgMessage {
   message_id: number;
   from?: TgUser;
   chat: { id: number; type: string };
   text?: string;
+  caption?: string;
+  document?: TgDocument;
+  photo?: TgPhotoSize[];
   date: number;
 }
 interface TgUpdate { update_id: number; message?: TgMessage }
 interface TgUpdatesResponse { ok: boolean; result: TgUpdate[] }
+
+const SUPPORTED_IMAGE_MIME: Record<string, "image/jpeg" | "image/png" | "image/gif" | "image/webp"> = {
+  "image/jpeg": "image/jpeg",
+  "image/jpg": "image/jpeg",
+  "image/png": "image/png",
+  "image/gif": "image/gif",
+  "image/webp": "image/webp",
+};
+
+function inferMimeFromName(name: string): string | undefined {
+  const ext = name.toLowerCase().split(".").pop();
+  if (!ext) return undefined;
+  const map: Record<string, string> = {
+    pdf: "application/pdf",
+    doc: "application/msword",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    xls: "application/vnd.ms-excel",
+    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ppt: "application/vnd.ms-powerpoint",
+    pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    csv: "text/csv",
+    txt: "text/plain",
+    md: "text/markdown",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    gif: "image/gif",
+    webp: "image/webp",
+  };
+  return map[ext];
+}
 
 export class TelegramChannel {
   private offset = 0;
@@ -117,22 +170,23 @@ export class TelegramChannel {
 
     for (const update of data.result) {
       this.offset = update.update_id + 1;
-      if (update.message?.text && update.message.chat.type === "private") {
-        this.handleMessage(update.message);
-      }
+      const msg = update.message;
+      if (!msg || msg.chat.type !== "private") continue;
+      const hasContent = !!(msg.text || msg.caption || msg.document || msg.photo);
+      if (hasContent) this.handleMessage(msg);
     }
   }
 
   private handleMessage(msg: TgMessage): void {
-    if (!msg.from || !msg.text) return;
+    if (!msg.from) return;
     const chatId = msg.chat.id;
-    const text = msg.text.trim();
+    const text = (msg.text ?? msg.caption ?? "").trim();
 
     const job: QueueJob = {
       id: newId(),
       priority: 1,
       enqueuedAt: Date.now(),
-      run: () => this.processMessage(chatId, text),
+      run: () => this.processMessage(chatId, text, msg),
     };
 
     if (!this.queue.enqueue(job)) {
@@ -141,8 +195,147 @@ export class TelegramChannel {
     }
   }
 
-  private async processMessage(chatId: number, text: string): Promise<void> {
-    logger.info("Telegram", `[${chatId}] ${text.slice(0, 80)}`);
+  /** GET file_path qua getFile + tải bytes. */
+  private async downloadTelegramFile(
+    fileId: string,
+  ): Promise<{ buffer: Buffer; filePath: string } | null> {
+    try {
+      const r1 = await fetch(`${this.apiBase}/getFile?file_id=${encodeURIComponent(fileId)}`, {
+        signal: AbortSignal.timeout(15_000),
+      });
+      const j1 = (await r1.json()) as { ok: boolean; result?: { file_path: string } };
+      if (!j1.ok || !j1.result?.file_path) {
+        logger.warn("Telegram", `getFile failed for ${fileId}`);
+        return null;
+      }
+      const filePath = j1.result.file_path;
+      const r2 = await fetch(`https://api.telegram.org/file/bot${this.botToken}/${filePath}`, {
+        signal: AbortSignal.timeout(60_000),
+      });
+      if (!r2.ok) {
+        logger.warn("Telegram", `download ${filePath} HTTP ${r2.status}`);
+        return null;
+      }
+      const buf = Buffer.from(await r2.arrayBuffer());
+      return { buffer: buf, filePath };
+    } catch (err) {
+      logger.warn("Telegram", `downloadTelegramFile threw: ${err}`);
+      return null;
+    }
+  }
+
+  /**
+   * Xử lý attachment từ Telegram message:
+   *  - Document: tải → upload Payload media → MarkItDown → text
+   *  - Photo (chọn size lớn nhất): tải → upload Payload media → buffer cho vision
+   * Mỗi bước có log rõ để debug. Trả về list attachments cho pipeline +
+   * 1 mảng note để hiển thị status trên Telegram.
+   */
+  private async resolveAttachments(
+    msg: TgMessage,
+    onStatus: (note: string) => void,
+  ): Promise<PipelineAttachment[]> {
+    const out: PipelineAttachment[] = [];
+
+    // Document
+    if (msg.document) {
+      const d = msg.document;
+      const name = d.file_name ?? `${d.file_id}.bin`;
+      const mime = d.mime_type ?? inferMimeFromName(name) ?? "application/octet-stream";
+      onStatus(`📥 Tải tệp ${name}...`);
+      const dl = await this.downloadTelegramFile(d.file_id);
+      if (!dl) {
+        onStatus(`⚠️ Không tải được tệp ${name}`);
+        return out;
+      }
+      logger.info("Telegram", `Downloaded ${name} (${(dl.buffer.length / 1024).toFixed(1)}KB)`);
+
+      // Upload Payload media (best-effort — không chặn flow nếu fail)
+      try {
+        onStatus(`📤 Lưu tệp vào kho media...`);
+        const media = await payload.uploadMedia({
+          buffer: dl.buffer,
+          filename: name,
+          mimeType: mime,
+          alt: `Telegram chat ${msg.chat.id}`,
+        });
+        logger.info("Telegram", `Uploaded ${name} → media#${media.id}`);
+      } catch (err) {
+        const reason = err instanceof PayloadError ? err.message : String(err);
+        logger.warn("Telegram", `Payload upload failed: ${reason}`);
+        onStatus(`⚠️ Lưu media thất bại (${reason}) — vẫn tiếp tục đọc nội dung`);
+      }
+
+      // MarkItDown
+      try {
+        onStatus(`🔍 Đọc nội dung qua MarkItDown...`);
+        const markdown = await convertToMarkdown(dl.buffer, name);
+        logger.info("Telegram", `MarkItDown ${name} → ${markdown.length} chars`);
+        out.push({ type: "document", name, markdown });
+      } catch (err) {
+        const reason = err instanceof MarkItDownError ? err.message : String(err);
+        logger.warn("Telegram", `MarkItDown failed: ${reason}`);
+        onStatus(`⚠️ Không đọc được nội dung tệp (${reason})`);
+      }
+      return out;
+    }
+
+    // Photo — Telegram trả mảng size, lấy size lớn nhất
+    if (msg.photo && msg.photo.length > 0) {
+      const largest = msg.photo.reduce(
+        (a, b) => ((a.width * a.height) >= (b.width * b.height) ? a : b),
+      );
+      const name = `photo_${largest.file_unique_id}.jpg`;
+      onStatus(`📥 Tải ảnh ${largest.width}×${largest.height}...`);
+      const dl = await this.downloadTelegramFile(largest.file_id);
+      if (!dl) {
+        onStatus(`⚠️ Không tải được ảnh`);
+        return out;
+      }
+      logger.info("Telegram", `Downloaded photo ${name} (${(dl.buffer.length / 1024).toFixed(1)}KB)`);
+
+      // Telegram thường trả jpeg, nhưng có thể là png nếu user gửi qua "send as file"
+      const ext = dl.filePath.split(".").pop()?.toLowerCase();
+      const mime = ext === "png" ? "image/png" :
+                   ext === "webp" ? "image/webp" :
+                   ext === "gif" ? "image/gif" : "image/jpeg";
+      const claudeMime = SUPPORTED_IMAGE_MIME[mime] ?? "image/jpeg";
+
+      try {
+        onStatus(`📤 Lưu ảnh vào kho media...`);
+        const media = await payload.uploadMedia({
+          buffer: dl.buffer,
+          filename: name,
+          mimeType: mime,
+          alt: `Telegram chat ${msg.chat.id}`,
+        });
+        logger.info("Telegram", `Uploaded photo → media#${media.id}`);
+      } catch (err) {
+        const reason = err instanceof PayloadError ? err.message : String(err);
+        logger.warn("Telegram", `Payload upload (photo) failed: ${reason}`);
+        onStatus(`⚠️ Lưu media thất bại (${reason}) — vẫn tiếp tục gửi AI xem`);
+      }
+
+      out.push({ type: "image", name, mediaType: claudeMime, buffer: dl.buffer });
+      return out;
+    }
+
+    return out;
+  }
+
+  private async processMessage(
+    chatId: number,
+    text: string,
+    msg: TgMessage,
+  ): Promise<void> {
+    const summary = text
+      ? `text "${text.slice(0, 80)}"`
+      : msg.document
+        ? `document ${msg.document.file_name ?? msg.document.file_id}`
+        : msg.photo
+          ? `photo ${msg.photo[msg.photo.length - 1].width}×${msg.photo[msg.photo.length - 1].height}`
+          : "(empty)";
+    logger.info("Telegram", `[${chatId}] ${summary}`);
 
     // Initial status message — edit it as tools are called.
     const statusMsgId = await this.sendPlainMessage(chatId, "💭 Đang nghĩ...");
@@ -184,8 +377,17 @@ export class TelegramChannel {
       }
     };
 
+    // Resolve attachments BEFORE pipeline (cần text từ MarkItDown để inject)
+    const onStatus = (note: string) => {
+      activityLog.push(note);
+      refreshTyping();
+      queueEdit();
+    };
+    const attachments = await this.resolveAttachments(msg, onStatus);
+
     const result = await runPipeline({
       message: text,
+      attachments,
       onToolCall: (name, args) => {
         const label = describeToolCall(name, args);
         activityLog.push(label);

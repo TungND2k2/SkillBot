@@ -6,16 +6,37 @@
  * caller (Telegram channel), passed in as `priorMessages`. Keep this
  * function pure for easier testing.
  */
-import { query, createSdkMcpServer } from "@anthropic-ai/claude-agent-sdk";
+import {
+  query,
+  createSdkMcpServer,
+  type SDKUserMessage,
+} from "@anthropic-ai/claude-agent-sdk";
 
 import { getConfig } from "../config.js";
 import { logger } from "../utils/logger.js";
 import { allTools } from "../tools/index.js";
 import { SYSTEM_PROMPT } from "./system-prompt.js";
 
+export type PipelineAttachment =
+  | {
+      type: "document";
+      /** Tên file gốc — Claude xem để biết đây là gì (vd "invoice.pdf"). */
+      name: string;
+      /** Markdown text đã chuyển từ MarkItDown. */
+      markdown: string;
+    }
+  | {
+      type: "image";
+      name: string;
+      mediaType: "image/jpeg" | "image/png" | "image/gif" | "image/webp";
+      buffer: Buffer;
+    };
+
 export interface PipelineInput {
-  /** Latest user message text. */
+  /** Latest user message text (caption khi gửi file, có thể rỗng). */
   message: string;
+  /** Files / ảnh user đính kèm cùng message này. */
+  attachments?: PipelineAttachment[];
   /** Optional callback fired each time Claude calls a tool. Receives raw args
    *  để caller có thể format mô tả thân thiện hiển thị cho user. */
   onToolCall?: (toolName: string, args: Record<string, unknown>) => void;
@@ -39,6 +60,58 @@ function preview(s: string, n = 80): string {
   return compact.length > n ? compact.slice(0, n) + "…" : compact;
 }
 
+/**
+ * Build claude-agent-sdk prompt. Khi không có ảnh, dùng string concat
+ * (rẻ + dễ đọc trong log). Khi có ảnh, phải dùng AsyncIterable<SDKUserMessage>
+ * để gửi content blocks (image + text) qua API vision.
+ */
+function buildPrompt(
+  message: string,
+  attachments: PipelineAttachment[],
+): string | AsyncIterable<SDKUserMessage> {
+  const docAttachments = attachments.filter(
+    (a): a is Extract<PipelineAttachment, { type: "document" }> => a.type === "document",
+  );
+  const imageAttachments = attachments.filter(
+    (a): a is Extract<PipelineAttachment, { type: "image" }> => a.type === "image",
+  );
+
+  const docsText = docAttachments
+    .map(
+      (d) =>
+        `\n\n📎 Đính kèm: ${d.name}\n--- BẮT ĐẦU NỘI DUNG ---\n${d.markdown}\n--- HẾT NỘI DUNG ---`,
+    )
+    .join("");
+
+  const composedText = (message?.trim() ? message : "(người dùng gửi tệp đính kèm — không kèm chú thích)") + docsText;
+
+  if (imageAttachments.length === 0) {
+    return composedText;
+  }
+
+  // Có ảnh → build async iterable với image + text blocks.
+  async function* iter(): AsyncIterable<SDKUserMessage> {
+    const content: Array<
+      | { type: "image"; source: { type: "base64"; media_type: string; data: string } }
+      | { type: "text"; text: string }
+    > = imageAttachments.map((img) => ({
+      type: "image",
+      source: {
+        type: "base64",
+        media_type: img.mediaType,
+        data: img.buffer.toString("base64"),
+      },
+    }));
+    content.push({ type: "text", text: composedText });
+    yield {
+      type: "user",
+      parent_tool_use_id: null,
+      message: { role: "user", content: content as never },
+    };
+  }
+  return iter();
+}
+
 export async function runPipeline(input: PipelineInput): Promise<PipelineOutput> {
   const config = getConfig();
   const tag = input.logTag ?? "Pipeline";
@@ -47,7 +120,14 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
   let ok = true;
 
   const startTs = Date.now();
-  logger.info(tag, `▶ user: "${preview(input.message, 100)}"`);
+  const attachments = input.attachments ?? [];
+  const attSummary =
+    attachments.length > 0
+      ? ` +${attachments.length} đính kèm: [${attachments
+          .map((a) => `${a.type === "image" ? "🖼" : "📄"}${a.name}`)
+          .join(", ")}]`
+      : "";
+  logger.info(tag, `▶ user: "${preview(input.message, 100)}"${attSummary}`);
 
   const mcpServer = createSdkMcpServer({
     name: "skillbot",
@@ -63,7 +143,7 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
 
   try {
     const q = query({
-      prompt: input.message,
+      prompt: buildPrompt(input.message, attachments),
       options: {
         systemPrompt: SYSTEM_PROMPT,
         mcpServers: { skillbot: mcpServer },

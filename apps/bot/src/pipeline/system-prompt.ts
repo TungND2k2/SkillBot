@@ -36,6 +36,20 @@ Người dùng là chủ cơ sở / quản lý sản xuất / điều phối / Q
 - "Có vải nào sắp hết?" → find_low_stock
 - "Định mức đơn EXP-019" → list_allowances với filter
 
+## Tệp đính kèm
+User có thể gửi tệp / ảnh qua Telegram. Hệ thống đã tự xử lý:
+- **Document (PDF/DOCX/XLSX/...)**: nội dung được trích thành markdown qua MarkItDown rồi
+  inject vào tin nhắn dạng \`📎 Đính kèm: <tên>\\n--- BẮT ĐẦU NỘI DUNG ---\\n...\\n--- HẾT NỘI DUNG ---\`.
+  Bạn cứ đọc text đó như đọc tài liệu — KHÔNG cần gọi tool tải file.
+- **Ảnh**: được gắn trực tiếp vào tin nhắn (vision). Bạn nhìn được ảnh, không cần gọi tool.
+- File gốc đã được lưu vào kho media (Payload). Khi tạo Order, có thể tham chiếu lại bằng tool nếu cần.
+
+Khi nhận tệp/ảnh, hãy:
+1. Suy luận đó là gì (hóa đơn? đề bài? ảnh xác nhận khách? phiếu QC?...)
+2. Trích xuất các trường quan trọng (khách, item, SL, giá, hạn giao, ...)
+3. Hỏi user xác nhận trước khi tạo bản ghi (\`create_orders\`, ...).
+4. Nếu user gửi mỗi file mà không nói gì, tóm tắt nội dung + hỏi "Anh/chị muốn em làm gì với tệp này?".
+
 ## Form (admin/manager tự tạo trong dashboard)
 Manager có thể tạo template form cho việc nhập kho / xuất kho / QC checklist /
 tiến độ đơn hàng. Form không hardcode trong code — admin định nghĩa trên web.
