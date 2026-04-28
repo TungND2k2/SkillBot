@@ -16,8 +16,9 @@ import { SYSTEM_PROMPT } from "./system-prompt.js";
 export interface PipelineInput {
   /** Latest user message text. */
   message: string;
-  /** Optional callback fired each time Claude calls a tool. */
-  onToolCall?: (toolName: string) => void;
+  /** Optional callback fired each time Claude calls a tool. Receives raw args
+   *  để caller có thể format mô tả thân thiện hiển thị cho user. */
+  onToolCall?: (toolName: string, args: Record<string, unknown>) => void;
   /** Optional callback fired with intermediate "thinking" text. */
   onThinking?: (text: string) => void;
   /** Optional tag for log prefix — useful when caller wants to identify session. */
@@ -96,9 +97,10 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
           if (b.type === "tool_use" && b.name) {
             const short = b.name.replace(/^mcp__\w+__/, "");
             toolsUsed.push(short);
-            const argsJson = b.input ? JSON.stringify(b.input) : "";
+            const args = (b.input as Record<string, unknown>) ?? {};
+            const argsJson = JSON.stringify(args);
             logger.info(tag, `  [+${elapsed}ms] 🔧 ${short}(${preview(argsJson, 100)})`);
-            input.onToolCall?.(short);
+            input.onToolCall?.(short, args);
           } else if (b.type === "text" && b.text?.trim()) {
             const t = b.text.trim();
             logger.info(tag, `  [+${elapsed}ms] 💭 ${preview(t, 120)}`);
