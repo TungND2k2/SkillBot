@@ -4,12 +4,12 @@
  * Form này LLM dùng để biết phải hỏi Sales gì khi tạo đơn mới qua chat.
  * Hardcoded theo spec B1 của khách hàng.
  *
- * Run:
- *   cd cms && npx tsx scripts/seed-sales-form.ts
+ * Run (override qua biến môi trường nếu cần):
+ *   PAYLOAD_URL=http://localhost:3001 \
+ *   SEED_ADMIN_EMAIL=admin@skillbot.local \
+ *   SEED_ADMIN_PASSWORD=... \
+ *   npx tsx scripts/seed-sales-form.ts
  */
-import { config as loadEnv } from "dotenv";
-loadEnv();
-
 const PAYLOAD_URL = process.env.PAYLOAD_URL ?? "http://localhost:3001";
 const EMAIL = process.env.SEED_ADMIN_EMAIL ?? "admin@skillbot.local";
 const PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? "123zXc_-";
