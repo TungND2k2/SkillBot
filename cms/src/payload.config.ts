@@ -16,6 +16,7 @@ import { Allowances } from "./collections/Allowances";
 import { QcLogs } from "./collections/QcLogs";
 import { Media } from "./collections/Media";
 import { Counters } from "./collections/Counters";
+import { WorkflowStages } from "./collections/WorkflowStages";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -47,6 +48,7 @@ export default buildConfig({
     Inventory,
     Allowances,
     QcLogs,
+    WorkflowStages,
     Media,
     Counters,
   ],
