@@ -143,19 +143,77 @@ export class TelegramChannel {
   private async processMessage(chatId: number, text: string): Promise<void> {
     logger.info("Telegram", `[${chatId}] ${text.slice(0, 80)}`);
 
-    // Quick "typing" indicator
-    fetch(`${this.apiBase}/sendChatAction`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, action: "typing" }),
-      signal: AbortSignal.timeout(5_000),
-    }).catch(() => {});
+    // Initial status message — edit it as tools are called.
+    const statusMsgId = await this.sendPlainMessage(chatId, "⏳ Đang xử lý...");
+    const toolLog: string[] = [];
+    let lastEditAt = 0;
+
+    const refreshTyping = () => {
+      void fetch(`${this.apiBase}/sendChatAction`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, action: "typing" }),
+        signal: AbortSignal.timeout(5_000),
+      }).catch(() => {});
+    };
+    refreshTyping();
 
     const result = await runPipeline({
       message: text,
-      onToolCall: (name) => logger.debug("Telegram", `tool: ${name}`),
+      onToolCall: (name) => {
+        toolLog.push(`🔧 ${name}`);
+        logger.debug("Telegram", `tool: ${name}`);
+        refreshTyping();
+        if (statusMsgId !== null) {
+          // Throttle edits — Telegram rate-limits at ~1/sec per message.
+          const now = Date.now();
+          if (now - lastEditAt > 800) {
+            lastEditAt = now;
+            const text = ["⏳ Đang xử lý...", "", ...toolLog].join("\n");
+            void this.editMessage(chatId, statusMsgId, text);
+          }
+        }
+      },
     });
 
+    // Remove status, send final reply.
+    if (statusMsgId !== null) await this.deleteMessage(chatId, statusMsgId);
     await this.sendMessage(chatId, result.reply);
+  }
+
+  private async sendPlainMessage(chatId: number, text: string): Promise<number | null> {
+    try {
+      const res = await fetch(`${this.apiBase}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text }),
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (!res.ok) return null;
+      const data = (await res.json()) as { ok: boolean; result?: { message_id: number } };
+      return data.ok && data.result ? data.result.message_id : null;
+    } catch { return null; }
+  }
+
+  private async editMessage(chatId: number, messageId: number, text: string): Promise<void> {
+    try {
+      await fetch(`${this.apiBase}/editMessageText`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, message_id: messageId, text }),
+        signal: AbortSignal.timeout(10_000),
+      });
+    } catch { /* ignore */ }
+  }
+
+  private async deleteMessage(chatId: number, messageId: number): Promise<void> {
+    try {
+      await fetch(`${this.apiBase}/deleteMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, message_id: messageId }),
+        signal: AbortSignal.timeout(10_000),
+      });
+    } catch { /* ignore */ }
   }
 }
