@@ -12,6 +12,7 @@ import { newId } from "../utils/id.js";
 import { MessageQueue, type QueueJob } from "../queue/message-queue.js";
 import { runPipeline } from "../pipeline/pipeline.js";
 import { mdToTelegramHtml, splitMessage } from "./format.js";
+import { describeToolCall } from "./tool-labels.js";
 
 interface TgUser {
   id: number;
@@ -144,9 +145,10 @@ export class TelegramChannel {
     logger.info("Telegram", `[${chatId}] ${text.slice(0, 80)}`);
 
     // Initial status message — edit it as tools are called.
-    const statusMsgId = await this.sendPlainMessage(chatId, "⏳ Đang xử lý...");
-    const toolLog: string[] = [];
+    const statusMsgId = await this.sendPlainMessage(chatId, "💭 Đang nghĩ...");
+    const activityLog: string[] = [];
     let lastEditAt = 0;
+    let pendingEdit: NodeJS.Timeout | null = null;
 
     const refreshTyping = () => {
       void fetch(`${this.apiBase}/sendChatAction`, {
@@ -158,25 +160,47 @@ export class TelegramChannel {
     };
     refreshTyping();
 
+    const flushEdit = () => {
+      if (statusMsgId === null) return;
+      lastEditAt = Date.now();
+      const body = activityLog.join("\n");
+      void this.editMessage(chatId, statusMsgId, body || "💭 Đang nghĩ...");
+    };
+
+    const queueEdit = () => {
+      if (statusMsgId === null) return;
+      const now = Date.now();
+      const sinceLast = now - lastEditAt;
+      if (sinceLast > 800) {
+        // Edit ngay
+        if (pendingEdit) { clearTimeout(pendingEdit); pendingEdit = null; }
+        flushEdit();
+      } else if (!pendingEdit) {
+        // Trì hoãn để gom edit, tránh rate-limit Telegram
+        pendingEdit = setTimeout(() => {
+          pendingEdit = null;
+          flushEdit();
+        }, 800 - sinceLast);
+      }
+    };
+
     const result = await runPipeline({
       message: text,
-      onToolCall: (name) => {
-        toolLog.push(`🔧 ${name}`);
-        logger.debug("Telegram", `tool: ${name}`);
+      onToolCall: (name, args) => {
+        const label = describeToolCall(name, args);
+        activityLog.push(label);
         refreshTyping();
-        if (statusMsgId !== null) {
-          // Throttle edits — Telegram rate-limits at ~1/sec per message.
-          const now = Date.now();
-          if (now - lastEditAt > 800) {
-            lastEditAt = now;
-            const text = ["⏳ Đang xử lý...", "", ...toolLog].join("\n");
-            void this.editMessage(chatId, statusMsgId, text);
-          }
-        }
+        queueEdit();
+      },
+      onThinking: (txt) => {
+        // AI có suy nghĩ trước khi gọi tool — preview ngắn lên status.
+        const preview = txt.split("\n")[0].slice(0, 80);
+        if (preview) activityLog.push(`💭 ${preview}${txt.length > 80 ? "…" : ""}`);
+        queueEdit();
       },
     });
 
-    // Remove status, send final reply.
+    if (pendingEdit) clearTimeout(pendingEdit);
     if (statusMsgId !== null) await this.deleteMessage(chatId, statusMsgId);
     await this.sendMessage(chatId, result.reply);
   }
