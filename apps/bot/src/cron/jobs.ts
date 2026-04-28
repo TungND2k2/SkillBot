@@ -3,10 +3,13 @@
  *  - T2 9h: tổng hợp lịch mua vải tuần
  *  - T6 17h: báo cáo tuần
  *  - Mỗi giờ: cảnh báo tồn kho thấp
+ *  - Mỗi giờ: scan order overdue → DM Telegram theo workflow.reminders
  */
 import type { CronJob } from "./worker.js";
 import { payload, PayloadError } from "../payload/client.js";
 import type { PayloadFindResponse } from "../payload/types.js";
+import type { TelegramChannel } from "../telegram/channel.js";
+import { runOrderReminders } from "./order-reminders.js";
 
 interface InventoryRow {
   id: string;
@@ -30,8 +33,15 @@ interface OrderStatusRow {
 const fabricLabel = (f: InventoryRow["fabric"]): string =>
   typeof f === "string" ? f : `${f.code} ${f.name}`;
 
-export function buildCronJobs(): CronJob[] {
-  return [
+export interface BuildCronJobsOptions {
+  /** Cần để job order-reminders gửi DM trực tiếp tới user. */
+  telegram?: TelegramChannel;
+  /** Fallback chat khi user không có telegramUserId. */
+  adminChatId?: number;
+}
+
+export function buildCronJobs(opts: BuildCronJobsOptions = {}): CronJob[] {
+  const jobs: CronJob[] = [
     {
       name: "weekly-purchase-monday",
       schedule: "0 9 * * 1", // Thứ Hai 9h
@@ -116,4 +126,18 @@ export function buildCronJobs(): CronJob[] {
       },
     },
   ];
+
+  // Job DM theo workflow reminders — chỉ chạy khi có TelegramChannel
+  // (không thì DM = no-op).
+  if (opts.telegram) {
+    const tg = opts.telegram;
+    const adminChat = opts.adminChatId;
+    jobs.push({
+      name: "hourly-order-reminders",
+      schedule: "5 * * * *", // mỗi giờ phút thứ 5 (lệch low-stock 5 phút)
+      run: () => runOrderReminders({ telegram: tg, adminChatId: adminChat }),
+    });
+  }
+
+  return jobs;
 }

@@ -45,17 +45,21 @@ async function main(): Promise<void> {
     telegram = new TelegramChannel(telegramToken, config);
     telegram.start();
 
-    if (adminChatId) {
-      cron = new CronWorker(buildCronJobs(), {
+    const adminChatNum = adminChatId ? Number(adminChatId) : undefined;
+    cron = new CronWorker(
+      buildCronJobs({ telegram, adminChatId: adminChatNum }),
+      {
         tickMs: config.CRON_TICK_MS,
         notify: async (jobName, text) => {
+          if (!adminChatNum) return; // không có admin chat → bỏ qua admin DM
           logger.info("Cron", `→ admin: ${jobName}`);
-          await telegram!.sendMessage(Number(adminChatId), text);
+          await telegram!.sendMessage(adminChatNum, text);
         },
-      });
-      cron.start();
-    } else {
-      logger.warn("Boot", "TELEGRAM_ADMIN_CHAT_ID not set — cron notifications disabled");
+      },
+    );
+    cron.start();
+    if (!adminChatNum) {
+      logger.warn("Boot", "TELEGRAM_ADMIN_CHAT_ID not set — admin notifications disabled (per-user DMs vẫn chạy)");
     }
   } else {
     logger.warn("Boot", "TELEGRAM_BOT_TOKEN not set — Telegram channel disabled (running headless)");

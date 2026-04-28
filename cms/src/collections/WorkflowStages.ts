@@ -30,6 +30,14 @@ export const WorkflowStages: CollectionConfig = {
   },
   fields: [
     {
+      name: "workflow",
+      label: "Thuộc workflow",
+      type: "relationship",
+      relationTo: "workflows",
+      required: true,
+      admin: { description: "Bước này thuộc quy trình nào" },
+    },
+    {
       type: "row",
       fields: [
         {
@@ -37,16 +45,14 @@ export const WorkflowStages: CollectionConfig = {
           label: "Thứ tự",
           type: "number",
           required: true,
-          unique: true,
           min: 1,
-          admin: { width: "20%", description: "1, 2, 3, ..." },
+          admin: { width: "20%", description: "1, 2, 3, ... (unique trong cùng workflow)" },
         },
         {
           name: "code",
           label: "Mã bước",
           type: "select",
           required: true,
-          unique: true,
           options: [
             { label: "B1 — Nhận đơn", value: "b1" },
             { label: "B2 — Tính định mức", value: "b2" },
