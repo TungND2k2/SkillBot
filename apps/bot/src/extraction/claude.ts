@@ -38,6 +38,7 @@ async function runQuery(
       maxTurns: 1,
       model: cfg.CLAUDE_MODEL,
       persistSession: false,
+      ...(cfg.CLAUDE_BIN ? { pathToClaudeCodeExecutable: cfg.CLAUDE_BIN } : {}),
     },
   });
 
