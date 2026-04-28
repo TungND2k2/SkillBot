@@ -1,12 +1,25 @@
 /**
- * Seed script: upsert a tenant with a Telegram bot token.
- * Usage: npx tsx src/db/seed.ts
+ * Seed script: upsert a tenant with a Telegram bot token, default roles,
+ * and (optionally) an initial super-admin web user so the dashboard is
+ * usable immediately after first deploy.
+ *
+ * Required env: SEED_BOT_TOKEN, DATABASE_URL
+ * Optional env:
+ *   SEED_TENANT_NAME       — display name for the tenant (default "SkillBot")
+ *   SEED_ADMIN_USERNAME    — initial web super-admin username
+ *   SEED_ADMIN_PASSWORD    — initial web super-admin password (8+ chars)
+ *   SEED_ADMIN_DISPLAY     — display name for the super-admin (default "Super Admin")
  */
 import "dotenv/config";
+import bcrypt from "bcryptjs";
 import { initDb, connectDb, closeDb, getDb } from "./connection.js";
+import { runMigrations } from "./migrate.js";
 
-const BOT_TOKEN   = process.env.SEED_BOT_TOKEN!;
+const BOT_TOKEN = process.env.SEED_BOT_TOKEN;
 const TENANT_NAME = process.env.SEED_TENANT_NAME ?? "SkillBot";
+const ADMIN_USERNAME = process.env.SEED_ADMIN_USERNAME;
+const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD;
+const ADMIN_DISPLAY = process.env.SEED_ADMIN_DISPLAY ?? "Super Admin";
 
 if (!BOT_TOKEN) {
   console.error("Set SEED_BOT_TOKEN in .env or environment before running seed.");
@@ -14,16 +27,21 @@ if (!BOT_TOKEN) {
 }
 
 const url = process.env.DATABASE_URL;
-if (!url) { console.error("DATABASE_URL not set"); process.exit(1); }
+if (!url) {
+  console.error("DATABASE_URL not set");
+  process.exit(1);
+}
 
 initDb(url);
 await connectDb();
+await runMigrations();
 
-const db  = getDb();
+const db = getDb();
 const now = Date.now();
 
-const existing = await db.collection("tenants").findOne({ botToken: BOT_TOKEN });
+// ── Tenant ───────────────────────────────────────────────────
 
+const existing = await db.collection("tenants").findOne({ botToken: BOT_TOKEN });
 let tenantId: string;
 
 if (existing) {
@@ -49,14 +67,15 @@ if (existing) {
   console.log(`✓ Created tenant "${TENANT_NAME}"`);
 }
 
-// Seed default roles
+// ── Default roles ────────────────────────────────────────────
+
 const defaultRoles = [
-  { name: "admin",   label: "Quản trị viên", description: "Toàn quyền hệ thống: quản lý users, roles, cấu hình tenant, tất cả các skill",                                                      level: 100, isSystem: true },
-  { name: "manager", label: "Quản lý",        description: "Quản lý vận hành: duyệt quyền, quản lý workflows/forms/rules, không được đổi roles admin",                                           level: 50,  isSystem: true },
-  { name: "sale",    label: "Sales",           description: "Nhân viên kinh doanh: nhập đơn hàng, theo dõi tiến độ đơn, xem báo cáo sales",                                                      level: 20,  isSystem: false },
-  { name: "qc",      label: "QC",              description: "Kiểm tra chất lượng: cập nhật kết quả QC, ghi nhận lỗi, duyệt sản phẩm qua/không qua kiểm định",                                   level: 20,  isSystem: false },
-  { name: "intern",  label: "Thực tập sinh",   description: "Thực tập sinh: xem thông tin, nhập liệu cơ bản, không được xóa hoặc thay đổi dữ liệu quan trọng",                                  level: 10,  isSystem: false },
-  { name: "user",    label: "Người dùng",      description: "Người dùng thông thường: sử dụng hệ thống cơ bản, nhập liệu, chạy workflows được phép",                                            level: 10,  isSystem: true },
+  { name: "admin", label: "Quản trị viên", description: "Toàn quyền hệ thống", level: 100, isSystem: true },
+  { name: "manager", label: "Quản lý", description: "Quản lý vận hành", level: 50, isSystem: true },
+  { name: "sale", label: "Sales", description: "Nhân viên kinh doanh", level: 20, isSystem: false },
+  { name: "qc", label: "QC", description: "Kiểm tra chất lượng", level: 20, isSystem: false },
+  { name: "intern", label: "Thực tập sinh", description: "Thực tập, chỉ đọc", level: 10, isSystem: false },
+  { name: "user", label: "Người dùng", description: "Người dùng thông thường", level: 10, isSystem: true },
 ];
 
 for (const role of defaultRoles) {
@@ -67,4 +86,47 @@ for (const role of defaultRoles) {
   }
 }
 
+// ── Initial super-admin web user (optional) ──────────────────
+
+if (ADMIN_USERNAME && ADMIN_PASSWORD) {
+  if (ADMIN_PASSWORD.length < 8) {
+    console.error("SEED_ADMIN_PASSWORD must be at least 8 characters.");
+    process.exit(1);
+  }
+
+  const existingAdmin = await db.collection("web_users").findOne({ username: ADMIN_USERNAME });
+  const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
+
+  if (existingAdmin) {
+    await db.collection("web_users").updateOne(
+      { username: ADMIN_USERNAME },
+      {
+        $set: {
+          passwordHash,
+          isSuperAdmin: true,
+          isActive: true,
+          updatedAt: now,
+        },
+      },
+    );
+    console.log(`✓ Updated super-admin web user "${ADMIN_USERNAME}"`);
+  } else {
+    await db.collection("web_users").insertOne({
+      tenantId,
+      username: ADMIN_USERNAME,
+      passwordHash,
+      displayName: ADMIN_DISPLAY,
+      role: "admin",
+      isSuperAdmin: true,
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+    console.log(`✓ Created super-admin web user "${ADMIN_USERNAME}" (login at /login)`);
+  }
+} else {
+  console.log("ℹ Skipping super-admin web user (set SEED_ADMIN_USERNAME + SEED_ADMIN_PASSWORD to create one)");
+}
+
 await closeDb();
+console.log("✓ Seed complete");

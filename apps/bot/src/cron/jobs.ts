@@ -1,0 +1,119 @@
+/**
+ * Pre-defined cron jobs cho cơ sở may thêu, theo guide:
+ *  - T2 9h: tổng hợp lịch mua vải tuần
+ *  - T6 17h: báo cáo tuần
+ *  - Mỗi giờ: cảnh báo tồn kho thấp
+ */
+import type { CronJob } from "./worker.js";
+import { payload, PayloadError } from "../payload/client.js";
+import type { PayloadFindResponse } from "../payload/types.js";
+
+interface InventoryRow {
+  id: string;
+  fabric: string | { code: string; name: string; color: string };
+  quantityM: number;
+  minLevel: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  [key: string]: unknown;
+}
+
+interface OrderStatusRow {
+  id: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  [key: string]: unknown;
+}
+
+const fabricLabel = (f: InventoryRow["fabric"]): string =>
+  typeof f === "string" ? f : `${f.code} ${f.name}`;
+
+export function buildCronJobs(): CronJob[] {
+  return [
+    {
+      name: "weekly-purchase-monday",
+      schedule: "0 9 * * 1", // Thứ Hai 9h
+      async run() {
+        try {
+          const res = await payload.request<PayloadFindResponse<InventoryRow>>("/api/inventory", {
+            query: {
+              where: { status: { in: ["low", "critical", "empty"] } },
+              depth: 1,
+              limit: 50,
+            },
+          });
+          if (res.totalDocs === 0) return "🟢 Sáng thứ Hai — toàn bộ vải đủ tồn, không cần đặt mới tuần này.";
+
+          const lines = res.docs.map((r) => {
+            const need = Math.max(0, r.minLevel - r.quantityM);
+            return `• ${fabricLabel(r.fabric)} — tồn ${r.quantityM}m, cần đặt ≥ ${need}m`;
+          });
+          return [
+            "🛒 *Lịch mua vải tuần này*",
+            "",
+            ...lines,
+            "",
+            `Tổng ${res.totalDocs} mã cần đặt. Vui lòng duyệt rồi gọi đặt NCC.`,
+          ].join("\n");
+        } catch (e) {
+          return `⚠️ Không tổng hợp được lịch mua vải: ${e instanceof PayloadError ? e.message : e}`;
+        }
+      },
+    },
+
+    {
+      name: "weekly-report-friday",
+      schedule: "0 17 * * 5", // Thứ Sáu 17h
+      async run() {
+        try {
+          const [orders, inv] = await Promise.all([
+            payload.request<PayloadFindResponse<OrderStatusRow>>("/api/orders", { query: { limit: 0 } }),
+            payload.request<PayloadFindResponse<InventoryRow>>("/api/inventory", {
+              query: { where: { status: { in: ["low", "critical", "empty"] } }, limit: 0 },
+            }),
+          ]);
+
+          const byStatus: Record<string, number> = {};
+          for (const o of orders.docs) {
+            byStatus[o.status] = (byStatus[o.status] ?? 0) + 1;
+          }
+
+          return [
+            "📊 *Báo cáo cuối tuần*",
+            "",
+            `📦 Đơn hàng: ${orders.totalDocs}`,
+            ...Object.entries(byStatus).map(([s, n]) => `  • ${s.toUpperCase()}: ${n}`),
+            "",
+            `📦 Vải tồn cảnh báo: ${inv.totalDocs} mã`,
+          ].join("\n");
+        } catch (e) {
+          return `⚠️ Không sinh được báo cáo: ${e instanceof PayloadError ? e.message : e}`;
+        }
+      },
+    },
+
+    {
+      name: "hourly-low-stock-watch",
+      schedule: "0 * * * *", // mỗi giờ
+      async run() {
+        try {
+          const res = await payload.request<PayloadFindResponse<InventoryRow>>("/api/inventory", {
+            query: { where: { status: { equals: "critical" } }, depth: 1, limit: 10 },
+          });
+          // Chỉ thông báo khi có hàng critical mới — để tránh spam ta giới hạn 1 thông báo/giờ.
+          if (res.totalDocs === 0) return "";
+
+          return [
+            "🚨 *Cảnh báo tồn kho rất thấp*",
+            "",
+            ...res.docs.map((r) => `• ${fabricLabel(r.fabric)} — chỉ còn ${r.quantityM}m`),
+          ].join("\n");
+        } catch {
+          return "";
+        }
+      },
+    },
+  ];
+}

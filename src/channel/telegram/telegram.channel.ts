@@ -9,6 +9,10 @@ import { logger } from "../../utils/logger.js";
 import { newId } from "../../utils/id.js";
 import { isStorageConfigured, uploadToS3 } from "../../storage/s3.js";
 import { extractText } from "../../storage/extractor.js";
+import type { WebUserService } from "../../domain/web-user/web-user.service.js";
+import { AppError } from "../../core/errors.js";
+
+const CHANNEL = "telegram";
 
 // ── Telegram Bot API minimal types ───────────────────────────
 
@@ -67,7 +71,8 @@ class TelegramBot {
     readonly botToken: string,
     private readonly db: DbInstance,
     private readonly config: Config,
-    private readonly queue: MessageQueue
+    private readonly queue: MessageQueue,
+    private readonly webUsers: WebUserService,
   ) {}
 
   private get apiBase(): string {
@@ -237,7 +242,7 @@ class TelegramBot {
           uploadedBy: telegramUserId,
           channel: "telegram",
         });
-        fileId = doc._id;
+        fileId = doc._id.toHexString();
         s3Note = `\n📎 File ID: <code>${fileId}</code>`;
       }
 
@@ -323,6 +328,12 @@ class TelegramBot {
       return;
     }
 
+    // /setweb <password> — set or change the web dashboard password.
+    if (text.startsWith("/setweb")) {
+      await this.handleSetWebPassword(chatId, telegramUserId, text);
+      return;
+    }
+
     // Resolve user — must be registered and active
     const result = await resolveUser(
       this.db,
@@ -338,6 +349,20 @@ class TelegramBot {
     }
 
     const { user } = result;
+
+    // Idempotently keep the web account in sync with the Telegram identity.
+    // No-op if it already exists; updates displayName/isActive on drift.
+    void this.webUsers
+      .upsertFromTelegram({
+        tenantId: this.tenantId,
+        channel: CHANNEL,
+        channelUserId: telegramUserId,
+        displayName: user.displayName,
+        role: user.role,
+        tenantUserId: telegramUserId, // we don't need exact _id here — denorm only
+        isActive: true,
+      })
+      .catch((err) => logger.warn("WebUser", `upsertFromTelegram failed: ${err.message}`));
 
     // Send a live status message that we'll edit as tools are called
     const statusMsgId = await this.sendMessage(chatId, "⏳ Đang xử lý...", "");
@@ -379,6 +404,36 @@ class TelegramBot {
       const html = mdToTelegramHtml(output.reply);
       const chunks = splitMessage(html);
       for (const chunk of chunks) await this.sendMessage(chatId, chunk);
+    }
+  }
+
+  /**
+   * /setweb <password> — set/change web dashboard password for the
+   * Telegram-linked account. Validates min length, hashes via bcrypt.
+   */
+  private async handleSetWebPassword(
+    chatId: number,
+    telegramUserId: string,
+    text: string,
+  ): Promise<void> {
+    const parts = text.split(/\s+/);
+    if (parts.length < 2 || !parts[1]) {
+      await this.sendMessage(
+        chatId,
+        "Cú pháp: <code>/setweb &lt;mật khẩu&gt;</code>\nVí dụ: <code>/setweb mypass1234</code>",
+      );
+      return;
+    }
+    const password = parts.slice(1).join(" ");
+    try {
+      const user = await this.webUsers.setPassword(CHANNEL, telegramUserId, password);
+      await this.sendMessage(
+        chatId,
+        `✅ Đã đặt mật khẩu web. Đăng nhập tại dashboard với:\n👤 Tên đăng nhập: <code>${user.username}</code>\n🔑 Mật khẩu: (như vừa đặt)`,
+      );
+    } catch (err) {
+      const msg = err instanceof AppError ? err.message : "Lỗi đặt mật khẩu";
+      await this.sendMessage(chatId, `⚠️ ${msg}`);
     }
   }
 
@@ -453,7 +508,8 @@ export class TelegramChannel implements Channel {
 
   constructor(
     private readonly db: DbInstance,
-    private readonly config: Config
+    private readonly config: Config,
+    private readonly webUsers: WebUserService,
   ) {
     this.queue = new MessageQueue(config);
   }
@@ -473,7 +529,8 @@ export class TelegramChannel implements Channel {
         tenant.botToken,
         this.db,
         this.config,
-        this.queue
+        this.queue,
+        this.webUsers,
       );
       this.bots.set(tenantId, bot);
       bot.start();

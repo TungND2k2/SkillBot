@@ -1,8 +1,15 @@
-// TypeScript document interfaces for all MongoDB collections
+// MongoDB document interfaces. Each interface mirrors a collection in the
+// database 1:1 — they describe what is *persisted*, not what is exposed to
+// callers (DTOs live in src/shared/dto.ts).
+//
+// `_id` is `ObjectId` for collections where MongoDB auto-generates it on
+// insert. The only exception is `web_sessions`, which provides its own
+// random hex token as the primary key.
+
+import type { ObjectId } from "mongodb";
 
 export interface SuperAdminDoc {
-  _id: string;
-
+  _id: ObjectId;
   channel: string;
   channelUserId: string;
   displayName?: string;
@@ -10,8 +17,7 @@ export interface SuperAdminDoc {
 }
 
 export interface TenantDoc {
-  _id: string;
-
+  _id: ObjectId;
   name: string;
   botToken?: string;
   botUsername?: string;
@@ -27,14 +33,13 @@ export interface TenantDoc {
 }
 
 export interface TenantUserDoc {
-  _id: string;
-
+  _id: ObjectId;
   tenantId: string;
   channel: string;
   channelUserId: string;
   displayName?: string;
-  role: string;           // cached role name (denormalized)
-  roleId?: string;         // reference to tenant_roles._id
+  role: string;
+  roleId?: string;
   permissions?: unknown[];
   reportsTo?: string;
   metadata?: Record<string, unknown>;
@@ -44,8 +49,7 @@ export interface TenantUserDoc {
 }
 
 export interface CollectionDoc {
-  _id: string;
-
+  _id: ObjectId;
   tenantId: string;
   name: string;
   slug: string;
@@ -61,8 +65,7 @@ export interface CollectionDoc {
 }
 
 export interface CollectionRowDoc {
-  _id: string;
-
+  _id: ObjectId;
   collectionId: string;
   data: Record<string, unknown>;
   createdBy?: string;
@@ -74,8 +77,7 @@ export interface CollectionRowDoc {
 }
 
 export interface WorkflowTemplateDoc {
-  _id: string;
-
+  _id: ObjectId;
   tenantId: string;
   name: string;
   description?: string;
@@ -94,8 +96,7 @@ export interface WorkflowTemplateDoc {
 }
 
 export interface FormTemplateDoc {
-  _id: string;
-
+  _id: ObjectId;
   tenantId: string;
   name: string;
   schema: unknown;
@@ -111,8 +112,7 @@ export interface FormTemplateDoc {
 }
 
 export interface BusinessRuleDoc {
-  _id: string;
-
+  _id: ObjectId;
   tenantId: string;
   name: string;
   description?: string;
@@ -131,8 +131,7 @@ export interface BusinessRuleDoc {
 }
 
 export interface WorkflowInstanceDoc {
-  _id: string;
-
+  _id: ObjectId;
   templateId: string;
   tenantId: string;
   initiatedBy: string;
@@ -150,8 +149,7 @@ export interface WorkflowInstanceDoc {
 }
 
 export interface WorkflowApprovalDoc {
-  _id: string;
-
+  _id: ObjectId;
   instanceId: string;
   stageId: string;
   approverId: string;
@@ -163,8 +161,7 @@ export interface WorkflowApprovalDoc {
 }
 
 export interface ConversationSessionDoc {
-  _id: string;
-
+  _id: ObjectId;
   tenantId: string;
   channel: string;
   channelUserId: string;
@@ -177,8 +174,7 @@ export interface ConversationSessionDoc {
 }
 
 export interface FileDoc {
-  _id: string;
-
+  _id: ObjectId;
   tenantId: string;
   fileName: string;
   fileSize: number;
@@ -193,8 +189,7 @@ export interface FileDoc {
 }
 
 export interface PermissionRequestDoc {
-  _id: string;
-
+  _id: ObjectId;
   tenantId: string;
   requesterId: string;
   requesterName?: string;
@@ -210,19 +205,19 @@ export interface PermissionRequestDoc {
 }
 
 export interface RoleDoc {
-  _id: string;
-
+  _id: ObjectId;
   tenantId: string;
-  name: string;            // slug: "admin", "manager", "user", or custom
-  label: string;           // display: "Quản trị viên", "Quản lý", ...
+  name: string;
+  label: string;
   description: string;
-  level: number;           // hierarchy: higher = more privileges (admin=100, manager=50, user=10)
-  isSystem: boolean;       // system roles cannot be deleted
+  level: number;
+  isSystem: boolean;
   createdAt: number;
   updatedAt: number;
 }
 
 export interface AuditLogDoc {
+  _id: ObjectId;
   userId: string;
   userName?: string;
   userRole?: string;
@@ -236,8 +231,7 @@ export interface AuditLogDoc {
 }
 
 export interface CronJobDoc {
-  _id: string;
-
+  _id: ObjectId;
   tenantId: string;
   name: string;
   schedule: string;
@@ -257,8 +251,7 @@ export interface CronJobDoc {
 }
 
 export interface BotDocDoc {
-  _id: string;
-
+  _id: ObjectId;
   tenantId: string;
   title: string;
   content: string;
@@ -267,4 +260,46 @@ export interface BotDocDoc {
   updatedByName?: string;
   createdAt: number;
   updatedAt: number;
+}
+
+/**
+ * Web dashboard user — independent identity from Telegram.
+ *
+ * Auto-created when a Telegram user registers (`username = "tg_<telegramId>"`,
+ * `passwordHash = null`). The user sets a password via Telegram bot command
+ * `/setweb <password>`, after which they can sign in to the web dashboard.
+ */
+export interface WebUserDoc {
+  _id: ObjectId;
+  tenantId: string;
+  username: string;
+  passwordHash: string | null;     // null = no password set, can't login yet
+  displayName: string;
+  role: string;                    // mirrors tenant_users.role at create time
+  isSuperAdmin: boolean;
+  isActive: boolean;
+  /** Channel + ID of the Telegram user this account is linked to (if any). */
+  linkedChannel?: string;
+  linkedChannelUserId?: string;
+  /** _id of the matching tenant_users row (denormalized for fast joins). */
+  linkedTenantUserId?: string;
+  createdAt: number;
+  updatedAt: number;
+  lastLoginAt?: number;
+}
+
+/**
+ * Web dashboard session. The `_id` is the random hex token used as the cookie
+ * value — it's set by application code on insert (not auto-generated by Mongo).
+ */
+export interface WebSessionDoc {
+  _id: string;
+  webUserId: string;               // hex of the WebUserDoc._id
+  tenantId: string | null;         // mirrored from web user — null only for cross-tenant super-admin
+  isSuperAdmin: boolean;
+  userAgent?: string;
+  ipAddress?: string;
+  createdAt: number;
+  expiresAt: number;
+  lastSeenAt: number;
 }

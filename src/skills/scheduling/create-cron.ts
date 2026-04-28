@@ -3,15 +3,16 @@ import type { SkillDef } from "../_types.js";
 import { ok, err } from "../_types.js";
 import { getDb } from "../../db/connection.js";
 import { nowMs } from "../../utils/clock.js";
+import { nextRunAt as cronNextRunAt, validateCron } from "../../cron/cron-schedule.js";
 
 const skill: SkillDef = {
   name: "create_cron",
-  description: "Tạo cron job. Args: name, schedule, action (tên tool), action_args?",
+  description: "Tạo cron job. Args: name, schedule (cron expression 5 trường: 'phút giờ ngày tháng thứ', vd '0 9 * * 1' = thứ Hai 9h), action (tên tool), action_args?",
   category: "scheduling",
   mutating: true,
   inputSchema: {
     name: z.string().describe("Tên cron job"),
-    schedule: z.string().describe("Cron expression hoặc mô tả (vd: every 5 minutes, daily at 9am)"),
+    schedule: z.string().describe("Cron expression chuẩn 5 trường (vd: '0 9 * * 1' thứ Hai 9h, '0 17 * * 5' thứ Sáu 17h, '*/15 * * * *' mỗi 15 phút)"),
     action: z.string().describe("Tên tool sẽ chạy"),
     action_args: z.record(z.unknown()).optional().describe("Args cho tool"),
   },
@@ -21,19 +22,22 @@ const skill: SkillDef = {
     const name = args.name as string;
     const action = args.action as string;
     const actionArgs = (args.action_args as Record<string, unknown>) ?? {};
-    const scheduleDescription = schedule;
-    const nextRunAt = now + 60_000;
+
+    const invalid = validateCron(schedule);
+    if (invalid) return err(`Cron expression không hợp lệ: ${invalid}`);
+
+    const nextRun = cronNextRunAt(schedule, now);
 
     const result = await getDb().collection("cron_jobs").insertOne({
       tenantId: ctx.tenantId,
       name,
       schedule,
-      scheduleDescription,
+      scheduleDescription: schedule,
       action,
       args: actionArgs,
       notifyUserId: ctx.userId,
       status: "active",
-      nextRunAt,
+      nextRunAt: nextRun,
       runCount: 0,
       createdByUserId: ctx.userId,
       createdByName: ctx.userName,
@@ -44,8 +48,8 @@ const skill: SkillDef = {
     return ok({
       id: result.insertedId.toHexString(),
       name,
-      schedule: scheduleDescription,
-      nextRun: new Date(nextRunAt).toISOString(),
+      schedule,
+      nextRun: new Date(nextRun).toISOString(),
     });
   },
 };

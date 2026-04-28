@@ -6,10 +6,13 @@ import { loadSkills, getAllSkills } from "./skills/_registry.js";
 import { TelegramChannel } from "./channel/telegram/telegram.channel.js";
 import { CronService } from "./cron/cron.service.js";
 import { initStorage } from "./storage/s3.js";
+import { startApiServer, type ApiServerHandle } from "./http/server.js";
+import { wireHttp } from "./http/wiring.js";
 import { logger } from "./utils/logger.js";
 
 let telegramChannel: TelegramChannel | null = null;
 let cronService: CronService | null = null;
+let apiServer: ApiServerHandle | null = null;
 
 async function main() {
   // 1. Config
@@ -30,33 +33,36 @@ async function main() {
   // 4. Storage (S3)
   initStorage(config);
 
-  // 4. Cron service
+  // 5. Cron service
   cronService = new CronService(db, config);
   cronService.start();
 
-  // 5. Telegram channel
-  telegramChannel = new TelegramChannel(db, config);
+  // 6. HTTP API (for web dashboard) — wire dependencies first because Telegram
+  // bot needs WebUserService to auto-link identities on registration.
+  const { controllers, webUsers } = wireHttp();
+
+  // 7. Telegram channel
+  telegramChannel = new TelegramChannel(db, config, webUsers);
   await telegramChannel.start();
 
-  // 6. Dashboard
-  if (config.HTTP_PORT) {
-    logger.info("Boot", `Dashboard HTTP not yet implemented (port ${config.HTTP_PORT})`);
-  }
+  // 8. Start API server.
+  apiServer = startApiServer(config.HTTP_PORT, controllers);
 
   logger.info("Boot", "SkillBot ready");
 }
 
 // ── Graceful shutdown ─────────────────────────────────────────
 
-function shutdown(signal: string) {
+async function shutdown(signal: string) {
   logger.info("Boot", `${signal} received — shutting down`);
   telegramChannel?.stop();
   cronService?.stop();
+  await apiServer?.stop();
   process.exit(0);
 }
 
-process.on("SIGINT", () => shutdown("SIGINT"));
-process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => void shutdown("SIGINT"));
+process.on("SIGTERM", () => void shutdown("SIGTERM"));
 
 main().catch((err) => {
   console.error("Fatal:", err);

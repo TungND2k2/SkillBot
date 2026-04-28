@@ -26,8 +26,8 @@ const configSchema = z.object({
   SUMMARY_THRESHOLD: z.coerce.number().default(24),
   KEEP_RECENT_MESSAGES: z.coerce.number().default(10),
 
-  // Dashboard
-  HTTP_PORT: z.coerce.number().optional(),
+  // HTTP API server (for the web dashboard)
+  HTTP_PORT: z.coerce.number().default(3102),
 
   // Cron
   CRON_TICK_MS: z.coerce.number().default(5000),

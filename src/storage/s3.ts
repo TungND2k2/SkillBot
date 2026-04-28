@@ -83,10 +83,9 @@ export async function uploadToS3(input: {
     createdAt: nowMs(),
   };
 
-  const result = await getDb().collection("files").insertOne({ _id: fileOid, ...docData } as any);
-  const fileId = result.insertedId.toHexString();
-  logger.info("Storage", `Saved file ${fileId} (${input.fileName})`);
-  return { _id: fileId, ...docData } as unknown as FileDoc;
+  await getDb().collection("files").insertOne({ _id: fileOid, ...docData } as any);
+  logger.info("Storage", `Saved file ${fileOid.toHexString()} (${input.fileName})`);
+  return { _id: fileOid, ...docData };
 }
 
 // ── Download raw bytes ───────────────────────────────────────

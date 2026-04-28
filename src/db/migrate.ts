@@ -21,6 +21,8 @@ export async function runMigrations(): Promise<void> {
     "tenant_roles",
     "tenant_users",
     "tenants",
+    "web_sessions",
+    "web_users",
     "workflow_instances",
     "workflow_templates",
   ];
@@ -50,6 +52,11 @@ export async function runMigrations(): Promise<void> {
   await db.collection("bot_docs").createIndex({ tenantId: 1 });
   await db.collection("permission_requests").createIndex({ tenantId: 1, status: 1 });
   await db.collection("super_admins").createIndex({ platform: 1, platformUserId: 1 });
+  await db.collection("web_sessions").createIndex({ webUserId: 1 });
+  await db.collection("web_sessions").createIndex({ expiresAt: 1 });
+  await db.collection("web_users").createIndex({ username: 1 }, { unique: true });
+  await db.collection("web_users").createIndex({ tenantId: 1 });
+  await db.collection("web_users").createIndex({ linkedChannel: 1, linkedChannelUserId: 1 });
 
   logger.info("DB", `Migrations complete — ${required.length} collections ensured`);
 }

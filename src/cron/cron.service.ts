@@ -6,14 +6,16 @@ import { getSkill } from "../skills/_registry.js";
 import type { SkillContext } from "../skills/_types.js";
 import { nowMs } from "../utils/clock.js";
 import { logger } from "../utils/logger.js";
+import { nextRunAt as nextFromCron } from "./cron-schedule.js";
 
 /**
- * Simple cron service: ticks every `config.CRON_TICK_MS` ms,
+ * Cron service: ticks every `config.CRON_TICK_MS` ms,
  * finds jobs whose `nextRunAt` is due, runs the associated skill,
  * and updates `lastRunAt` / `nextRunAt` / `runCount`.
  *
- * nextRunAt scheduling is naive (+intervalMs) — a real cron parser
- * can be plugged in later by replacing computeNextRun().
+ * nextRunAt is computed from the job's cron expression via cron-parser.
+ * Jobs with invalid schedules are flipped to status="error" so they
+ * stop firing until a human fixes them.
  */
 export class CronService {
   private timer: ReturnType<typeof setTimeout> | null = null;
@@ -70,7 +72,7 @@ export class CronService {
     const skill = getSkill(job.action);
     if (!skill) {
       logger.warn("Cron", `Job "${job.name}" references unknown skill "${job.action}"`);
-      await this.markDone(String(job._id), now, `error: unknown skill ${job.action}`);
+      await this.markDone(job, now, `error: unknown skill ${job.action}`);
       return;
     }
 
@@ -91,26 +93,45 @@ export class CronService {
         ? `error: ${result.content[0]?.text ?? "unknown"}`
         : "ok";
       logger.info("Cron", `Job "${job.name}" ran → ${summary}`);
-      await this.markDone(String(job._id), now, summary);
+      await this.markDone(job, now, summary);
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       logger.error("Cron", `Job "${job.name}" threw: ${msg}`, error);
-      await this.markDone(String(job._id), now, `error: ${msg}`);
+      await this.markDone(job, now, `error: ${msg}`);
     }
   }
 
   private async markDone(
-    jobId: string,
+    job: CronJobDoc,
     ranAt: number,
     lastResult: string
   ): Promise<void> {
-    // Simple requeue: next run in ~1 minute (12 × tick interval)
-    const nextRunAt = ranAt + this.config.CRON_TICK_MS * 12;
+    let next: number;
+    try {
+      next = nextFromCron(job.schedule, ranAt);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      logger.error("Cron", `Job "${job.name}" has invalid schedule "${job.schedule}": ${msg}`);
+      // Disable the job so it doesn't keep firing — user can fix and reactivate.
+      await this.db.collection("cron_jobs").updateOne(
+        { _id: new ObjectId(String(job._id)) },
+        {
+          $set: {
+            lastRunAt: ranAt,
+            lastResult: `invalid schedule: ${msg}`.slice(0, 500),
+            status: "error",
+            updatedAt: nowMs(),
+          },
+          $inc: { runCount: 1 },
+        }
+      );
+      return;
+    }
 
     await this.db.collection("cron_jobs").updateOne(
-      { _id: new ObjectId(jobId) },
+      { _id: new ObjectId(String(job._id)) },
       {
-        $set: { lastRunAt: ranAt, nextRunAt, lastResult: lastResult.slice(0, 500), updatedAt: nowMs() },
+        $set: { lastRunAt: ranAt, nextRunAt: next, lastResult: lastResult.slice(0, 500), updatedAt: nowMs() },
         $inc: { runCount: 1 },
       }
     );
