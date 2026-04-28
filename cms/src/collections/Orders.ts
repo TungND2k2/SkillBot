@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 import { generateOrderCode } from "../hooks/orders/generate-code";
 import { computeOrderTotals } from "../hooks/orders/compute-totals";
 import { validateOrderAdvance } from "../hooks/orders/advance-gate";
+import { trackStageTiming } from "../hooks/orders/track-stage-timing";
 
 /**
  * Orders — đơn hàng xuất khẩu trẻ em.
@@ -40,7 +41,12 @@ export const Orders: CollectionConfig = {
     delete: ({ req: { user } }) => user?.role === "admin",
   },
   hooks: {
-    beforeChange: [generateOrderCode, computeOrderTotals, validateOrderAdvance],
+    beforeChange: [
+      generateOrderCode,
+      computeOrderTotals,
+      validateOrderAdvance,
+      trackStageTiming,
+    ],
   },
   fields: [
     // ── Bước B1: Nhận đơn ─────────────────────────────────────
@@ -366,6 +372,48 @@ export const Orders: CollectionConfig = {
               label: "Phụ trách bước hiện tại",
               type: "relationship",
               relationTo: "users",
+            },
+            {
+              type: "row",
+              fields: [
+                {
+                  name: "stageStartedAt",
+                  label: "Vào bước hiện tại lúc",
+                  type: "date",
+                  admin: {
+                    width: "50%",
+                    readOnly: true,
+                    description: "Tự cập nhật mỗi lần đổi status",
+                    date: { pickerAppearance: "dayAndTime" },
+                  },
+                },
+                {
+                  name: "expectedStageEndAt",
+                  label: "Hạn dự kiến bước này",
+                  type: "date",
+                  admin: {
+                    width: "50%",
+                    description: "Tự tính từ stageStartedAt + durationDays của workflow",
+                    date: { pickerAppearance: "dayOnly" },
+                  },
+                },
+              ],
+            },
+            {
+              name: "remindersSent",
+              label: "Đã gửi nhắc",
+              type: "array",
+              admin: {
+                readOnly: true,
+                description: "Cron worker dùng để dedupe — không spam cùng 1 reminder",
+                initCollapsed: true,
+              },
+              fields: [
+                { name: "stageCode", type: "text" },
+                { name: "atDay", type: "number" },
+                { name: "kind", type: "text" },
+                { name: "sentAt", type: "date" },
+              ],
             },
           ],
         },
