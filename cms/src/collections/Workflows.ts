@@ -76,6 +76,35 @@ export const Workflows: CollectionConfig = {
       type: "checkbox",
       defaultValue: true,
     },
+    {
+      type: "ui",
+      name: "stagesDiagram",
+      admin: {
+        components: {
+          Field: "/components/admin/WorkflowDiagram",
+        },
+      },
+    },
+    {
+      name: "stages",
+      label: "Các bước thuộc workflow này",
+      type: "join",
+      collection: "workflow-stages",
+      on: "workflow",
+      defaultSort: "order",
+      admin: {
+        defaultColumns: [
+          "order",
+          "code",
+          "name",
+          "durationDays",
+          "responsibleRole",
+          "isActive",
+        ],
+        description:
+          "Click vào bước để chỉnh sửa, hoặc bấm 'Create New' để thêm bước mới (nhớ chọn workflow này).",
+      },
+    },
   ],
   timestamps: true,
 };
