@@ -33,6 +33,13 @@ interface StageDoc {
   durationDays?: number;
   responsibleRole: string;
   reminders?: ReminderConfig[];
+  workflow?: string | { id: string };
+}
+
+interface WorkflowDoc {
+  id: string;
+  slug: string;
+  isDefault?: boolean;
 }
 
 interface ReminderSent {
@@ -51,6 +58,7 @@ interface OrderDoc {
   salesperson?: string | UserDoc;
   assignedTo?: string | UserDoc;
   remindersSent?: ReminderSent[];
+  workflow?: string | { id: string };
 }
 
 const ACTIVE_STATUSES = ["b1", "b2", "b3", "b4", "b5", "b6"];
@@ -162,8 +170,8 @@ export async function runOrderReminders({
   let processedOrders = 0;
 
   try {
-    // 1. Fetch active orders + workflow stages
-    const [ordersRes, stagesRes] = await Promise.all([
+    // 1. Fetch active orders + workflow stages + default workflow
+    const [ordersRes, stagesRes, defaultWfRes] = await Promise.all([
       payload.request<{ docs: OrderDoc[]; totalDocs: number }>("/api/orders", {
         query: {
           where: { status: { in: ACTIVE_STATUSES } },
@@ -172,15 +180,36 @@ export async function runOrderReminders({
         },
       }),
       payload.request<{ docs: StageDoc[] }>("/api/workflow-stages", {
-        query: { limit: 50 },
+        query: { limit: 100, depth: 0 },
+      }),
+      payload.request<{ docs: WorkflowDoc[] }>("/api/workflows", {
+        query: { where: { isDefault: { equals: true } }, limit: 1, depth: 0 },
       }),
     ]);
 
-    const stageByCode = new Map(stagesRes.docs.map((s) => [s.code, s]));
+    // Index stages: workflowId → code → stage
+    const stageByWorkflowAndCode = new Map<string, Map<string, StageDoc>>();
+    for (const s of stagesRes.docs) {
+      const wfId =
+        typeof s.workflow === "string" ? s.workflow : s.workflow?.id;
+      if (!wfId) continue;
+      let inner = stageByWorkflowAndCode.get(wfId);
+      if (!inner) {
+        inner = new Map();
+        stageByWorkflowAndCode.set(wfId, inner);
+      }
+      inner.set(s.code, s);
+    }
+    const defaultWfId = defaultWfRes.docs[0]?.id;
 
     for (const order of ordersRes.docs) {
       processedOrders += 1;
-      const stage = stageByCode.get(order.status);
+      const orderWfId =
+        (typeof order.workflow === "string"
+          ? order.workflow
+          : order.workflow?.id) ?? defaultWfId;
+      if (!orderWfId) continue;
+      const stage = stageByWorkflowAndCode.get(orderWfId)?.get(order.status);
       if (!stage || !stage.reminders || stage.reminders.length === 0) continue;
       if (!order.stageStartedAt) continue;
 
