@@ -124,6 +124,9 @@ export default buildConfig({
     // và S3_ACCESS_KEY_ID / S3_SECRET_ACCESS_KEY (chuẩn AWS SDK env names).
     s3Storage({
       enabled: !!process.env.S3_BUCKET,
+      // Bật presigned URL — browser upload thẳng lên S3, bypass Next.js
+      // bodyParser limit. Cần bucket có CORS allow origin = admin domain.
+      clientUploads: true,
       collections: {
         media: {
           // URL trỏ thẳng bucket, không proxy qua Payload.
