@@ -470,89 +470,63 @@ export const Orders: CollectionConfig = {
           ],
         },
 
-        // ── Trạng thái workflow ────────────────────────────
-        {
-          label: "Trạng thái",
-          fields: [
-            {
-              name: "status",
-              label: "Bước hiện tại",
-              type: "select",
-              required: true,
-              defaultValue: "b1",
-              options: [
-                { label: "B1 — Nhận đơn", value: "b1" },
-                { label: "B2 — Tính định mức", value: "b2" },
-                { label: "B3 — Mua nguyên liệu", value: "b3" },
-                { label: "B4 — Gửi NCC", value: "b4" },
-                { label: "B5 — Sản xuất", value: "b5" },
-                { label: "B6 — QC & Giao", value: "b6" },
-                { label: "✅ Hoàn thành", value: "done" },
-                { label: "⏸ Tạm dừng", value: "paused" },
-                { label: "❌ Hủy", value: "cancelled" },
-              ],
-            },
-            {
-              name: "assignedTo",
-              label: "Phụ trách bước hiện tại",
-              type: "relationship",
-              relationTo: "users",
-            },
-            {
-              name: "workflow",
-              label: "Quy trình áp dụng",
-              type: "relationship",
-              relationTo: "workflows",
-              admin: {
-                description: "Quy trình đơn này dùng — bỏ trống = quy trình mặc định",
-              },
-            },
-            {
-              type: "row",
-              fields: [
-                {
-                  name: "stageStartedAt",
-                  label: "Vào bước hiện tại lúc",
-                  type: "date",
-                  admin: {
-                    width: "50%",
-                    readOnly: true,
-                    description: "Tự cập nhật mỗi lần đổi status",
-                    date: { pickerAppearance: "dayAndTime" },
-                  },
-                },
-                {
-                  name: "expectedStageEndAt",
-                  label: "Hạn dự kiến bước này",
-                  type: "date",
-                  admin: {
-                    width: "50%",
-                    readOnly: true,
-                    description:
-                      "Tự tính = stageStartedAt + stage.durationDays. Đổi qua admin sẽ bị ghi đè khi status đổi lần sau.",
-                    date: { pickerAppearance: "dayOnly" },
-                  },
-                },
-              ],
-            },
-            {
-              name: "remindersSent",
-              label: "Đã gửi nhắc",
-              type: "array",
-              admin: {
-                readOnly: true,
-                description: "Cron worker dùng để dedupe — không spam cùng 1 reminder",
-                initCollapsed: true,
-              },
-              fields: [
-                { name: "stageCode", type: "text" },
-                { name: "atDay", type: "number" },
-                { name: "kind", type: "text" },
-                { name: "sentAt", type: "date" },
-              ],
-            },
-          ],
-        },
+      ],
+    },
+
+    // ── Sidebar: status + assignedTo (luôn hiện bên phải khi edit đơn) ──
+    {
+      name: "status",
+      label: "Bước hiện tại",
+      type: "select",
+      required: true,
+      defaultValue: "b1",
+      admin: { position: "sidebar" },
+      options: [
+        { label: "B1 — Nhận đơn", value: "b1" },
+        { label: "B2 — Tính định mức", value: "b2" },
+        { label: "B3 — Mua nguyên liệu", value: "b3" },
+        { label: "B4 — Gửi NCC", value: "b4" },
+        { label: "B5 — Sản xuất", value: "b5" },
+        { label: "B6 — QC & Giao", value: "b6" },
+        { label: "✅ Hoàn thành", value: "done" },
+        { label: "⏸ Tạm dừng", value: "paused" },
+        { label: "❌ Hủy", value: "cancelled" },
+      ],
+    },
+    {
+      name: "assignedTo",
+      label: "Phụ trách bước",
+      type: "relationship",
+      relationTo: "users",
+      admin: { position: "sidebar" },
+    },
+
+    // ── Hidden — workflow tự link, timing tự compute, reminders dedupe ──
+    {
+      name: "workflow",
+      type: "relationship",
+      relationTo: "workflows",
+      admin: { hidden: true },
+    },
+    {
+      name: "stageStartedAt",
+      type: "date",
+      admin: { hidden: true },
+    },
+    {
+      name: "expectedStageEndAt",
+      type: "date",
+      admin: { hidden: true },
+    },
+    {
+      name: "remindersSent",
+      type: "array",
+      admin: { hidden: true },
+      fields: [
+        { name: "stageCode", type: "text" },
+        { name: "atDay", type: "number" },
+        { name: "kind", type: "text" },
+        { name: "sentAt", type: "date" },
       ],
     },
   ],
