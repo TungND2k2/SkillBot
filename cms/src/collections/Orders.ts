@@ -357,6 +357,119 @@ export const Orders: CollectionConfig = {
           ],
         },
 
+        // ── Tab "Nhà cung cấp" ─────────────────────────────
+        {
+          label: "Nhà cung cấp",
+          fields: [
+            {
+              name: "suppliers",
+              label: "NCC cấu hình cho đơn này",
+              type: "array",
+              admin: {
+                description:
+                  "Cấu hình tất cả NCC sử dụng cho đơn (vải chính, vải phụ, NPL, xưởng thêu, xưởng may, in vải, vận chuyển). " +
+                  "Cron sẽ DM Telegram nhắc Sales mỗi 2 giờ nếu còn thiếu role bắt buộc (vải chính, NPL, xưởng thêu, xưởng may).",
+                initCollapsed: false,
+              },
+              fields: [
+                {
+                  type: "row",
+                  fields: [
+                    {
+                      name: "role",
+                      label: "Vai trò",
+                      type: "select",
+                      required: true,
+                      options: [
+                        { label: "🧵 Vải chính", value: "fabric_main" },
+                        { label: "🧶 Vải phụ (lót, bèo)", value: "fabric_secondary" },
+                        { label: "🔘 NPL (ren, cúc, ruy băng)", value: "accessory" },
+                        { label: "🎨 Xưởng thêu", value: "embroidery" },
+                        { label: "✂️ Xưởng may", value: "sewing" },
+                        { label: "🖨 In vải", value: "fabric_printing" },
+                        { label: "🚚 Vận chuyển", value: "logistics" },
+                      ],
+                      admin: { width: "30%" },
+                    },
+                    {
+                      name: "supplier",
+                      label: "NCC",
+                      type: "relationship",
+                      relationTo: "suppliers",
+                      required: true,
+                      admin: { width: "70%" },
+                    },
+                  ],
+                },
+                {
+                  name: "notes",
+                  label: "Ghi chú riêng cho NCC này",
+                  type: "textarea",
+                  admin: { rows: 2 },
+                },
+                {
+                  name: "files",
+                  label: "📎 File / Ảnh",
+                  type: "array",
+                  admin: {
+                    description:
+                      "Mẫu vải, ảnh thêu/may cập nhật, ảnh QC, bằng chứng giao, ...",
+                  },
+                  fields: [
+                    {
+                      type: "row",
+                      fields: [
+                        {
+                          name: "kind",
+                          label: "Loại",
+                          type: "select",
+                          required: true,
+                          options: [
+                            { label: "🧵 Ảnh vải đã nhận", value: "fabric_received" },
+                            { label: "🎴 Mẫu vải swatch", value: "fabric_swatch" },
+                            { label: "🎨 Ảnh thêu cập nhật", value: "embroidery_progress" },
+                            { label: "🎨 Mẫu thêu duyệt", value: "embroidery_sample" },
+                            { label: "✂️ Ảnh may cập nhật", value: "sewing_progress" },
+                            { label: "✂️ Mẫu may duyệt", value: "sewing_sample" },
+                            { label: "✅ QC ảnh kiểm tra", value: "qc_photo" },
+                            { label: "🚚 Bằng chứng giao", value: "delivery_proof" },
+                            { label: "📄 Tài liệu khác", value: "other" },
+                          ],
+                          admin: { width: "33%" },
+                        },
+                        {
+                          name: "file",
+                          label: "File",
+                          type: "upload",
+                          relationTo: "media",
+                          required: true,
+                          admin: { width: "67%" },
+                        },
+                      ],
+                    },
+                    {
+                      name: "notes",
+                      label: "Ghi chú",
+                      type: "text",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              name: "supplierLastWarnedAt",
+              label: "Cảnh báo NCC thiếu — gửi lần cuối",
+              type: "date",
+              admin: {
+                readOnly: true,
+                description:
+                  "Cron dùng để dedupe — không spam Sales hơn 1 lần / 2 giờ.",
+                date: { pickerAppearance: "dayAndTime" },
+              },
+            },
+          ],
+        },
+
         // ── Trạng thái workflow ────────────────────────────
         {
           label: "Trạng thái",

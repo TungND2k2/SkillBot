@@ -11,6 +11,7 @@ import type { PayloadFindResponse } from "../payload/types.js";
 import type { TelegramChannel } from "../telegram/channel.js";
 import { runOrderReminders } from "./order-reminders.js";
 import { runCalendarReminders } from "./calendar-reminders.js";
+import { runMissingSupplierWarnings } from "./missing-suppliers.js";
 
 interface InventoryRow {
   id: string;
@@ -142,6 +143,12 @@ export function buildCronJobs(opts: BuildCronJobsOptions = {}): CronJob[] {
       name: "calendar-reminders",
       schedule: "*/5 * * * *", // mỗi 5 phút — calendar event granularity
       run: () => runCalendarReminders({ telegram: tg, adminChatId: adminChat }),
+    });
+    jobs.push({
+      name: "missing-supplier-warnings",
+      schedule: "25 * * * *", // mỗi giờ phút thứ 25 (lệch các cron khác)
+      run: () =>
+        runMissingSupplierWarnings({ telegram: tg, adminChatId: adminChat }),
     });
   }
 
