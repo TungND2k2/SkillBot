@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { ownerField, setOwnerOnCreate, readSameOrg } from "../access/owner";
 
 /**
  * Nhà cung cấp / đối tác hỗ trợ sản xuất.
@@ -23,14 +24,18 @@ export const Suppliers: CollectionConfig = {
     listSearchableFields: ["code", "name", "specialty", "phone"],
   },
   access: {
-    read: ({ req: { user } }) => !!user,
+    read: readSameOrg,
     create: ({ req: { user } }) =>
       ["admin", "manager", "planner"].includes(user?.role ?? ""),
     update: ({ req: { user } }) =>
       ["admin", "manager", "planner"].includes(user?.role ?? ""),
     delete: ({ req: { user } }) => user?.role === "admin",
   },
+  hooks: {
+    beforeChange: [setOwnerOnCreate],
+  },
   fields: [
+    ownerField,
     {
       type: "row",
       fields: [

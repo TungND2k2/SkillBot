@@ -1,4 +1,10 @@
 import type { CollectionConfig } from "payload";
+import {
+  ownerField,
+  setOwnerOnCreate,
+  readByOwnerScoped,
+  updateByOwnerScoped,
+} from "../access/owner";
 
 /**
  * Customers — khách đặt hàng. Lưu để auto-fill thông tin khi tạo Order
@@ -13,14 +19,19 @@ export const Customers: CollectionConfig = {
     group: "Đối tác",
   },
   access: {
-    read: ({ req: { user } }) => !!user,
+    // Sales chỉ thấy khách mình tạo (privacy giữa các sales);
+    // manager/admin/accountant thấy hết.
+    read: readByOwnerScoped(),
     create: ({ req: { user } }) =>
       ["admin", "manager", "salesperson"].includes(user?.role ?? ""),
-    update: ({ req: { user } }) =>
-      ["admin", "manager", "salesperson"].includes(user?.role ?? ""),
+    update: updateByOwnerScoped({ creators: ["salesperson"] }),
     delete: ({ req: { user } }) => user?.role === "admin",
   },
+  hooks: {
+    beforeChange: [setOwnerOnCreate],
+  },
   fields: [
+    ownerField,
     {
       name: "name",
       label: "Tên / Brand",

@@ -3,6 +3,12 @@ import { generateOrderCode } from "../hooks/orders/generate-code";
 import { computeOrderTotals } from "../hooks/orders/compute-totals";
 import { validateOrderAdvance } from "../hooks/orders/advance-gate";
 import { trackStageTiming } from "../hooks/orders/track-stage-timing";
+import {
+  ownerField,
+  setOwnerOnCreate,
+  readByOwnerScoped,
+  updateByOwnerScoped,
+} from "../access/owner";
 
 /**
  * Orders — đơn hàng xuất khẩu trẻ em.
@@ -33,15 +39,20 @@ export const Orders: CollectionConfig = {
     group: "Sản xuất",
   },
   access: {
-    read: ({ req: { user } }) => !!user,
+    // sales chỉ thấy đơn của mình; manager/admin/accountant thấy hết
+    read: readByOwnerScoped({ alsoOwnedVia: ["salesperson", "assignedTo"] }),
     create: ({ req: { user } }) =>
       ["admin", "manager", "salesperson", "planner"].includes(user?.role ?? ""),
-    update: ({ req: { user } }) =>
-      ["admin", "manager", "salesperson", "planner", "accountant"].includes(user?.role ?? ""),
+    update: updateByOwnerScoped({
+      creators: ["salesperson", "planner"],
+      alsoOwnedVia: ["salesperson", "assignedTo"],
+      alwaysCanUpdate: ["accountant"], // kế toán update đặt cọc bất kỳ đơn nào
+    }),
     delete: ({ req: { user } }) => user?.role === "admin",
   },
   hooks: {
     beforeChange: [
+      setOwnerOnCreate,
       generateOrderCode,
       computeOrderTotals,
       validateOrderAdvance,
@@ -49,6 +60,7 @@ export const Orders: CollectionConfig = {
     ],
   },
   fields: [
+    ownerField,
     // ── Bước B1: Nhận đơn ─────────────────────────────────────
     {
       type: "tabs",

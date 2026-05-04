@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { ownerField, setOwnerOnCreate, readSameOrg } from "../access/owner";
 
 /**
  * Tồn kho theo từng mã vải.
@@ -15,7 +16,7 @@ export const Inventory: CollectionConfig = {
     group: "Sản xuất",
   },
   access: {
-    read: ({ req: { user } }) => !!user,
+    read: readSameOrg, // tồn kho dùng chung — kế toán + storage + planner đều xem
     create: ({ req: { user } }) =>
       ["admin", "manager", "planner", "storage"].includes(user?.role ?? ""),
     update: ({ req: { user } }) =>
@@ -23,6 +24,7 @@ export const Inventory: CollectionConfig = {
     delete: ({ req: { user } }) => user?.role === "admin",
   },
   fields: [
+    ownerField,
     {
       name: "fabric",
       label: "Vải",
@@ -74,6 +76,7 @@ export const Inventory: CollectionConfig = {
   timestamps: true,
   hooks: {
     beforeChange: [
+      setOwnerOnCreate,
       ({ data }) => {
         const qty = Number(data?.quantityM ?? 0);
         const min = Number(data?.minLevel ?? 0);

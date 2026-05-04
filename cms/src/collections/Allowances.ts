@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { ownerField, setOwnerOnCreate, readSameOrg } from "../access/owner";
 
 /**
  * Định mức vải cho từng đơn × mã vải.
@@ -23,7 +24,7 @@ export const Allowances: CollectionConfig = {
     group: "Sản xuất",
   },
   access: {
-    read: ({ req: { user } }) => !!user,
+    read: readSameOrg,
     create: ({ req: { user } }) =>
       ["admin", "manager", "planner"].includes(user?.role ?? ""),
     update: ({ req: { user } }) =>
@@ -31,6 +32,7 @@ export const Allowances: CollectionConfig = {
     delete: ({ req: { user } }) => user?.role === "admin",
   },
   fields: [
+    ownerField,
     {
       name: "order",
       label: "Đơn hàng",
@@ -95,6 +97,7 @@ export const Allowances: CollectionConfig = {
   timestamps: true,
   hooks: {
     beforeChange: [
+      setOwnerOnCreate,
       async ({ data, req }) => {
         const tech = Number(data?.technicalQty ?? 0);
         const wastage = Number(data?.wastagePercent ?? 0);

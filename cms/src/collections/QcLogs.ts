@@ -1,4 +1,10 @@
 import type { CollectionConfig } from "payload";
+import {
+  ownerField,
+  setOwnerOnCreate,
+  readByOwnerScoped,
+  updateByOwnerScoped,
+} from "../access/owner";
 
 /**
  * QC Log — kết quả kiểm tra chất lượng theo từng lô của 1 đơn hàng.
@@ -22,14 +28,19 @@ export const QcLogs: CollectionConfig = {
     group: "Sản xuất",
   },
   access: {
-    read: ({ req: { user } }) => !!user,
+    // QC chỉ thấy log mình tạo + log của đơn mình inspect.
+    // Manager/admin/accountant thấy hết.
+    read: readByOwnerScoped({ alsoOwnedVia: ["inspector"] }),
     create: ({ req: { user } }) =>
       ["admin", "manager", "qc"].includes(user?.role ?? ""),
-    update: ({ req: { user } }) =>
-      ["admin", "manager", "qc"].includes(user?.role ?? ""),
+    update: updateByOwnerScoped({
+      creators: ["qc"],
+      alsoOwnedVia: ["inspector"],
+    }),
     delete: ({ req: { user } }) => user?.role === "admin",
   },
   fields: [
+    ownerField,
     {
       name: "order",
       label: "Đơn hàng",
@@ -103,6 +114,7 @@ export const QcLogs: CollectionConfig = {
   timestamps: true,
   hooks: {
     beforeChange: [
+      setOwnerOnCreate,
       ({ data }) => {
         const inspected = Number(data?.inspectedQty ?? 0);
         const defects = Number(data?.defectCount ?? 0);

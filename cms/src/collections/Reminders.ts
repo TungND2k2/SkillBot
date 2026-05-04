@@ -1,4 +1,10 @@
 import type { CollectionConfig } from "payload";
+import {
+  ownerField,
+  setOwnerOnCreate,
+  readByOwnerScoped,
+  updateByOwnerScoped,
+} from "../access/owner";
 
 /**
  * Reminders — lịch nhắc tự do (calendar event).
@@ -26,15 +32,22 @@ export const Reminders: CollectionConfig = {
   },
   defaultSort: "dueAt",
   access: {
-    read: ({ req: { user } }) => !!user,
+    // Mọi user thấy reminder mình tạo + reminder gửi cho mình.
+    // Manager/admin thấy hết để debug lịch.
+    read: readByOwnerScoped({ alsoOwnedVia: ["recipients"] }),
     create: ({ req: { user } }) =>
       ["admin", "manager", "planner", "salesperson", "qc"].includes(user?.role ?? ""),
-    update: ({ req: { user } }) =>
-      ["admin", "manager", "planner", "salesperson", "qc"].includes(user?.role ?? ""),
+    update: updateByOwnerScoped({
+      creators: ["planner", "salesperson", "qc"],
+    }),
     delete: ({ req: { user } }) =>
       ["admin", "manager"].includes(user?.role ?? ""),
   },
+  hooks: {
+    beforeChange: [setOwnerOnCreate],
+  },
   fields: [
+    ownerField,
     {
       name: "title",
       label: "Tiêu đề",

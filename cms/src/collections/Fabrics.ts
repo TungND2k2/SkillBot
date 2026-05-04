@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
+import { ownerField, setOwnerOnCreate, readSameOrg } from "../access/owner";
 
-/** Mã vải đang sử dụng. */
+/** Mã vải đang sử dụng. Shared production data — ai trong org đều xem. */
 export const Fabrics: CollectionConfig = {
   slug: "fabrics",
   labels: { singular: "Mã vải", plural: "Mã vải" },
@@ -10,14 +11,18 @@ export const Fabrics: CollectionConfig = {
     group: "Sản xuất",
   },
   access: {
-    read: ({ req: { user } }) => !!user,
+    read: readSameOrg, // production data — toàn bộ user đều xem
     create: ({ req: { user } }) =>
       ["admin", "manager", "planner"].includes(user?.role ?? ""),
     update: ({ req: { user } }) =>
       ["admin", "manager", "planner"].includes(user?.role ?? ""),
     delete: ({ req: { user } }) => user?.role === "admin",
   },
+  hooks: {
+    beforeChange: [setOwnerOnCreate],
+  },
   fields: [
+    ownerField,
     {
       name: "code",
       label: "Mã vải",
