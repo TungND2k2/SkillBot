@@ -402,7 +402,9 @@ export const Orders: CollectionConfig = {
                   type: "date",
                   admin: {
                     width: "50%",
-                    description: "Tự tính từ stageStartedAt + durationDays của workflow",
+                    readOnly: true,
+                    description:
+                      "Tự tính = stageStartedAt + stage.durationDays. Đổi qua admin sẽ bị ghi đè khi status đổi lần sau.",
                     date: { pickerAppearance: "dayOnly" },
                   },
                 },
