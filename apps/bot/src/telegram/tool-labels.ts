@@ -18,6 +18,7 @@ const ENTITY_LABEL: Record<string, string> = {
   inventory: "tồn kho",
   "qc-logs": "QC log",
   allowances: "định mức vải",
+  reminders: "lịch nhắc",
   forms: "form mẫu",
   "form-submissions": "submissions",
 };
@@ -76,7 +77,7 @@ export function describeToolCall(rawName: string, args: ArgsBag = {}): string {
       case "get":
         return `📄 Xem chi tiết ${label}${args.id ? ` #${args.id}` : ""}`;
       case "create": {
-        const title = pickFilter(args, ["name", "orderCode", "code", "username"]);
+        const title = pickFilter(args, ["title", "name", "orderCode", "code", "username"]);
         return title
           ? `✏️ Tạo ${label} "${title}"`
           : `✏️ Tạo ${label} mới`;

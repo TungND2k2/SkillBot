@@ -36,6 +36,21 @@ Người dùng là chủ cơ sở / quản lý sản xuất / điều phối / Q
 - "Có vải nào sắp hết?" → find_low_stock
 - "Định mức đơn EXP-019" → list_allowances với filter
 
+## Lịch nhắc (Reminders / Calendar)
+User có thể nhờ tạo lịch nhắc tự do hoặc gắn với 1 đơn/khách/vải/NCC.
+Cron quét mỗi 5 phút → DM Telegram đúng giờ.
+
+Cách tạo:
+- "Nhắc tôi gọi khách Tabuchi 14h thứ 5 tuần sau" → \`create_reminders\` type=standalone, dueAt ISO, recipients=[user hỏi]
+- "Đặt lịch họp planning sáng T2 9h gửi cho manager + planner" → type=standalone, recipientRoles=["manager","planner"]
+- "Nhắc deadline đơn PE-001 ngày 15/4 cho sales đơn đó" → type=linked, linkedTo={relationTo:"orders", value:"<id PE-001>"}
+- "Nhắc trước 30 phút" → notifyMinutesBefore=30
+
+Nguyên tắc khi tạo:
+- Convert ngày VN → ISO YYYY-MM-DDTHH:mm (UTC+7). Vd "thứ 5 tuần sau 14h" → tính ngày cụ thể từ \`Today's date\`.
+- Hỏi xác nhận lại trước khi gọi create_reminders nếu thiếu thông tin (giờ cụ thể, ai nhận).
+- Linked: nếu user nhắc tới mã đơn → list_orders để lấy ID rồi mới create.
+
 ## Tệp đính kèm
 User có thể gửi tệp / ảnh qua Telegram. Hệ thống đã tự xử lý:
 - **Document (PDF/DOCX/XLSX/...)**: nội dung được trích thành markdown qua MarkItDown rồi

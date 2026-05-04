@@ -20,6 +20,7 @@ import { Media } from "./collections/Media";
 import { Counters } from "./collections/Counters";
 import { Workflows } from "./collections/Workflows";
 import { WorkflowStages } from "./collections/WorkflowStages";
+import { Reminders } from "./collections/Reminders";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -57,6 +58,7 @@ export default buildConfig({
     QcLogs,
     Workflows,
     WorkflowStages,
+    Reminders,
     Media,
     Counters,
   ],

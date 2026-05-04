@@ -10,6 +10,7 @@ import { payload, PayloadError } from "../payload/client.js";
 import type { PayloadFindResponse } from "../payload/types.js";
 import type { TelegramChannel } from "../telegram/channel.js";
 import { runOrderReminders } from "./order-reminders.js";
+import { runCalendarReminders } from "./calendar-reminders.js";
 
 interface InventoryRow {
   id: string;
@@ -136,6 +137,11 @@ export function buildCronJobs(opts: BuildCronJobsOptions = {}): CronJob[] {
       name: "hourly-order-reminders",
       schedule: "5 * * * *", // mỗi giờ phút thứ 5 (lệch low-stock 5 phút)
       run: () => runOrderReminders({ telegram: tg, adminChatId: adminChat }),
+    });
+    jobs.push({
+      name: "calendar-reminders",
+      schedule: "*/5 * * * *", // mỗi 5 phút — calendar event granularity
+      run: () => runCalendarReminders({ telegram: tg, adminChatId: adminChat }),
     });
   }
 
