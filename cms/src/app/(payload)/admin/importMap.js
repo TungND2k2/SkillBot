@@ -1,3 +1,4 @@
+import { default as default_58e2c239282f21552c0a35e0a8db8a1a } from '../../../components/admin/WorkflowDiagram'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -23,11 +24,12 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { default as default_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { default as default_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
-import { default as default_a1b2c3d4e5f60718293a4b5c6d7e8f90 } from '../../../components/admin/WorkflowDiagram'
+import { default as default_chat_provider_b1c2d3e4f5061718293a4b5c6d7e8f90 } from '../../../components/admin/ChatProvider'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "/components/admin/WorkflowDiagram#default": default_58e2c239282f21552c0a35e0a8db8a1a,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -53,6 +55,6 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/components/admin/Icon#default": default_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#default": default_91a09b539d3c86b0aebf520e7564ce08,
-  "/components/admin/WorkflowDiagram#default": default_a1b2c3d4e5f60718293a4b5c6d7e8f90,
+  "/components/admin/ChatProvider#default": default_chat_provider_b1c2d3e4f5061718293a4b5c6d7e8f90,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

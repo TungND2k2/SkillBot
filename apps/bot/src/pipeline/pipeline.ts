@@ -32,11 +32,20 @@ export type PipelineAttachment =
       buffer: Buffer;
     };
 
+export interface PriorMessage {
+  role: "user" | "assistant";
+  text: string;
+  attachmentNote?: string;
+}
+
 export interface PipelineInput {
   /** Latest user message text (caption khi gửi file, có thể rỗng). */
   message: string;
   /** Files / ảnh user đính kèm cùng message này. */
   attachments?: PipelineAttachment[];
+  /** Lịch sử cuộc trò chuyện (last N turns trong cùng session).
+   *  Stateless pipeline — caller giữ history. */
+  priorMessages?: PriorMessage[];
   /** Optional callback fired each time Claude calls a tool. Receives raw args
    *  để caller có thể format mô tả thân thiện hiển thị cho user. */
   onToolCall?: (toolName: string, args: Record<string, unknown>) => void;
@@ -68,6 +77,7 @@ function preview(s: string, n = 80): string {
 function buildPrompt(
   message: string,
   attachments: PipelineAttachment[],
+  priorMessages: PriorMessage[] = [],
 ): string | AsyncIterable<SDKUserMessage> {
   const docAttachments = attachments.filter(
     (a): a is Extract<PipelineAttachment, { type: "document" }> => a.type === "document",
@@ -83,7 +93,24 @@ function buildPrompt(
     )
     .join("");
 
-  const composedText = (message?.trim() ? message : "(người dùng gửi tệp đính kèm — không kèm chú thích)") + docsText;
+  // Lịch sử cuộc trò chuyện — chèn đầu prompt để Claude có context multi-turn.
+  const historyText =
+    priorMessages.length > 0
+      ? "## Lịch sử trò chuyện gần đây (để tham khảo context)\n" +
+        priorMessages
+          .map((m) => {
+            const tag = m.role === "user" ? "👤 User" : "🤖 You (Assistant)";
+            const att = m.attachmentNote ? ` [${m.attachmentNote}]` : "";
+            return `${tag}${att}: ${m.text}`;
+          })
+          .join("\n\n") +
+        "\n\n## Tin nhắn hiện tại\n"
+      : "";
+
+  const userText = message?.trim()
+    ? message
+    : "(người dùng gửi tệp đính kèm — không kèm chú thích)";
+  const composedText = historyText + userText + docsText;
 
   if (imageAttachments.length === 0) {
     return composedText;
@@ -143,7 +170,7 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
 
   try {
     const q = query({
-      prompt: buildPrompt(input.message, attachments),
+      prompt: buildPrompt(input.message, attachments, input.priorMessages ?? []),
       options: {
         systemPrompt: SYSTEM_PROMPT,
         mcpServers: { skillbot: mcpServer },

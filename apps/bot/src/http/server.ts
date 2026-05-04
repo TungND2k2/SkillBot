@@ -21,6 +21,7 @@ import { extractBrief } from "../extraction/brief.js";
 import { compareDocuments } from "../extraction/compare.js";
 import { verifyConfirmationImage } from "../extraction/verify-image.js";
 import type { InvoiceExtract, BriefExtract } from "../extraction/types.js";
+import { registerChatRoutes } from "./chat.js";
 
 export interface HttpServerHandle {
   stop: () => Promise<void>;
@@ -49,6 +50,9 @@ export function startHttpServer(): HttpServerHandle {
 
   // ── Health ──────────────────────────────────────────────────
   app.get("/health", (c) => c.json({ ok: true, ts: Date.now() }));
+
+  // ── Web chat (SSE streaming) ─────────────────────────────────
+  registerChatRoutes(app);
 
   // ── Extract invoice ─────────────────────────────────────────
   const invoiceSchema = z.object({

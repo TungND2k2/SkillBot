@@ -72,9 +72,9 @@ export const WorkflowDiagram: React.FC = () => {
   if (!id) {
     return (
       <Hint>
-        Lưu workflow trước để bắt đầu cấu hình các bước. Sau khi lưu, bạn có thể
+        Lưu quy trình trước để bắt đầu cấu hình các bước. Sau khi lưu, bạn có thể
         thêm các bước (B1, B2, ...) ở bên dưới hoặc trong collection
-        <em> Workflow đơn hàng</em>.
+        <em> Bước quy trình</em>.
       </Hint>
     );
   }
@@ -85,7 +85,7 @@ export const WorkflowDiagram: React.FC = () => {
   if (stages.length === 0) {
     return (
       <Hint variant="empty">
-        Workflow này chưa có bước nào.{" "}
+        Quy trình này chưa có bước nào.{" "}
         <Link
           href={`/admin/collections/workflow-stages/create?workflow=${id}`}
           style={{ textDecoration: "underline", fontWeight: 500 }}

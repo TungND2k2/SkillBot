@@ -15,7 +15,7 @@ import type { CollectionConfig } from "payload";
  */
 export const WorkflowStages: CollectionConfig = {
   slug: "workflow-stages",
-  labels: { singular: "Bước workflow", plural: "Workflow đơn hàng" },
+  labels: { singular: "Bước quy trình", plural: "Bước quy trình" },
   admin: {
     useAsTitle: "name",
     defaultColumns: ["order", "code", "name", "durationDays", "responsibleRole"],
@@ -31,7 +31,7 @@ export const WorkflowStages: CollectionConfig = {
   fields: [
     {
       name: "workflow",
-      label: "Thuộc workflow",
+      label: "Thuộc quy trình",
       type: "relationship",
       relationTo: "workflows",
       required: true,
@@ -46,7 +46,7 @@ export const WorkflowStages: CollectionConfig = {
           type: "number",
           required: true,
           min: 1,
-          admin: { width: "20%", description: "1, 2, 3, ... (unique trong cùng workflow)" },
+          admin: { width: "20%", description: "1, 2, 3, ... (duy nhất trong cùng quy trình)" },
         },
         {
           name: "code",

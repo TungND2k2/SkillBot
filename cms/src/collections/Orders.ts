@@ -375,11 +375,11 @@ export const Orders: CollectionConfig = {
             },
             {
               name: "workflow",
-              label: "Workflow áp dụng",
+              label: "Quy trình áp dụng",
               type: "relationship",
               relationTo: "workflows",
               admin: {
-                description: "Quy trình đơn này dùng — bỏ trống = workflow mặc định",
+                description: "Quy trình đơn này dùng — bỏ trống = quy trình mặc định",
               },
             },
             {

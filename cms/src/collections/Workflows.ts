@@ -13,7 +13,7 @@ import type { CollectionConfig } from "payload";
  */
 export const Workflows: CollectionConfig = {
   slug: "workflows",
-  labels: { singular: "Workflow", plural: "Workflows" },
+  labels: { singular: "Quy trình", plural: "Quy trình" },
   admin: {
     useAsTitle: "name",
     defaultColumns: ["slug", "name", "domain", "isActive"],
@@ -65,10 +65,10 @@ export const Workflows: CollectionConfig = {
     },
     {
       name: "isDefault",
-      label: "Workflow mặc định",
+      label: "Quy trình mặc định",
       type: "checkbox",
       defaultValue: false,
-      admin: { description: "Đơn mới sẽ tự dùng workflow này nếu user không chọn" },
+      admin: { description: "Đơn mới sẽ tự dùng quy trình này nếu chưa chọn" },
     },
     {
       name: "isActive",
@@ -87,7 +87,7 @@ export const Workflows: CollectionConfig = {
     },
     {
       name: "stages",
-      label: "Các bước thuộc workflow này",
+      label: "Các bước thuộc quy trình này",
       type: "join",
       collection: "workflow-stages",
       on: "workflow",

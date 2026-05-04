@@ -45,6 +45,7 @@ export default buildConfig({
         Icon: "/components/admin/Icon",
         Logo: "/components/admin/Logo",
       },
+      providers: ["/components/admin/ChatProvider"],
     },
   },
   collections: [
