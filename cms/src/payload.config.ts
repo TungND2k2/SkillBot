@@ -62,6 +62,17 @@ export default buildConfig({
     Media,
     Counters,
   ],
+  // Folder cho Media: tạo collection 'payload-folders' tự động, parent self-relation,
+  // admin có folder tree trong list view + file picker.
+  folders: {
+    collectionOverrides: [
+      ({ collection }) => ({
+        ...collection,
+        labels: { singular: "Thư mục", plural: "Thư mục" },
+        admin: { ...collection.admin, group: "Hệ thống" },
+      }),
+    ],
+  },
   plugins: [
     formBuilderPlugin({
       // Manager + admin tự build form qua giao diện kéo thả block

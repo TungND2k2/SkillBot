@@ -9,6 +9,9 @@ import type { CollectionConfig } from "payload";
 export const Media: CollectionConfig = {
   slug: "media",
   labels: { singular: "Tệp tin", plural: "Tệp tin" },
+  // Bật folder tree built-in của Payload v3 — admin tạo/đổi tên/di chuyển folder
+  // qua sidebar, file picker khi upload vào Order cũng thấy tree.
+  folders: true,
   admin: {
     group: "Hệ thống",
     useAsTitle: "filename",
