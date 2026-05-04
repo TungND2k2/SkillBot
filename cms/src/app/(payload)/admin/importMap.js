@@ -25,6 +25,8 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { default as default_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { default as default_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
 import { default as default_chat_provider_b1c2d3e4f5061718293a4b5c6d7e8f90 } from '../../../components/admin/ChatProvider'
+import { default as default_workflow_overview_a7c5e8f3b2d1467890a3b1c2d3e4f506 } from '../../../components/admin/WorkflowOverview'
+import { default as default_workflow_nav_link_b8d6f9e4c3e2578901b4c2d3e4f50617 } from '../../../components/admin/WorkflowNavLink'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { FolderTableCell as FolderTableCell_folders } from '@payloadcms/next/rsc'
 import { FolderField as FolderField_folders } from '@payloadcms/next/rsc'
@@ -60,6 +62,8 @@ export const importMap = {
   "/components/admin/Icon#default": default_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#default": default_91a09b539d3c86b0aebf520e7564ce08,
   "/components/admin/ChatProvider#default": default_chat_provider_b1c2d3e4f5061718293a4b5c6d7e8f90,
+  "/components/admin/WorkflowOverview#default": default_workflow_overview_a7c5e8f3b2d1467890a3b1c2d3e4f506,
+  "/components/admin/WorkflowNavLink#default": default_workflow_nav_link_b8d6f9e4c3e2578901b4c2d3e4f50617,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/next/rsc#FolderTableCell": FolderTableCell_folders,
   "@payloadcms/next/rsc#FolderField": FolderField_folders,

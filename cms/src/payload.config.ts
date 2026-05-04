@@ -47,6 +47,19 @@ export default buildConfig({
         Logo: "/components/admin/Logo",
       },
       providers: ["/components/admin/ChatProvider"],
+      // Nav link "Quy trình" trên sidebar
+      beforeNavLinks: ["/components/admin/WorkflowNavLink"],
+      // Custom view "Quy trình" — read-only diagram cho manager xem flow B1-B6
+      views: {
+        workflowOverview: {
+          Component: "/components/admin/WorkflowOverview",
+          path: "/quy-trinh",
+          meta: {
+            title: "Quy trình sản xuất",
+            description: "Sơ đồ B1 → B6 + chi tiết từng bước",
+          },
+        },
+      },
     },
   },
   collections: [
