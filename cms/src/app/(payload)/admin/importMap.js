@@ -29,6 +29,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 import { FolderTableCell as FolderTableCell_folders } from '@payloadcms/next/rsc'
 import { FolderField as FolderField_folders } from '@payloadcms/next/rsc'
 import { FolderTypeField as FolderTypeField_folders } from '@payloadcms/next/client'
+import { S3ClientUploadHandler as S3ClientUploadHandler_s3storage } from '@payloadcms/storage-s3/client'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -62,5 +63,6 @@ export const importMap = {
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/next/rsc#FolderTableCell": FolderTableCell_folders,
   "@payloadcms/next/rsc#FolderField": FolderField_folders,
-  "@payloadcms/next/client#FolderTypeField": FolderTypeField_folders
+  "@payloadcms/next/client#FolderTypeField": FolderTypeField_folders,
+  "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_s3storage
 }
