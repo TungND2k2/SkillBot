@@ -9,13 +9,7 @@ import { tool } from "@anthropic-ai/claude-agent-sdk";
 import { z } from "zod";
 
 import { payload, PayloadError } from "../payload/client.js";
-
-interface StageDoc {
-  code: string;
-  name: string;
-  durationDays?: number;
-  responsibleRole?: string;
-}
+import { getStage } from "../cron/stages.js";
 
 interface OrderRow {
   id: string;
@@ -78,11 +72,8 @@ Dùng khi user hỏi "đơn X đang sao rồi", "PE5 còn lại mấy ngày", v.
         };
       }
 
-      // Lấy stage config
-      const stagesRes = await payload.request<{ docs: StageDoc[] }>("/api/workflow-stages", {
-        query: { where: { code: { equals: order.status } }, limit: 1 },
-      });
-      const stage = stagesRes.docs[0];
+      // Stage config — đọc từ hard-coded constant, không query DB
+      const stage = getStage(order.status);
 
       const lines = [`📦 Đơn ${order.orderCode} — ${customerName(order.customer)}`];
       lines.push(`Trạng thái: ${order.status.toUpperCase()}${stage ? " — " + stage.name : ""}`);

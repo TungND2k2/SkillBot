@@ -9,6 +9,14 @@ import {
   readByOwnerScoped,
   updateByOwnerScoped,
 } from "../access/owner";
+import { STATUS_SELECT_OPTIONS } from "../lib/workflow-stages";
+
+// Helper: collapsible "B<X>" chỉ hiện khi status đã đến hoặc qua bước đó.
+const reachedB2 = ["b2", "b3", "b4", "b5", "b6", "done"];
+const reachedB3 = ["b3", "b4", "b5", "b6", "done"];
+const reachedB4 = ["b4", "b5", "b6", "done"];
+const reachedB5 = ["b5", "b6", "done"];
+const reachedB6 = ["b6", "done"];
 
 /**
  * Orders — đơn hàng xuất khẩu trẻ em.
@@ -357,7 +365,341 @@ export const Orders: CollectionConfig = {
           ],
         },
 
-        // ── Tab "Nhà cung cấp" ─────────────────────────────
+        // ── Tab "Tiến độ" — collapsibles theo status, NCC + ngày inline ──
+        {
+          label: "Tiến độ",
+          fields: [
+            // ── B2 — Định mức ─────────────────────────────
+            {
+              type: "collapsible",
+              label: "B2 — Tính định mức",
+              admin: {
+                condition: (_, data) => reachedB2.includes(data?.status ?? ""),
+                initCollapsed: false,
+              },
+              fields: [
+                {
+                  name: "fabricAllowances",
+                  label: "Bảng định mức vải",
+                  type: "array",
+                  fields: [
+                    {
+                      type: "row",
+                      fields: [
+                        {
+                          name: "fabric",
+                          label: "Vải",
+                          type: "relationship",
+                          relationTo: "fabrics",
+                          required: true,
+                          admin: { width: "40%" },
+                        },
+                        {
+                          name: "qtyPerPiece",
+                          label: "m / pcs",
+                          type: "number",
+                          required: true,
+                          admin: { width: "20%", step: 0.01 },
+                        },
+                        {
+                          name: "totalQty",
+                          label: "Tổng (m)",
+                          type: "number",
+                          admin: { width: "20%", description: "Tự = qtyPerPiece × SL đơn" },
+                        },
+                        {
+                          name: "kind",
+                          label: "Loại",
+                          type: "select",
+                          defaultValue: "main",
+                          options: [
+                            { label: "Vải chính", value: "main" },
+                            { label: "Vải phụ (lót/bèo)", value: "secondary" },
+                            { label: "NPL", value: "accessory" },
+                          ],
+                          admin: { width: "20%" },
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  type: "row",
+                  fields: [
+                    {
+                      name: "allowanceApprovedAt",
+                      label: "Ngày Manager duyệt",
+                      type: "date",
+                      admin: { width: "50%", date: { pickerAppearance: "dayOnly" } },
+                    },
+                    {
+                      name: "allowanceApprovedBy",
+                      label: "Manager duyệt",
+                      type: "relationship",
+                      relationTo: "users",
+                      filterOptions: () => ({ role: { in: ["manager", "admin"] } }),
+                      admin: { width: "50%" },
+                    },
+                  ],
+                },
+              ],
+            },
+
+            // ── B3 — Mua NL ──────────────────────────────
+            {
+              type: "collapsible",
+              label: "B3 — Mua nguyên liệu",
+              admin: {
+                condition: (_, data) => reachedB3.includes(data?.status ?? ""),
+                initCollapsed: false,
+              },
+              fields: [
+                {
+                  type: "row",
+                  fields: [
+                    {
+                      name: "purchaseStartedAt",
+                      label: "Ngày bắt đầu đặt",
+                      type: "date",
+                      admin: { width: "33%", date: { pickerAppearance: "dayOnly" } },
+                    },
+                    {
+                      name: "purchaseExpectedAt",
+                      label: "Dự kiến nhận",
+                      type: "date",
+                      admin: { width: "33%", date: { pickerAppearance: "dayOnly" } },
+                    },
+                    {
+                      name: "purchaseReceivedAt",
+                      label: "Ngày nhận đủ NL",
+                      type: "date",
+                      admin: { width: "34%", date: { pickerAppearance: "dayOnly" } },
+                    },
+                  ],
+                },
+                {
+                  name: "purchaseInvoiceFile",
+                  label: "Toa NPL / Hoá đơn mua",
+                  type: "upload",
+                  relationTo: "media",
+                },
+                {
+                  name: "purchaseQualityCheck",
+                  label: "Ghi chú kiểm chất lượng vải nhận",
+                  type: "textarea",
+                  admin: {
+                    description:
+                      "Màu / chất / lỗi vải / test giặt với vải lạ — sales note lại để truy vết khi sản xuất.",
+                    rows: 3,
+                  },
+                },
+              ],
+            },
+
+            // ── B4 — Gửi đề bài NCC ────────────────────
+            {
+              type: "collapsible",
+              label: "B4 — Gửi đề bài NCC",
+              admin: {
+                condition: (_, data) => reachedB4.includes(data?.status ?? ""),
+                initCollapsed: false,
+              },
+              fields: [
+                {
+                  type: "row",
+                  fields: [
+                    {
+                      name: "supplierBriefSentAt",
+                      label: "Ngày gửi đề bài",
+                      type: "date",
+                      admin: { width: "50%", date: { pickerAppearance: "dayOnly" } },
+                    },
+                    {
+                      name: "supplierAckAt",
+                      label: "Ngày NCC xác nhận",
+                      type: "date",
+                      admin: { width: "50%", date: { pickerAppearance: "dayOnly" } },
+                    },
+                  ],
+                },
+                {
+                  name: "supplierBriefFile",
+                  label: "File đề bài đã gửi (đầy đủ)",
+                  type: "upload",
+                  relationTo: "media",
+                  admin: {
+                    description:
+                      "Có ảnh thiết kế, mô tả style/vải/thêu/NPL/lining/phụ kiện/deadline.",
+                  },
+                },
+                {
+                  name: "approvalSampleRequired",
+                  label: "Cần làm mẫu duyệt trước (mã lạ/phức tạp)",
+                  type: "checkbox",
+                  defaultValue: false,
+                },
+                {
+                  name: "approvalSampleFile",
+                  label: "Mẫu đã duyệt",
+                  type: "upload",
+                  relationTo: "media",
+                  admin: {
+                    condition: (_, data) =>
+                      Boolean(data?.approvalSampleRequired),
+                  },
+                },
+              ],
+            },
+
+            // ── B5 — Sản xuất (Thêu + May) ──────────────
+            {
+              type: "collapsible",
+              label: "B5 — Sản xuất",
+              admin: {
+                condition: (_, data) => reachedB5.includes(data?.status ?? ""),
+                initCollapsed: false,
+              },
+              fields: [
+                {
+                  name: "productionStartedAt",
+                  label: "Ngày NCC nhận vải",
+                  type: "date",
+                  admin: { date: { pickerAppearance: "dayOnly" } },
+                },
+                {
+                  name: "embroideryUpdates",
+                  label: "Ảnh thêu cập nhật",
+                  type: "array",
+                  admin: {
+                    description:
+                      "Mỗi tuần phải có 1 ảnh — thiếu sẽ bị Telegram nhắc.",
+                  },
+                  fields: [
+                    {
+                      type: "row",
+                      fields: [
+                        {
+                          name: "date",
+                          label: "Ngày",
+                          type: "date",
+                          required: true,
+                          admin: { width: "30%", date: { pickerAppearance: "dayOnly" } },
+                        },
+                        {
+                          name: "photo",
+                          label: "Ảnh",
+                          type: "upload",
+                          relationTo: "media",
+                          required: true,
+                          admin: { width: "70%" },
+                        },
+                      ],
+                    },
+                    { name: "notes", type: "text", label: "Ghi chú" },
+                  ],
+                },
+                {
+                  name: "sewingUpdates",
+                  label: "Ảnh may cập nhật",
+                  type: "array",
+                  admin: { description: "Sau 4 tuần phải có ảnh đầu tiên." },
+                  fields: [
+                    {
+                      type: "row",
+                      fields: [
+                        {
+                          name: "date",
+                          label: "Ngày",
+                          type: "date",
+                          required: true,
+                          admin: { width: "30%", date: { pickerAppearance: "dayOnly" } },
+                        },
+                        {
+                          name: "photo",
+                          label: "Ảnh",
+                          type: "upload",
+                          relationTo: "media",
+                          required: true,
+                          admin: { width: "70%" },
+                        },
+                      ],
+                    },
+                    { name: "notes", type: "text", label: "Ghi chú" },
+                  ],
+                },
+              ],
+            },
+
+            // ── B6 — QC + Giao ──────────────────────────
+            {
+              type: "collapsible",
+              label: "B6 — QC & Giao hàng",
+              admin: {
+                condition: (_, data) => reachedB6.includes(data?.status ?? ""),
+                initCollapsed: false,
+              },
+              fields: [
+                {
+                  type: "row",
+                  fields: [
+                    {
+                      name: "qcDate",
+                      label: "Ngày QC final",
+                      type: "date",
+                      admin: { width: "50%", date: { pickerAppearance: "dayOnly" } },
+                    },
+                    {
+                      name: "qcResult",
+                      label: "Kết quả QC",
+                      type: "select",
+                      options: [
+                        { label: "✅ Đạt", value: "pass" },
+                        { label: "❌ Không đạt — cần sửa", value: "fail" },
+                        { label: "⚠️ Một phần đạt", value: "partial" },
+                      ],
+                      admin: { width: "50%" },
+                    },
+                  ],
+                },
+                {
+                  name: "qcNotes",
+                  label: "Ghi chú QC",
+                  type: "textarea",
+                  admin: {
+                    description:
+                      "Checklist: không bẩn / form / smock / chỉ thừa / nhăn / size / mác.",
+                  },
+                },
+                {
+                  type: "row",
+                  fields: [
+                    {
+                      name: "deliveryDate",
+                      label: "Ngày giao thực tế",
+                      type: "date",
+                      admin: { width: "50%", date: { pickerAppearance: "dayOnly" } },
+                    },
+                    {
+                      name: "trackingNumber",
+                      label: "Mã vận đơn / tracking",
+                      type: "text",
+                      admin: { width: "50%" },
+                    },
+                  ],
+                },
+                {
+                  name: "deliveryProof",
+                  label: "Bằng chứng giao",
+                  type: "upload",
+                  relationTo: "media",
+                },
+              ],
+            },
+          ],
+        },
+
+        // ── Tab "Nhà cung cấp" — array tự do, manager tự pick role + NCC
+        //     khi nào cần (không gắn cứng vào status).
         {
           label: "Nhà cung cấp",
           fields: [
@@ -473,7 +815,7 @@ export const Orders: CollectionConfig = {
       ],
     },
 
-    // ── Sidebar: status + assignedTo (luôn hiện bên phải khi edit đơn) ──
+    // ── Sidebar: status dropdown (manager click chuyển bước) + assignedTo
     {
       name: "status",
       label: "Bước hiện tại",
@@ -481,17 +823,7 @@ export const Orders: CollectionConfig = {
       required: true,
       defaultValue: "b1",
       admin: { position: "sidebar" },
-      options: [
-        { label: "B1 — Nhận đơn", value: "b1" },
-        { label: "B2 — Tính định mức", value: "b2" },
-        { label: "B3 — Mua nguyên liệu", value: "b3" },
-        { label: "B4 — Gửi NCC", value: "b4" },
-        { label: "B5 — Sản xuất", value: "b5" },
-        { label: "B6 — QC & Giao", value: "b6" },
-        { label: "✅ Hoàn thành", value: "done" },
-        { label: "⏸ Tạm dừng", value: "paused" },
-        { label: "❌ Hủy", value: "cancelled" },
-      ],
+      options: STATUS_SELECT_OPTIONS,
     },
     {
       name: "assignedTo",
@@ -501,13 +833,7 @@ export const Orders: CollectionConfig = {
       admin: { position: "sidebar" },
     },
 
-    // ── Hidden — workflow tự link, timing tự compute, reminders dedupe ──
-    {
-      name: "workflow",
-      type: "relationship",
-      relationTo: "workflows",
-      admin: { hidden: true },
-    },
+    // ── Hidden — timing tự compute, reminders dedupe
     {
       name: "stageStartedAt",
       type: "date",
@@ -529,6 +855,7 @@ export const Orders: CollectionConfig = {
         { name: "sentAt", type: "date" },
       ],
     },
+    // Workflow ref đã bỏ — dùng STAGES hard-code, không cần
   ],
   timestamps: true,
 };

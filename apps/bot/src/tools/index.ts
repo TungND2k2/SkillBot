@@ -10,7 +10,7 @@ import { supplierTools } from "./suppliers.tools.js";
 import { inventoryTools } from "./inventory.tools.js";
 import { qcLogTools } from "./qcLogs.tools.js";
 import { allowanceTools } from "./allowances.tools.js";
-import { workflowStageTools } from "./workflow-stages.tools.js";
+// workflow-stages tools deprecated — STAGES hard-coded trong cron/stages.ts
 import { reminderTools } from "./reminders.tools.js";
 
 import { advanceOrderStatus } from "./orders.workflow.js";
@@ -27,7 +27,6 @@ export const allTools = [
   ...inventoryTools,        // 4: no delete
   ...qcLogTools,            // 4: no delete
   ...allowanceTools,        // 5
-  ...workflowStageTools,    // 4: no delete
   ...reminderTools,         // 5: list/get/create/update/delete _reminders
 
   // Form builder integration.

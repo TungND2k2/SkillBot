@@ -20,6 +20,8 @@ export const WorkflowStages: CollectionConfig = {
     useAsTitle: "name",
     defaultColumns: ["order", "code", "name", "durationDays", "responsibleRole"],
     group: "Hệ thống",
+    // Hard-code trong cms/src/lib/workflow-stages.ts — ẩn collection này.
+    hidden: true,
   },
   defaultSort: "order",
   access: {

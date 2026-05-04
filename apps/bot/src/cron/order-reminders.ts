@@ -10,6 +10,7 @@
 import { payload, PayloadError } from "../payload/client.js";
 import { logger } from "../utils/logger.js";
 import type { TelegramChannel } from "../telegram/channel.js";
+import { getStage, ACTIVE_STAGE_CODES } from "./stages.js";
 
 interface UserDoc {
   id: string;
@@ -17,29 +18,6 @@ interface UserDoc {
   displayName?: string;
   role?: string;
   telegramUserId?: string;
-}
-
-interface ReminderConfig {
-  atDay: number;
-  recipients: string[];
-  kind: "checkin" | "overdue" | "critical";
-  message: string;
-}
-
-interface StageDoc {
-  id: string;
-  code: string;
-  name: string;
-  durationDays?: number;
-  responsibleRole: string;
-  reminders?: ReminderConfig[];
-  workflow?: string | { id: string };
-}
-
-interface WorkflowDoc {
-  id: string;
-  slug: string;
-  isDefault?: boolean;
 }
 
 interface ReminderSent {
@@ -58,10 +36,9 @@ interface OrderDoc {
   salesperson?: string | UserDoc;
   assignedTo?: string | UserDoc;
   remindersSent?: ReminderSent[];
-  workflow?: string | { id: string };
 }
 
-const ACTIVE_STATUSES = ["b1", "b2", "b3", "b4", "b5", "b6"];
+const ACTIVE_STATUSES = ACTIVE_STAGE_CODES;
 
 function customerName(c: OrderDoc["customer"]): string {
   if (!c) return "—";
@@ -170,46 +147,22 @@ export async function runOrderReminders({
   let processedOrders = 0;
 
   try {
-    // 1. Fetch active orders + workflow stages + default workflow
-    const [ordersRes, stagesRes, defaultWfRes] = await Promise.all([
-      payload.request<{ docs: OrderDoc[]; totalDocs: number }>("/api/orders", {
+    // Fetch active orders. Stages giờ hard-code (./stages.ts) — không
+    // cần query Workflows/WorkflowStages collection nữa.
+    const ordersRes = await payload.request<{ docs: OrderDoc[]; totalDocs: number }>(
+      "/api/orders",
+      {
         query: {
           where: { status: { in: ACTIVE_STATUSES } },
           limit: 200,
           depth: 0,
         },
-      }),
-      payload.request<{ docs: StageDoc[] }>("/api/workflow-stages", {
-        query: { limit: 100, depth: 0 },
-      }),
-      payload.request<{ docs: WorkflowDoc[] }>("/api/workflows", {
-        query: { where: { isDefault: { equals: true } }, limit: 1, depth: 0 },
-      }),
-    ]);
-
-    // Index stages: workflowId → code → stage
-    const stageByWorkflowAndCode = new Map<string, Map<string, StageDoc>>();
-    for (const s of stagesRes.docs) {
-      const wfId =
-        typeof s.workflow === "string" ? s.workflow : s.workflow?.id;
-      if (!wfId) continue;
-      let inner = stageByWorkflowAndCode.get(wfId);
-      if (!inner) {
-        inner = new Map();
-        stageByWorkflowAndCode.set(wfId, inner);
-      }
-      inner.set(s.code, s);
-    }
-    const defaultWfId = defaultWfRes.docs[0]?.id;
+      },
+    );
 
     for (const order of ordersRes.docs) {
       processedOrders += 1;
-      const orderWfId =
-        (typeof order.workflow === "string"
-          ? order.workflow
-          : order.workflow?.id) ?? defaultWfId;
-      if (!orderWfId) continue;
-      const stage = stageByWorkflowAndCode.get(orderWfId)?.get(order.status);
+      const stage = getStage(order.status);
       if (!stage || !stage.reminders || stage.reminders.length === 0) continue;
       if (!order.stageStartedAt) continue;
 

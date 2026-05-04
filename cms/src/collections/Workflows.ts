@@ -18,6 +18,9 @@ export const Workflows: CollectionConfig = {
     useAsTitle: "name",
     defaultColumns: ["slug", "name", "domain", "isActive"],
     group: "Hệ thống",
+    // Quy trình giờ hard-code trong code (cms/src/lib/workflow-stages.ts).
+    // Collection này giữ lại để DB cũ không vỡ, nhưng ẩn khỏi sidebar.
+    hidden: true,
   },
   access: {
     read: ({ req: { user } }) => !!user,
