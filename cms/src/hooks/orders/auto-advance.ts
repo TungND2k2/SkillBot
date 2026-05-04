@@ -49,29 +49,24 @@ function nonEmpty(v: unknown): boolean {
 }
 
 function isB1Complete(d: OrderData, o: OrderData): boolean {
+  // Soft check: chỉ require các trường Sales tự điền được. Các flag AI
+  // (documentMatch, confirmationVerified) là quality check optional —
+  // không gate workflow. accountantConfirmed cũng optional cho dev nhẹ;
+  // KT có thể tick sau, không chặn quy trình.
   const customer = pick(d, o, "customer");
   const invoice = pick(d, o, "invoiceFile");
   const brief = pick(d, o, "briefFile");
   const total = pick(d, o, "totalAmount");
-  const acct = pick(d, o, "accountantConfirmed");
-  const conf = pick(d, o, "confirmationVerified");
   const deadline = pick(d, o, "expectedDeliveryDate");
-  const match =
-    (d.documentMatch?.status ?? o.documentMatch?.status) ?? "pending";
-  const salesAck =
-    Boolean(d.documentMatch?.salesConfirmedMismatch) ||
-    Boolean(o.documentMatch?.salesConfirmedMismatch);
 
-  // Required B1 fields
-  if (!nonEmpty(customer) || !nonEmpty(invoice) || !nonEmpty(brief)) return false;
-  if (!nonEmpty(total) || !nonEmpty(deadline)) return false;
-  if (!acct) return false;
-  if (conf !== "valid") return false;
-
-  // Doc match: pass nếu match || (warning + sales ack)
-  if (match === "match") return true;
-  if (match === "warning" && salesAck) return true;
-  return false;
+  return (
+    nonEmpty(customer) &&
+    nonEmpty(invoice) &&
+    nonEmpty(brief) &&
+    nonEmpty(total) &&
+    Number(total) > 0 &&
+    nonEmpty(deadline)
+  );
 }
 
 function isB2Complete(d: OrderData, o: OrderData): boolean {
