@@ -120,12 +120,13 @@ export default buildConfig({
     }),
     // S3 storage cho Media collection — `enabled: false` khi env chưa
     // điền (fallback local disk), `true` khi có S3_BUCKET.
+    // Đọc cả 2 cặp biến: S3_ACCESS_KEY / S3_SECRET_KEY (legacy + repo gốc),
+    // và S3_ACCESS_KEY_ID / S3_SECRET_ACCESS_KEY (chuẩn AWS SDK env names).
     s3Storage({
       enabled: !!process.env.S3_BUCKET,
       collections: {
         media: {
-          // generateFileURL trả URL public — Payload sẽ inject vào doc.url.
-          // Để default — sẽ dùng endpoint từ config.
+          // URL trỏ thẳng bucket, không proxy qua Payload.
           disablePayloadAccessControl: true,
         },
       },
@@ -134,10 +135,14 @@ export default buildConfig({
         endpoint: process.env.S3_ENDPOINT,
         region: process.env.S3_REGION ?? "us-east-1",
         credentials: {
-          accessKeyId: process.env.S3_ACCESS_KEY_ID ?? "",
-          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? "",
+          accessKeyId:
+            process.env.S3_ACCESS_KEY ?? process.env.S3_ACCESS_KEY_ID ?? "",
+          secretAccessKey:
+            process.env.S3_SECRET_KEY ?? process.env.S3_SECRET_ACCESS_KEY ?? "",
         },
-        forcePathStyle: process.env.S3_FORCE_PATH_STYLE === "true",
+        // Default true cho custom endpoint (MinIO/Spaces/xorcloud).
+        // Set `S3_FORCE_PATH_STYLE=false` để override khi dùng AWS thật.
+        forcePathStyle: process.env.S3_FORCE_PATH_STYLE !== "false",
       },
     }),
   ],
