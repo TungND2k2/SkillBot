@@ -9,6 +9,13 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
+  // Cho phép upload file lớn (mặc định Next.js serverActions = 1MB).
+  // 50MB đủ cho hoá đơn / đề bài / ảnh chất lượng cao.
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "50mb",
+    },
+  },
 };
 
 export default withPayload(nextConfig, { devBundleServerPackages: false });
