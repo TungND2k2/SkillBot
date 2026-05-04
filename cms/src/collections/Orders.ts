@@ -815,22 +815,23 @@ export const Orders: CollectionConfig = {
       ],
     },
 
-    // ── Sidebar: status dropdown (manager click chuyển bước) + assignedTo
+    // status + assignedTo: ẩn khỏi UI. Status default "b1" lúc create,
+    // chuyển bước qua AI chat ("chuyển PE-001 sang B2") hoặc tool
+    // advance_order_status. Collapsibles B2-B6 ở trên dùng status ngầm
+    // để show/hide.
     {
       name: "status",
-      label: "Bước hiện tại",
       type: "select",
       required: true,
       defaultValue: "b1",
-      admin: { position: "sidebar" },
+      admin: { hidden: true },
       options: STATUS_SELECT_OPTIONS,
     },
     {
       name: "assignedTo",
-      label: "Phụ trách bước",
       type: "relationship",
       relationTo: "users",
-      admin: { position: "sidebar" },
+      admin: { hidden: true },
     },
 
     // ── Hidden — timing tự compute, reminders dedupe
