@@ -4,6 +4,7 @@ import { buildConfig } from "payload";
 import { mongooseAdapter } from "@payloadcms/db-mongodb";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { formBuilderPlugin } from "@payloadcms/plugin-form-builder";
+import { s3Storage } from "@payloadcms/storage-s3";
 import { vi } from "@payloadcms/translations/languages/vi";
 import { en } from "@payloadcms/translations/languages/en";
 import sharp from "sharp";
@@ -115,6 +116,28 @@ export default buildConfig({
           update: ({ req: { user } }) => ["admin", "manager"].includes(user?.role ?? ""),
           delete: ({ req: { user } }) => user?.role === "admin",
         },
+      },
+    }),
+    // S3 storage cho Media collection — `enabled: false` khi env chưa
+    // điền (fallback local disk), `true` khi có S3_BUCKET.
+    s3Storage({
+      enabled: !!process.env.S3_BUCKET,
+      collections: {
+        media: {
+          // generateFileURL trả URL public — Payload sẽ inject vào doc.url.
+          // Để default — sẽ dùng endpoint từ config.
+          disablePayloadAccessControl: true,
+        },
+      },
+      bucket: process.env.S3_BUCKET ?? "",
+      config: {
+        endpoint: process.env.S3_ENDPOINT,
+        region: process.env.S3_REGION ?? "us-east-1",
+        credentials: {
+          accessKeyId: process.env.S3_ACCESS_KEY_ID ?? "",
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? "",
+        },
+        forcePathStyle: process.env.S3_FORCE_PATH_STYLE === "true",
       },
     }),
   ],
