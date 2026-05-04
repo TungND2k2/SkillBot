@@ -11,6 +11,7 @@
  *  - History per Payload user (server-side trong bot Map<sessionKey, ...>).
  */
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface Message {
   role: "user" | "assistant";
@@ -25,13 +26,68 @@ interface ToolEvent {
 
 const STORAGE_KEY = "skillbot-chat-open";
 
+/**
+ * Render markdown đơn giản trong message:
+ *  - **bold**, *italic*
+ *  - `code`
+ *  - line breaks
+ *  - bullet lines bắt đầu bằng "- "
+ */
+function renderMarkdown(text: string): React.ReactNode {
+  const lines = text.split("\n");
+  return lines.map((line, i) => {
+    const trimmed = line.trim();
+    const isBullet = /^[-•]\s+/.test(trimmed);
+    const inner = isBullet ? trimmed.replace(/^[-•]\s+/, "") : line;
+    const parts = inner.split(/(\*\*[^*]+\*\*|\*[^*\n]+\*|`[^`]+`)/g).map((p, j) => {
+      if (p.startsWith("**") && p.endsWith("**")) {
+        return <strong key={j}>{p.slice(2, -2)}</strong>;
+      }
+      if (p.startsWith("*") && p.endsWith("*") && p.length > 2) {
+        return <em key={j}>{p.slice(1, -1)}</em>;
+      }
+      if (p.startsWith("`") && p.endsWith("`")) {
+        return (
+          <code
+            key={j}
+            style={{
+              background: "rgba(0,0,0,0.06)",
+              padding: "1px 5px",
+              borderRadius: 4,
+              fontSize: "0.9em",
+            }}
+          >
+            {p.slice(1, -1)}
+          </code>
+        );
+      }
+      return p;
+    });
+    if (isBullet) {
+      return (
+        <div key={i} style={{ display: "flex", gap: 6 }}>
+          <span style={{ opacity: 0.6 }}>•</span>
+          <span>{parts}</span>
+        </div>
+      );
+    }
+    if (line === "") return <div key={i} style={{ height: 6 }} />;
+    return <div key={i}>{parts}</div>;
+  });
+}
+
 export const ChatBubble: React.FC = () => {
+  const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
   const [streaming, setStreaming] = useState<boolean>(false);
   const [activity, setActivity] = useState<string[]>([]);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Persist open/close giữa navigation
   useEffect(() => {
@@ -159,7 +215,12 @@ export const ChatBubble: React.FC = () => {
     } catch { /* ignore */ }
   }
 
-  return (
+  // Portal vào document.body để escape khỏi mọi ancestor có transform/filter
+  // (Payload nav layout có nhiều element tạo containing block) — `position:fixed`
+  // mới đúng vị trí + z-index không bị che.
+  if (!mounted) return null;
+
+  const content = (
     <>
       <style>{INLINE_CSS}</style>
 
@@ -250,7 +311,7 @@ export const ChatBubble: React.FC = () => {
                   <div className="sb-chat-avatar sb-chat-avatar--ai">S</div>
                 )}
                 <div className={`sb-chat-bubble sb-chat-bubble--${m.role}`}>
-                  {m.text}
+                  {m.role === "assistant" ? renderMarkdown(m.text) : m.text}
                 </div>
               </div>
             ))}
@@ -259,15 +320,17 @@ export const ChatBubble: React.FC = () => {
               <div className="sb-chat-row sb-chat-row--assistant">
                 <div className="sb-chat-avatar sb-chat-avatar--ai">S</div>
                 <div className="sb-chat-bubble sb-chat-bubble--activity">
-                  {activity.length > 0 ? (
+                  <div className="sb-chat-typing-row">
+                    <div className="sb-chat-typing">
+                      <span></span><span></span><span></span>
+                    </div>
+                    <span className="sb-chat-typing-label">đang xử lý</span>
+                  </div>
+                  {activity.length > 0 && (
                     <div className="sb-chat-activity-list">
                       {activity.map((a, i) => (
                         <div key={i} className="sb-chat-activity-item">{a}</div>
                       ))}
-                    </div>
-                  ) : (
-                    <div className="sb-chat-typing">
-                      <span></span><span></span><span></span>
                     </div>
                   )}
                 </div>
@@ -305,6 +368,8 @@ export const ChatBubble: React.FC = () => {
       )}
     </>
   );
+
+  return createPortal(content, document.body);
 };
 
 export default ChatBubble;
@@ -460,14 +525,31 @@ const INLINE_CSS = `
   color: rgb(var(--theme-elevation-700));
 }
 
-.sb-chat-activity-list { display: flex; flex-direction: column; gap: 4px; }
+.sb-chat-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed rgb(var(--theme-elevation-150));
+}
 .sb-chat-activity-item { font-size: 12px; }
 
+.sb-chat-typing-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sb-chat-typing-label {
+  font-size: 12px;
+  color: rgb(var(--theme-elevation-600));
+  font-style: italic;
+}
 .sb-chat-typing {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 4px;
+  padding: 2px 0;
 }
 .sb-chat-typing span {
   width: 7px;

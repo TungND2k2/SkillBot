@@ -27,29 +27,26 @@ export const DEFAULT_ORG_ID = "skillbot-default";
 export const SEE_ALL_ROLES = ["admin", "manager", "accountant"] as const;
 export type SeeAllRole = (typeof SEE_ALL_ROLES)[number];
 
-/** Field group dùng chung — spread vào fields[] của collection. */
+/**
+ * Field group dùng chung — spread vào fields[] của collection.
+ * Ẩn khỏi admin UI (`admin.hidden: true`) — auto-set ngầm, không cần hiện.
+ * Vẫn truy vấn được qua REST API + dùng cho access control.
+ */
 export const ownerField: Field = {
   name: "owner",
   type: "group",
-  label: "Owner (auto)",
-  admin: {
-    position: "sidebar",
-    description: "Ai tạo + thuộc tổ chức nào — auto-set khi create.",
-  },
+  label: "Owner",
+  admin: { hidden: true },
   fields: [
     {
       name: "userId",
-      label: "Người tạo",
       type: "relationship",
       relationTo: "users",
-      admin: { readOnly: true },
     },
     {
       name: "orgId",
-      label: "Tổ chức",
       type: "text",
       defaultValue: DEFAULT_ORG_ID,
-      admin: { readOnly: true },
     },
   ],
 };
