@@ -318,18 +318,18 @@ export const ChatBubble: React.FC = () => {
 
             {streaming && (
               <div className="sb-chat-row sb-chat-row--assistant">
-                <div className="sb-chat-avatar sb-chat-avatar--ai">S</div>
+                <div className="sb-chat-avatar sb-chat-avatar--ai sb-chat-avatar--pulse">S</div>
                 <div className="sb-chat-bubble sb-chat-bubble--activity">
                   <div className="sb-chat-typing-row">
-                    <div className="sb-chat-typing">
-                      <span></span><span></span><span></span>
-                    </div>
                     <span className="sb-chat-typing-label">đang xử lý</span>
+                    <span className="sb-chat-typing-dots" aria-hidden="true" />
                   </div>
                   {activity.length > 0 && (
                     <div className="sb-chat-activity-list">
                       {activity.map((a, i) => (
-                        <div key={i} className="sb-chat-activity-item">{a}</div>
+                        <div key={i} className="sb-chat-activity-item">
+                          <span className="sb-chat-activity-bullet">▸</span> {a}
+                        </div>
                       ))}
                     </div>
                   )}
@@ -420,13 +420,7 @@ const INLINE_CSS = `
   animation: sb-chat-fadein .18s ease;
   isolation: isolate;
 }
-@media (prefers-color-scheme: dark) {
-  .sb-chat-panel {
-    background-color: #1a1f2e;
-    color: #e5e7eb;
-    border-color: #2c3344;
-  }
-}
+/* Force light theme — user yêu cầu nền trắng kể cả OS dark mode */
 @keyframes sb-chat-fadein {
   from { opacity: 0; transform: translateY(8px) scale(0.98); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
@@ -496,11 +490,6 @@ const INLINE_CSS = `
   gap: 10px;
   background-color: #f9fafb;
 }
-@media (prefers-color-scheme: dark) {
-  .sb-chat-messages {
-    background-color: #111623;
-  }
-}
 
 .sb-chat-row {
   display: flex;
@@ -529,6 +518,7 @@ const INLINE_CSS = `
   background-color: #ffffff;
   border: 1px solid #e5e7eb;
   border-bottom-left-radius: 4px;
+  color: #1f2937;
 }
 .sb-chat-bubble--activity {
   background-color: #f3f4f6;
@@ -536,18 +526,6 @@ const INLINE_CSS = `
   border-bottom-left-radius: 4px;
   font-size: 12px;
   color: #4b5563;
-}
-@media (prefers-color-scheme: dark) {
-  .sb-chat-bubble--assistant {
-    background-color: #232938;
-    border-color: #2c3344;
-    color: #e5e7eb;
-  }
-  .sb-chat-bubble--activity {
-    background-color: #1a1f2e;
-    border-color: #2c3344;
-    color: #9ca3af;
-  }
 }
 
 .sb-chat-activity-list {
@@ -563,31 +541,47 @@ const INLINE_CSS = `
 .sb-chat-typing-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
+  font-size: 13px;
+  color: #4b5563;
+  font-style: italic;
+  font-weight: 500;
 }
 .sb-chat-typing-label {
-  font-size: 12px;
-  color: rgb(var(--theme-elevation-600));
-  font-style: italic;
+  letter-spacing: 0.01em;
 }
-.sb-chat-typing {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 0;
+/* Animated cycling dots: '' → '.' → '..' → '...' */
+.sb-chat-typing-dots {
+  display: inline-block;
+  width: 18px;
+  text-align: left;
+  font-style: normal;
+  font-weight: 700;
+  color: rgb(16, 185, 129);
 }
-.sb-chat-typing span {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: rgb(var(--theme-elevation-300));
-  animation: sb-chat-bounce 1.2s infinite ease-in-out;
+.sb-chat-typing-dots::after {
+  content: "";
+  animation: sb-chat-dots 1.2s steps(4) infinite;
 }
-.sb-chat-typing span:nth-child(2) { animation-delay: 0.15s; }
-.sb-chat-typing span:nth-child(3) { animation-delay: 0.3s; }
-@keyframes sb-chat-bounce {
-  0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
-  40% { transform: scale(1); opacity: 1; }
+@keyframes sb-chat-dots {
+  0%   { content: ""; }
+  25%  { content: "."; }
+  50%  { content: ".."; }
+  75%  { content: "..."; }
+  100% { content: ""; }
+}
+.sb-chat-activity-bullet {
+  color: rgb(16, 185, 129);
+  font-weight: 700;
+  margin-right: 4px;
+}
+/* Avatar pulse khi đang xử lý */
+.sb-chat-avatar--pulse {
+  animation: sb-chat-pulse 1.6s ease-in-out infinite;
+}
+@keyframes sb-chat-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55); }
+  50%      { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
 }
 
 .sb-chat-empty {
@@ -643,7 +637,7 @@ const INLINE_CSS = `
   border-radius: 10px;
   border: 1px solid #e5e7eb;
   background-color: #f9fafb;
-  color: inherit;
+  color: #1f2937;
   font-size: 13.5px;
   outline: none;
   transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
@@ -652,20 +646,6 @@ const INLINE_CSS = `
   border-color: rgb(16,185,129);
   background-color: #ffffff;
   box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
-}
-@media (prefers-color-scheme: dark) {
-  .sb-chat-input {
-    background-color: #1a1f2e;
-    border-top-color: #2c3344;
-  }
-  .sb-chat-input input {
-    background-color: #232938;
-    border-color: #2c3344;
-    color: #e5e7eb;
-  }
-  .sb-chat-input input:focus {
-    background-color: #1a1f2e;
-  }
 }
 .sb-chat-input button {
   width: 38px;
