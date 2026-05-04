@@ -3,6 +3,7 @@ import { generateOrderCode } from "../hooks/orders/generate-code";
 import { computeOrderTotals } from "../hooks/orders/compute-totals";
 import { validateOrderAdvance } from "../hooks/orders/advance-gate";
 import { trackStageTiming } from "../hooks/orders/track-stage-timing";
+import { autoAdvanceStage } from "../hooks/orders/auto-advance";
 import {
   ownerField,
   setOwnerOnCreate,
@@ -64,7 +65,8 @@ export const Orders: CollectionConfig = {
       generateOrderCode,
       computeOrderTotals,
       validateOrderAdvance,
-      trackStageTiming,
+      autoAdvanceStage,    // tự đẩy status sang bước tiếp khi đủ field
+      trackStageTiming,    // chạy SAU autoAdvance để compute timing đúng
     ],
   },
   fields: [
