@@ -25,6 +25,14 @@ const chatSchema = z.object({
   message: z.string().min(1),
   sessionKey: z.string().min(1),
   reset: z.boolean().optional(),
+  currentUser: z
+    .object({
+      id: z.string().optional(),
+      email: z.string().optional(),
+      displayName: z.string().optional(),
+      role: z.string().optional(),
+    })
+    .optional(),
 });
 
 export function registerChatRoutes(app: Hono): void {
@@ -34,7 +42,7 @@ export function registerChatRoutes(app: Hono): void {
     if (!parsed.success) {
       return c.json({ error: "bad-request", details: parsed.error.issues }, 400);
     }
-    const { message, sessionKey, reset } = parsed.data;
+    const { message, sessionKey, reset, currentUser } = parsed.data;
 
     if (reset) {
       chatHistory.delete(sessionKey);
@@ -42,7 +50,21 @@ export function registerChatRoutes(app: Hono): void {
     }
 
     const history = chatHistory.get(sessionKey) ?? [];
-    logger.info("ChatHTTP", `[${sessionKey}] "${message.slice(0, 80)}"`);
+    const userTag = currentUser?.role ? ` ${currentUser.role}` : "";
+    logger.info(
+      "ChatHTTP",
+      `[${sessionKey}${userTag}] "${message.slice(0, 80)}"`,
+    );
+
+    // Prepend "current user" context vào message để Claude biết role + name.
+    // Đồng thời inject vào system prompt qua wrap message — đơn giản hơn pass
+    // qua PipelineInput thêm field.
+    const contextualMessage = currentUser
+      ? `[Người đang chat: ${currentUser.displayName || currentUser.email || currentUser.id || "unknown"}` +
+        (currentUser.role ? ` — role: ${currentUser.role}` : "") +
+        (currentUser.id ? ` — id: ${currentUser.id}` : "") +
+        `]\n${message}`
+      : message;
 
     return streamSSE(c, async (stream) => {
       const sendEvent = async (event: string, data: unknown) => {
@@ -58,7 +80,7 @@ export function registerChatRoutes(app: Hono): void {
 
       try {
         const result = await runPipeline({
-          message,
+          message: contextualMessage,
           priorMessages: history,
           logTag: `Chat[${sessionKey}]`,
           onToolCall: (name, args) => {
@@ -70,7 +92,8 @@ export function registerChatRoutes(app: Hono): void {
           },
         });
 
-        // Update history
+        // Update history — lưu tin nhắn gốc (không có context wrap) để
+        // turn sau không double-prepend [Người đang chat: ...].
         history.push({ role: "user", text: message });
         history.push({ role: "assistant", text: result.reply });
         if (history.length > MAX_HISTORY) {

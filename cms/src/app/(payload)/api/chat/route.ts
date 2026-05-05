@@ -36,13 +36,28 @@ export async function POST(req: Request): Promise<Response> {
   }
 
   const sessionKey = `web:${user.id}`;
+  // Pass current user context để bot inject vào pipeline. AI biết:
+  //  - ai đang chat (xưng hô, không lộ data sai role)
+  //  - role gì (sales chỉ thấy đơn của mình → AI không trả đơn của người khác)
+  const currentUser = {
+    id: String(user.id),
+    email: (user as { email?: string }).email ?? "",
+    displayName: (user as { displayName?: string }).displayName ?? "",
+    role: (user as { role?: string }).role ?? "",
+  };
+
   const upstream = await fetch(`${botUrl}/api/chat`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "x-internal-secret": secret,
     },
-    body: JSON.stringify({ message: message ?? "", sessionKey, reset: !!reset }),
+    body: JSON.stringify({
+      message: message ?? "",
+      sessionKey,
+      reset: !!reset,
+      currentUser,
+    }),
   });
 
   if (reset) {

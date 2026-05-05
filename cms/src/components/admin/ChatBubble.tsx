@@ -12,6 +12,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useAuth } from "@payloadcms/ui";
 
 interface Message {
   role: "user" | "assistant";
@@ -77,6 +78,7 @@ function renderMarkdown(text: string): React.ReactNode {
 }
 
 export const ChatBubble: React.FC = () => {
+  const { user } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -88,6 +90,9 @@ export const ChatBubble: React.FC = () => {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Login chưa, KHÔNG render bubble (login page, public routes)
+  if (!user) return null;
 
   // Persist open/close giữa navigation
   useEffect(() => {
