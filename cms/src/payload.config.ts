@@ -22,6 +22,9 @@ import { Counters } from "./collections/Counters";
 import { Workflows } from "./collections/Workflows";
 import { WorkflowStages } from "./collections/WorkflowStages";
 import { Reminders } from "./collections/Reminders";
+import { TelegramUsers } from "./collections/TelegramUsers";
+import { TelegramGroups } from "./collections/TelegramGroups";
+import { TelegramMembership } from "./collections/TelegramMembership";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -74,6 +77,9 @@ export default buildConfig({
     Workflows,
     WorkflowStages,
     Reminders,
+    TelegramUsers,
+    TelegramGroups,
+    TelegramMembership,
     Media,
     Counters,
   ],

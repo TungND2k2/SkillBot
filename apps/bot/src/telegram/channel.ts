@@ -18,6 +18,7 @@ import { mdToTelegramHtml, splitMessage } from "./format.js";
 import { describeToolCall } from "./tool-labels.js";
 import { convertToMarkdown, MarkItDownError } from "../extraction/markitdown.js";
 import { payload, PayloadError } from "../payload/client.js";
+import { syncOnIncomingMessage } from "../payload/telegram-sync.js";
 
 interface TgUser {
   id: number;
@@ -181,6 +182,10 @@ export class TelegramChannel {
     if (!msg.from) return;
     const chatId = msg.chat.id;
     const text = (msg.text ?? msg.caption ?? "").trim();
+
+    // Fire-and-forget: upsert TelegramUser/Group/Membership trong Payload.
+    // Không block message — pipeline vẫn chạy ngay cả khi sync chậm/fail.
+    void syncOnIncomingMessage(msg.from, msg.chat).catch(() => {});
 
     const job: QueueJob = {
       id: newId(),
