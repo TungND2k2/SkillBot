@@ -78,105 +78,113 @@ export const Orders: CollectionConfig = {
         {
           label: "B1 — Nhận đơn",
           fields: [
-            // 1. Ngày đặt đơn
+            // ── 1. Thông tin cơ bản ─────────────────────────
             {
-              type: "row",
+              type: "collapsible",
+              label: "📝 Thông tin cơ bản",
+              admin: { initCollapsed: false },
               fields: [
                 {
-                  name: "orderDate",
-                  label: "Ngày đặt đơn",
-                  type: "date",
-                  required: true,
-                  defaultValue: () => new Date().toISOString(),
-                  admin: { width: "33%", date: { pickerAppearance: "dayOnly" } },
-                },
-                // 2. Mã đơn — auto-gen
-                {
-                  name: "orderCode",
-                  label: "Mã đơn",
-                  type: "text",
-                  unique: true,
-                  admin: {
-                    width: "33%",
-                    readOnly: true,
-                    description: "Tự sinh dạng PE{seq} khi tạo mới",
-                  },
-                },
-                // 3a. Brand code (PE / VN / ...)
-                {
-                  name: "brandCode",
-                  label: "Mã thương hiệu",
-                  type: "text",
-                  required: true,
-                  defaultValue: "PE",
-                  admin: { width: "33%", description: "PE = Petite Étoile, vd: PE/VN/JP" },
-                },
-              ],
-            },
-
-            // 3b. Country / SL / Salesperson — composite Mã DA
-            {
-              type: "row",
-              fields: [
-                {
-                  name: "country",
-                  label: "Quốc gia khách",
-                  type: "text",
-                  required: true,
-                  admin: { width: "33%" },
+                  type: "row",
+                  fields: [
+                    {
+                      name: "orderDate",
+                      label: "Ngày đặt đơn",
+                      type: "date",
+                      required: true,
+                      defaultValue: () => new Date().toISOString(),
+                      admin: { width: "33%", date: { pickerAppearance: "dayOnly" } },
+                    },
+                    {
+                      name: "orderCode",
+                      label: "Mã đơn",
+                      type: "text",
+                      unique: true,
+                      admin: {
+                        width: "33%",
+                        readOnly: true,
+                        description: "Tự sinh PE{seq}",
+                      },
+                    },
+                    {
+                      name: "brandCode",
+                      label: "Mã thương hiệu",
+                      type: "text",
+                      required: true,
+                      defaultValue: "PE",
+                      admin: { width: "33%", description: "vd: PE/VN/JP" },
+                    },
+                  ],
                 },
                 {
-                  name: "salesperson",
-                  label: "Sales phụ trách",
+                  type: "row",
+                  fields: [
+                    {
+                      name: "country",
+                      label: "Quốc gia khách",
+                      type: "text",
+                      required: true,
+                      admin: { width: "33%" },
+                    },
+                    {
+                      name: "salesperson",
+                      label: "Sales phụ trách",
+                      type: "relationship",
+                      relationTo: "users",
+                      filterOptions: () => ({ role: { in: ["salesperson", "manager", "admin"] } }),
+                      admin: { width: "33%" },
+                    },
+                    {
+                      name: "salespersonCode",
+                      label: "Mã Sales",
+                      type: "text",
+                      admin: { width: "33%", description: "vd: Nguyễn Mai → MAINT" },
+                    },
+                  ],
+                },
+                {
+                  name: "customer",
+                  label: "Khách hàng",
                   type: "relationship",
-                  relationTo: "users",
-                  filterOptions: () => ({ role: { in: ["salesperson", "manager", "admin"] } }),
-                  admin: { width: "33%" },
-                },
-                {
-                  name: "salespersonCode",
-                  label: "Mã Sales (vd: MAINT)",
-                  type: "text",
-                  admin: { width: "33%", description: "Tên + chữ cái viết tắt, vd: Nguyễn Thị Mai → MAINT" },
+                  relationTo: "customers",
+                  required: true,
+                  admin: { description: "Chọn khách có sẵn để auto-fill" },
                 },
               ],
             },
 
-            // 4. Customer relationship → auto-fill
+            // ── 2. Hoá đơn + đề bài ────────────────────────
             {
-              name: "customer",
-              label: "Khách hàng",
-              type: "relationship",
-              relationTo: "customers",
-              required: true,
-              admin: { description: "Chọn khách có sẵn để auto-fill thông tin" },
-            },
-
-            // 5. Hóa đơn
-            {
-              type: "row",
+              type: "collapsible",
+              label: "📎 Hoá đơn + Đề bài",
+              admin: { initCollapsed: false },
               fields: [
                 {
-                  name: "invoiceFile",
-                  label: "Hóa đơn (PDF/ảnh)",
-                  type: "upload",
-                  relationTo: "media",
-                  required: true,
-                  admin: {
-                    width: "50%",
-                    description: "Phải có: thông tin khách + đơn + size + SL + giá",
-                  },
-                },
-                {
-                  name: "briefFile",
-                  label: "Đề bài (PDF/ảnh)",
-                  type: "upload",
-                  relationTo: "media",
-                  required: true,
-                  admin: {
-                    width: "50%",
-                    description: "Chỉ thông tin đơn + mẫu + mô tả + size + SL + DEADLINE. KHÔNG có khách + giá.",
-                  },
+                  type: "row",
+                  fields: [
+                    {
+                      name: "invoiceFile",
+                      label: "Hoá đơn (PDF/ảnh)",
+                      type: "upload",
+                      relationTo: "media",
+                      required: true,
+                      admin: {
+                        width: "50%",
+                        description: "Có khách + đơn + size + SL + giá",
+                      },
+                    },
+                    {
+                      name: "briefFile",
+                      label: "Đề bài (PDF/ảnh)",
+                      type: "upload",
+                      relationTo: "media",
+                      required: true,
+                      admin: {
+                        width: "50%",
+                        description: "Đơn + mẫu + mô tả + size + SL + DEADLINE. KHÔNG có giá.",
+                      },
+                    },
+                  ],
                 },
               ],
             },
@@ -255,113 +263,132 @@ export const Orders: CollectionConfig = {
               ],
             },
 
-            // 7-8. Tổng giá + đặt cọc + còn nợ
+            // ── 4. Tài chính ────────────────────────────
             {
-              type: "row",
+              type: "collapsible",
+              label: "💰 Tài chính",
+              admin: { initCollapsed: false },
               fields: [
                 {
-                  name: "totalAmount",
-                  label: "Tổng giá trị (đ)",
-                  type: "number",
-                  required: true,
-                  min: 0,
-                  admin: { width: "33%" },
-                },
-                {
-                  name: "deposit",
-                  label: "Đặt cọc (đ)",
-                  type: "number",
-                  defaultValue: 0,
-                  min: 0,
-                  admin: { width: "33%" },
-                },
-                {
-                  name: "owedAmount",
-                  label: "Còn nợ (đ)",
-                  type: "number",
-                  admin: {
-                    width: "33%",
-                    readOnly: true,
-                    description: "Tự tính = Tổng - Đặt cọc",
-                  },
-                },
-              ],
-            },
-
-            // 10. Kế toán xác nhận
-            {
-              name: "accountantConfirmed",
-              label: "Kế toán xác nhận đã nhận tiền cọc",
-              type: "checkbox",
-              defaultValue: false,
-              access: {
-                update: ({ req: { user } }) =>
-                  ["admin", "accountant"].includes(user?.role ?? ""),
-              },
-              admin: { description: "Chỉ Kế toán hoặc Admin tick được" },
-            },
-
-            // 12-13. Phí ship + trọng lượng
-            {
-              type: "row",
-              fields: [
-                {
-                  name: "shippingFee",
-                  label: "Phí ship (đ)",
-                  type: "number",
-                  defaultValue: 0,
-                  admin: { width: "50%" },
-                },
-                {
-                  name: "expectedWeightKg",
-                  label: "Trọng lượng dự kiến (kg)",
-                  type: "number",
-                  admin: { width: "50%", step: 0.1 },
-                },
-              ],
-            },
-
-            // 14. Thời gian trả hàng
-            {
-              name: "expectedDeliveryDate",
-              label: "Hạn giao",
-              type: "date",
-              required: true,
-              admin: { date: { pickerAppearance: "dayOnly" } },
-            },
-
-            // 15. Ảnh xác nhận khách
-            {
-              type: "row",
-              fields: [
-                {
-                  name: "customerConfirmationImage",
-                  label: "Ảnh khách xác nhận hóa đơn",
-                  type: "upload",
-                  relationTo: "media",
-                  admin: {
-                    width: "70%",
-                    description: "Screenshot chat — khách trả lời approved/correct/confirmed cho câu xác nhận hóa đơn",
-                  },
-                },
-                {
-                  name: "confirmationVerified",
-                  label: "AI xác minh ảnh",
-                  type: "select",
-                  defaultValue: "pending",
-                  options: [
-                    { label: "⏳ Chưa kiểm", value: "pending" },
-                    { label: "✅ Hợp lệ", value: "valid" },
-                    { label: "❌ Không hợp lệ", value: "invalid" },
+                  type: "row",
+                  fields: [
+                    {
+                      name: "totalAmount",
+                      label: "Tổng giá trị (đ)",
+                      type: "number",
+                      required: true,
+                      min: 0,
+                      admin: { width: "33%" },
+                    },
+                    {
+                      name: "deposit",
+                      label: "Đặt cọc (đ)",
+                      type: "number",
+                      defaultValue: 0,
+                      min: 0,
+                      admin: { width: "33%" },
+                    },
+                    {
+                      name: "owedAmount",
+                      label: "Còn nợ (đ)",
+                      type: "number",
+                      admin: {
+                        width: "33%",
+                        readOnly: true,
+                        description: "Tự = Tổng − Cọc",
+                      },
+                    },
                   ],
-                  admin: { width: "30%", readOnly: true },
+                },
+                {
+                  name: "accountantConfirmed",
+                  label: "Kế toán đã nhận cọc",
+                  type: "checkbox",
+                  defaultValue: false,
+                  access: {
+                    update: ({ req: { user } }) =>
+                      ["admin", "accountant"].includes(user?.role ?? ""),
+                  },
+                  admin: { description: "Chỉ Kế toán/Admin tick" },
                 },
               ],
             },
 
+            // ── 5. Giao hàng + deadline ─────────────────
+            {
+              type: "collapsible",
+              label: "📦 Giao hàng",
+              admin: { initCollapsed: false },
+              fields: [
+                {
+                  type: "row",
+                  fields: [
+                    {
+                      name: "expectedDeliveryDate",
+                      label: "Hạn giao",
+                      type: "date",
+                      required: true,
+                      admin: { width: "33%", date: { pickerAppearance: "dayOnly" } },
+                    },
+                    {
+                      name: "shippingFee",
+                      label: "Phí ship (đ)",
+                      type: "number",
+                      defaultValue: 0,
+                      admin: { width: "33%" },
+                    },
+                    {
+                      name: "expectedWeightKg",
+                      label: "Trọng lượng dự kiến (kg)",
+                      type: "number",
+                      admin: { width: "34%", step: 0.1 },
+                    },
+                  ],
+                },
+              ],
+            },
+
+            // ── 6. Xác nhận khách (collapsed) ──────────
+            {
+              type: "collapsible",
+              label: "👋 Xác nhận khách (ảnh chat)",
+              admin: { initCollapsed: true },
+              fields: [
+                {
+                  type: "row",
+                  fields: [
+                    {
+                      name: "customerConfirmationImage",
+                      label: "Ảnh khách xác nhận hoá đơn",
+                      type: "upload",
+                      relationTo: "media",
+                      admin: {
+                        width: "70%",
+                        description:
+                          "Screenshot chat — khách trả lời approved/correct/confirmed cho hoá đơn",
+                      },
+                    },
+                    {
+                      name: "confirmationVerified",
+                      label: "AI xác minh",
+                      type: "select",
+                      defaultValue: "pending",
+                      options: [
+                        { label: "⏳ Chưa kiểm", value: "pending" },
+                        { label: "✅ Hợp lệ", value: "valid" },
+                        { label: "❌ Không hợp lệ", value: "invalid" },
+                      ],
+                      admin: { width: "30%", readOnly: true },
+                    },
+                  ],
+                },
+              ],
+            },
+
+            // ── 7. Ghi chú ─────────────────────────────
             {
               name: "notes",
-              label: "Ghi chú",
+              label: "📝 Ghi chú",
               type: "textarea",
             },
           ],
