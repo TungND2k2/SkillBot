@@ -27,6 +27,7 @@ import { default as default_91a09b539d3c86b0aebf520e7564ce08 } from '../../../co
 import { default as default_chat_provider_b1c2d3e4f5061718293a4b5c6d7e8f90 } from '../../../components/admin/ChatProvider'
 import { default as default_workflow_overview_a7c5e8f3b2d1467890a3b1c2d3e4f506 } from '../../../components/admin/WorkflowOverview'
 import { default as default_workflow_nav_link_b8d6f9e4c3e2578901b4c2d3e4f50617 } from '../../../components/admin/WorkflowNavLink'
+import { default as default_media_pdf_preview_c1e7f0a5b4f3689012c5d3e4f5061728 } from '../../../components/admin/MediaPdfPreview'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { FolderTableCell as FolderTableCell_folders } from '@payloadcms/next/rsc'
 import { FolderField as FolderField_folders } from '@payloadcms/next/rsc'
@@ -64,6 +65,7 @@ export const importMap = {
   "/components/admin/ChatProvider#default": default_chat_provider_b1c2d3e4f5061718293a4b5c6d7e8f90,
   "/components/admin/WorkflowOverview#default": default_workflow_overview_a7c5e8f3b2d1467890a3b1c2d3e4f506,
   "/components/admin/WorkflowNavLink#default": default_workflow_nav_link_b8d6f9e4c3e2578901b4c2d3e4f50617,
+  "/components/admin/MediaPdfPreview#default": default_media_pdf_preview_c1e7f0a5b4f3689012c5d3e4f5061728,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/next/rsc#FolderTableCell": FolderTableCell_folders,
   "@payloadcms/next/rsc#FolderField": FolderField_folders,
