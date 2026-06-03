@@ -148,8 +148,8 @@ export default buildConfig({
       clientUploads: true,
       collections: {
         media: {
-          // URL trỏ thẳng bucket, không proxy qua Payload.
-          disablePayloadAccessControl: true,
+          // File phục vụ qua Payload route (presigned ngầm) để giữ private —
+          // bucket ptc-stories không public-read, AccessDenied nếu trỏ thẳng.
         },
       },
       bucket: process.env.S3_BUCKET ?? "",
