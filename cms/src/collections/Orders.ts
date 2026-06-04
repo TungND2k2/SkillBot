@@ -298,7 +298,7 @@ export const Orders: CollectionConfig = {
                   fields: [
                     {
                       name: "totalAmount",
-                      label: "Tổng giá trị (đ)",
+                      label: "Tổng giá trị ($)",
                       type: "number",
                       required: true,
                       min: 0,
@@ -306,7 +306,7 @@ export const Orders: CollectionConfig = {
                     },
                     {
                       name: "deposit",
-                      label: "Đặt cọc (đ)",
+                      label: "Đặt cọc ($)",
                       type: "number",
                       defaultValue: 0,
                       min: 0,
@@ -314,7 +314,7 @@ export const Orders: CollectionConfig = {
                     },
                     {
                       name: "owedAmount",
-                      label: "Còn nợ (đ)",
+                      label: "Còn nợ ($)",
                       type: "number",
                       admin: {
                         width: "25%",

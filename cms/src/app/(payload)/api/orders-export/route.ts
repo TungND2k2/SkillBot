@@ -73,9 +73,9 @@ export async function GET(req: Request): Promise<Response> {
     "Khách",
     "Quốc gia",
     "Số lượng",
-    "Tổng giá trị",
-    "Đặt cọc",
-    "Còn nợ",
+    "Tổng giá trị ($)",
+    "Đặt cọc ($)",
+    "Còn nợ ($)",
     "Hạn giao",
     "Trạng thái",
   ];
