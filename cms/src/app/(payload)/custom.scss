@@ -106,6 +106,33 @@ label {
   }
 }
 
+/* ── List Orders: compact để fit nhiều cột trong 1 màn ───── */
+.collection-list--orders {
+  .table {
+    font-size: 12.5px;
+
+    thead th,
+    tbody td {
+      padding-inline: 8px;
+      white-space: nowrap;
+    }
+    tbody td {
+      padding-block: 10px;
+    }
+    /* Cell numbers right-align, đơn vị dễ nhìn */
+    tbody td.cell-totalAmount,
+    tbody td.cell-deposit,
+    tbody td.cell-owedAmount,
+    tbody td.cell-totalQuantity,
+    thead th.cell-totalAmount,
+    thead th.cell-deposit,
+    thead th.cell-owedAmount,
+    thead th.cell-totalQuantity {
+      text-align: right;
+    }
+  }
+}
+
 /* ── Input field: rounder, subtle border ─────────────────── */
 .field-type input[type="text"],
 .field-type input[type="email"],
