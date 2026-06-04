@@ -130,7 +130,7 @@ label {
       transform: scale(0.75);
       transform-origin: left center;
     }
-    /* Cell numbers right-align, đơn vị dễ nhìn */
+    /* Cột số: hẹp + căn giữa */
     tbody td.cell-totalAmount,
     tbody td.cell-deposit,
     tbody td.cell-owedAmount,
@@ -139,7 +139,10 @@ label {
     thead th.cell-deposit,
     thead th.cell-owedAmount,
     thead th.cell-totalQuantity {
-      text-align: right;
+      text-align: center;
+      width: 70px;
+      max-width: 70px;
+      min-width: 60px;
     }
   }
 }
