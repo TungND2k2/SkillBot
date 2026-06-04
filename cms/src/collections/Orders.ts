@@ -745,16 +745,19 @@ export const Orders: CollectionConfig = {
       ],
     },
 
-    // status + assignedTo: ẩn khỏi UI. Status default "b1" lúc create,
-    // chuyển bước qua AI chat ("chuyển PE-001 sang B2") hoặc tool
-    // advance_order_status. Collapsibles B2-B6 ở trên dùng status ngầm
-    // để show/hide.
+    // status: read-only — auto-advance qua hook khi user điền đủ field.
+    // Vẫn show ở sidebar + list column để track tiến độ, nhưng không cho
+    // edit tay (tránh user nhảy bước lung tung).
     {
       name: "status",
       type: "select",
       required: true,
       defaultValue: "b1",
-      admin: { hidden: true },
+      admin: {
+        readOnly: true,
+        position: "sidebar",
+        description: "Tự đổi theo dữ liệu đã điền — không sửa tay.",
+      },
       options: STATUS_SELECT_OPTIONS,
     },
     {
