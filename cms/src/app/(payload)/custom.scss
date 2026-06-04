@@ -110,14 +110,25 @@ label {
 .collection-list--orders {
   .table {
     font-size: 12.5px;
+    table-layout: auto;
 
     thead th,
     tbody td {
-      padding-inline: 8px;
+      padding-inline: 6px;
       white-space: nowrap;
     }
+    thead th {
+      font-size: 10.5px;
+    }
     tbody td {
-      padding-block: 10px;
+      padding-block: 9px;
+    }
+    /* Sort arrows nhỏ hơn để bớt chiếm chỗ */
+    thead .sort-column__buttons,
+    thead .sort-column__asc,
+    thead .sort-column__desc {
+      transform: scale(0.75);
+      transform-origin: left center;
     }
     /* Cell numbers right-align, đơn vị dễ nhìn */
     tbody td.cell-totalAmount,

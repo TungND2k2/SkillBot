@@ -113,11 +113,17 @@ export const Orders: CollectionConfig = {
                   fields: [
                     {
                       name: "orderDate",
-                      label: "Ngày đặt đơn",
+                      label: "Ngày đặt",
                       type: "date",
                       required: true,
                       defaultValue: () => new Date().toISOString(),
-                      admin: { width: "33%", date: { pickerAppearance: "dayOnly" } },
+                      admin: {
+                        width: "33%",
+                        date: {
+                          pickerAppearance: "dayOnly",
+                          displayFormat: "dd/MM/yy",
+                        },
+                      },
                     },
                     {
                       name: "orderCode",
@@ -359,7 +365,13 @@ export const Orders: CollectionConfig = {
                       label: "Hạn giao",
                       type: "date",
                       required: true,
-                      admin: { width: "33%", date: { pickerAppearance: "dayOnly" } },
+                      admin: {
+                        width: "33%",
+                        date: {
+                          pickerAppearance: "dayOnly",
+                          displayFormat: "dd/MM/yy",
+                        },
+                      },
                     },
                     {
                       name: "shippingFee",
