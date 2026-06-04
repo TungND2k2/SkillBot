@@ -44,6 +44,7 @@ export const Users: CollectionConfig = {
         { label: "👑 Chủ cơ sở (Admin)", value: "admin" },
         { label: "📋 Quản lý SX", value: "manager" },
         { label: "🔧 Điều phối", value: "planner" },
+        { label: "⌨️ Input (nhập SX)", value: "input" },
         { label: "💼 Sales", value: "salesperson" },
         { label: "✅ QC", value: "qc" },
         { label: "📦 Thủ kho", value: "storage" },

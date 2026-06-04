@@ -1,4 +1,4 @@
-import type { CollectionConfig } from "payload";
+import type { CollectionConfig, FieldAccess } from "payload";
 import { generateOrderCode } from "../hooks/orders/generate-code";
 import { computeOrderTotals } from "../hooks/orders/compute-totals";
 import { validateOrderAdvance } from "../hooks/orders/advance-gate";
@@ -18,6 +18,23 @@ const reachedB3 = ["b3", "b4", "b5", "b6", "done"];
 const reachedB4 = ["b4", "b5", "b6", "done"];
 const reachedB5 = ["b5", "b6", "done"];
 const reachedB6 = ["b6", "done"];
+
+// Field-level role visibility.
+// B2 (định mức) chỉ manager/input/admin xem; B3-B6 (ảnh sản xuất + QC)
+// thêm sales vào để theo dõi.
+const B2_VIEW_ROLES = ["admin", "manager", "input"];
+const B3_PLUS_VIEW_ROLES = ["admin", "manager", "input", "salesperson"];
+
+const roleHas =
+  (allowed: string[]): FieldAccess =>
+  ({ req }) =>
+    allowed.includes((req?.user as { role?: string } | null)?.role ?? "");
+
+const accessByRole = (allowed: string[]) => ({
+  read: roleHas(allowed),
+  update: roleHas(allowed),
+  create: roleHas(allowed),
+});
 
 /**
  * Orders — đơn hàng xuất khẩu trẻ em.
@@ -39,13 +56,20 @@ export const Orders: CollectionConfig = {
   admin: {
     useAsTitle: "orderCode",
     defaultColumns: [
+      "orderDate",
+      "brandCode",
       "orderCode",
-      "customer",
       "totalAmount",
-      "status",
+      "deposit",
+      "owedAmount",
+      "totalQuantity",
       "expectedDeliveryDate",
+      "status",
     ],
     group: "Sản xuất",
+    components: {
+      beforeListTable: ["/components/admin/OrdersExportButton"],
+    },
   },
   access: {
     // sales chỉ thấy đơn của mình; manager/admin/accountant thấy hết
@@ -278,7 +302,7 @@ export const Orders: CollectionConfig = {
                       type: "number",
                       required: true,
                       min: 0,
-                      admin: { width: "33%" },
+                      admin: { width: "25%" },
                     },
                     {
                       name: "deposit",
@@ -286,17 +310,24 @@ export const Orders: CollectionConfig = {
                       type: "number",
                       defaultValue: 0,
                       min: 0,
-                      admin: { width: "33%" },
+                      admin: { width: "25%" },
                     },
                     {
                       name: "owedAmount",
                       label: "Còn nợ (đ)",
                       type: "number",
                       admin: {
-                        width: "33%",
+                        width: "25%",
                         readOnly: true,
                         description: "Tự = Tổng − Cọc",
                       },
+                    },
+                    {
+                      name: "totalQuantity",
+                      label: "Số lượng (pcs)",
+                      type: "number",
+                      min: 0,
+                      admin: { width: "25%", description: "Tổng số sản phẩm trong đơn" },
                     },
                   ],
                 },
@@ -394,309 +425,183 @@ export const Orders: CollectionConfig = {
           ],
         },
 
-        // ── Tab "Tiến độ" — collapsibles theo status, NCC + ngày inline ──
+        // ── Tab "Tiến độ" — 5 mục: định mức → duyệt vải → thêu → hoàn thiện → QC/ship.
+        // Mua NL + gửi NCC là việc nội bộ của Input (không cần báo cáo riêng);
+        // sales chỉ thấy từ B3 trở đi.
         {
           label: "Tiến độ",
           fields: [
-            // ── B2 — Định mức ─────────────────────────────
+            // ── B2 — Định mức vải (manager + input) ────────
             {
               type: "collapsible",
-              label: "B2 — Tính định mức",
+              label: "1) Định mức vải (Google Sheet)",
               admin: {
                 condition: (_, data) => reachedB2.includes(data?.status ?? ""),
                 initCollapsed: false,
               },
               fields: [
                 {
-                  name: "fabricAllowances",
-                  label: "Bảng định mức vải",
-                  type: "array",
-                  fields: [
-                    {
-                      type: "row",
-                      fields: [
-                        {
-                          name: "fabric",
-                          label: "Vải",
-                          type: "relationship",
-                          relationTo: "fabrics",
-                          required: true,
-                          admin: { width: "40%" },
-                        },
-                        {
-                          name: "qtyPerPiece",
-                          label: "m / pcs",
-                          type: "number",
-                          required: true,
-                          admin: { width: "20%", step: 0.01 },
-                        },
-                        {
-                          name: "totalQty",
-                          label: "Tổng (m)",
-                          type: "number",
-                          admin: { width: "20%", description: "Tự = qtyPerPiece × SL đơn" },
-                        },
-                        {
-                          name: "kind",
-                          label: "Loại",
-                          type: "select",
-                          defaultValue: "main",
-                          options: [
-                            { label: "Vải chính", value: "main" },
-                            { label: "Vải phụ (lót/bèo)", value: "secondary" },
-                            { label: "NPL", value: "accessory" },
-                          ],
-                          admin: { width: "20%" },
-                        },
-                      ],
-                    },
-                  ],
+                  name: "fabricSheetUrl",
+                  label: "Link Google Sheet bảng định mức",
+                  type: "text",
+                  access: accessByRole(B2_VIEW_ROLES),
+                  admin: {
+                    description:
+                      "Dán link Google Sheet công khai (chia sẻ ai có link xem được).",
+                  },
+                },
+                {
+                  name: "allowanceApproved",
+                  label: "Manager đã duyệt",
+                  type: "checkbox",
+                  defaultValue: false,
+                  access: accessByRole(B2_VIEW_ROLES),
+                  admin: {
+                    description: "Manager tick để xác nhận → tự sang bước tiếp.",
+                  },
                 },
                 {
                   type: "row",
                   fields: [
                     {
                       name: "allowanceApprovedAt",
-                      label: "Ngày Manager duyệt",
+                      label: "Ngày duyệt",
                       type: "date",
-                      admin: { width: "50%", date: { pickerAppearance: "dayOnly" } },
+                      access: accessByRole(B2_VIEW_ROLES),
+                      admin: {
+                        width: "50%",
+                        readOnly: true,
+                        date: { pickerAppearance: "dayOnly" },
+                      },
                     },
                     {
                       name: "allowanceApprovedBy",
-                      label: "Manager duyệt",
+                      label: "Người duyệt",
                       type: "relationship",
                       relationTo: "users",
                       filterOptions: () => ({ role: { in: ["manager", "admin"] } }),
-                      admin: { width: "50%" },
+                      access: accessByRole(B2_VIEW_ROLES),
+                      admin: { width: "50%", readOnly: true },
                     },
                   ],
                 },
               ],
             },
 
-            // ── B3 — Mua NL ──────────────────────────────
+            // ── B3 — Duyệt vải (input up + sales xem) ───────
             {
               type: "collapsible",
-              label: "B3 — Mua nguyên liệu",
+              label: "2) Duyệt vải (Input show vải đã mua)",
               admin: {
                 condition: (_, data) => reachedB3.includes(data?.status ?? ""),
                 initCollapsed: false,
               },
               fields: [
                 {
-                  type: "row",
-                  fields: [
-                    {
-                      name: "purchaseStartedAt",
-                      label: "Ngày bắt đầu đặt",
-                      type: "date",
-                      admin: { width: "33%", date: { pickerAppearance: "dayOnly" } },
-                    },
-                    {
-                      name: "purchaseExpectedAt",
-                      label: "Dự kiến nhận",
-                      type: "date",
-                      admin: { width: "33%", date: { pickerAppearance: "dayOnly" } },
-                    },
-                    {
-                      name: "purchaseReceivedAt",
-                      label: "Ngày nhận đủ NL",
-                      type: "date",
-                      admin: { width: "34%", date: { pickerAppearance: "dayOnly" } },
-                    },
-                  ],
-                },
-                {
-                  name: "purchaseInvoiceFile",
-                  label: "Toa NPL / Hoá đơn mua",
+                  name: "fabricCheckPhoto",
+                  label: "Ảnh vải đã mua",
                   type: "upload",
                   relationTo: "media",
-                },
-                {
-                  name: "purchaseQualityCheck",
-                  label: "Ghi chú kiểm chất lượng vải nhận",
-                  type: "textarea",
+                  access: accessByRole(B3_PLUS_VIEW_ROLES),
                   admin: {
                     description:
-                      "Màu / chất / lỗi vải / test giặt với vải lạ — sales note lại để truy vết khi sản xuất.",
-                    rows: 3,
+                      "Input upload ảnh vải nhận từ NCC. Có ảnh là tự sang bước thêu.",
                   },
                 },
               ],
             },
 
-            // ── B4 — Gửi đề bài NCC ────────────────────
+            // ── B4 — Ảnh thêu (input up + sales tick) ───────
             {
               type: "collapsible",
-              label: "B4 — Gửi đề bài NCC",
+              label: "3) Ảnh thêu",
               admin: {
                 condition: (_, data) => reachedB4.includes(data?.status ?? ""),
                 initCollapsed: false,
               },
               fields: [
                 {
-                  type: "row",
-                  fields: [
-                    {
-                      name: "supplierBriefSentAt",
-                      label: "Ngày gửi đề bài",
-                      type: "date",
-                      admin: { width: "50%", date: { pickerAppearance: "dayOnly" } },
-                    },
-                    {
-                      name: "supplierAckAt",
-                      label: "Ngày NCC xác nhận",
-                      type: "date",
-                      admin: { width: "50%", date: { pickerAppearance: "dayOnly" } },
-                    },
-                  ],
-                },
-                {
-                  name: "supplierBriefFile",
-                  label: "File đề bài đã gửi (đầy đủ)",
+                  name: "embroideryPhoto",
+                  label: "Ảnh thêu cập nhật",
                   type: "upload",
                   relationTo: "media",
-                  admin: {
-                    description:
-                      "Có ảnh thiết kế, mô tả style/vải/thêu/NPL/lining/phụ kiện/deadline.",
-                  },
+                  access: accessByRole(B3_PLUS_VIEW_ROLES),
+                  admin: { description: "Input upload ảnh thêu mới nhất." },
                 },
                 {
-                  name: "approvalSampleRequired",
-                  label: "Cần làm mẫu duyệt trước (mã lạ/phức tạp)",
+                  name: "embroideryApproved",
+                  label: "Sales đã duyệt",
                   type: "checkbox",
                   defaultValue: false,
+                  access: accessByRole(B3_PLUS_VIEW_ROLES),
+                  admin: {
+                    description: "Sales tick khi ảnh thêu OK → tự sang bước hoàn thiện.",
+                  },
                 },
                 {
-                  name: "approvalSampleFile",
-                  label: "Mẫu đã duyệt",
-                  type: "upload",
-                  relationTo: "media",
-                  admin: {
-                    condition: (_, data) =>
-                      Boolean(data?.approvalSampleRequired),
-                  },
+                  name: "embroideryApprovedAt",
+                  label: "Ngày sales duyệt",
+                  type: "date",
+                  access: accessByRole(B3_PLUS_VIEW_ROLES),
+                  admin: { readOnly: true, date: { pickerAppearance: "dayOnly" } },
                 },
               ],
             },
 
-            // ── B5 — Sản xuất (Thêu + May) ──────────────
+            // ── B5 — Ảnh hoàn thiện (input up + sales tick) ──
             {
               type: "collapsible",
-              label: "B5 — Sản xuất",
+              label: "4) Ảnh hoàn thiện",
               admin: {
                 condition: (_, data) => reachedB5.includes(data?.status ?? ""),
                 initCollapsed: false,
               },
               fields: [
                 {
-                  name: "productionStartedAt",
-                  label: "Ngày NCC nhận vải",
-                  type: "date",
-                  admin: { date: { pickerAppearance: "dayOnly" } },
+                  name: "sewingPhoto",
+                  label: "Ảnh hoàn thiện (may xong)",
+                  type: "upload",
+                  relationTo: "media",
+                  access: accessByRole(B3_PLUS_VIEW_ROLES),
+                  admin: { description: "Input upload ảnh sau khi may + ráp xong." },
                 },
                 {
-                  name: "embroideryUpdates",
-                  label: "Ảnh thêu cập nhật",
-                  type: "array",
+                  name: "sewingApproved",
+                  label: "Sales đã duyệt",
+                  type: "checkbox",
+                  defaultValue: false,
+                  access: accessByRole(B3_PLUS_VIEW_ROLES),
                   admin: {
-                    description:
-                      "Mỗi tuần phải có 1 ảnh — thiếu sẽ bị Telegram nhắc.",
+                    description: "Sales tick khi hàng OK → tự sang bước QC/ship.",
                   },
-                  fields: [
-                    {
-                      type: "row",
-                      fields: [
-                        {
-                          name: "date",
-                          label: "Ngày",
-                          type: "date",
-                          required: true,
-                          admin: { width: "30%", date: { pickerAppearance: "dayOnly" } },
-                        },
-                        {
-                          name: "photo",
-                          label: "Ảnh",
-                          type: "upload",
-                          relationTo: "media",
-                          required: true,
-                          admin: { width: "70%" },
-                        },
-                      ],
-                    },
-                    { name: "notes", type: "text", label: "Ghi chú" },
-                  ],
                 },
                 {
-                  name: "sewingUpdates",
-                  label: "Ảnh may cập nhật",
-                  type: "array",
-                  admin: { description: "Sau 4 tuần phải có ảnh đầu tiên." },
-                  fields: [
-                    {
-                      type: "row",
-                      fields: [
-                        {
-                          name: "date",
-                          label: "Ngày",
-                          type: "date",
-                          required: true,
-                          admin: { width: "30%", date: { pickerAppearance: "dayOnly" } },
-                        },
-                        {
-                          name: "photo",
-                          label: "Ảnh",
-                          type: "upload",
-                          relationTo: "media",
-                          required: true,
-                          admin: { width: "70%" },
-                        },
-                      ],
-                    },
-                    { name: "notes", type: "text", label: "Ghi chú" },
-                  ],
+                  name: "sewingApprovedAt",
+                  label: "Ngày sales duyệt",
+                  type: "date",
+                  access: accessByRole(B3_PLUS_VIEW_ROLES),
+                  admin: { readOnly: true, date: { pickerAppearance: "dayOnly" } },
                 },
               ],
             },
 
-            // ── B6 — QC + Giao ──────────────────────────
+            // ── B6 — QC / Đóng gói ship (sales up) ──────────
             {
               type: "collapsible",
-              label: "B6 — QC & Giao hàng",
+              label: "5) QC / Đóng gói ship hàng",
               admin: {
                 condition: (_, data) => reachedB6.includes(data?.status ?? ""),
                 initCollapsed: false,
               },
               fields: [
                 {
-                  type: "row",
-                  fields: [
-                    {
-                      name: "qcDate",
-                      label: "Ngày QC final",
-                      type: "date",
-                      admin: { width: "50%", date: { pickerAppearance: "dayOnly" } },
-                    },
-                    {
-                      name: "qcResult",
-                      label: "Kết quả QC",
-                      type: "select",
-                      options: [
-                        { label: "✅ Đạt", value: "pass" },
-                        { label: "❌ Không đạt — cần sửa", value: "fail" },
-                        { label: "⚠️ Một phần đạt", value: "partial" },
-                      ],
-                      admin: { width: "50%" },
-                    },
-                  ],
-                },
-                {
-                  name: "qcNotes",
-                  label: "Ghi chú QC",
-                  type: "textarea",
+                  name: "qcShipPhoto",
+                  label: "Ảnh QC / đóng gói ship",
+                  type: "upload",
+                  relationTo: "media",
+                  access: accessByRole(B3_PLUS_VIEW_ROLES),
                   admin: {
-                    description:
-                      "Checklist: không bẩn / form / smock / chỉ thừa / nhăn / size / mác.",
+                    description: "Sales upload ảnh QC + đóng gói. Có ảnh + ngày giao là done.",
                   },
                 },
                 {
@@ -706,21 +611,17 @@ export const Orders: CollectionConfig = {
                       name: "deliveryDate",
                       label: "Ngày giao thực tế",
                       type: "date",
+                      access: accessByRole(B3_PLUS_VIEW_ROLES),
                       admin: { width: "50%", date: { pickerAppearance: "dayOnly" } },
                     },
                     {
                       name: "trackingNumber",
                       label: "Mã vận đơn / tracking",
                       type: "text",
+                      access: accessByRole(B3_PLUS_VIEW_ROLES),
                       admin: { width: "50%" },
                     },
                   ],
-                },
-                {
-                  name: "deliveryProof",
-                  label: "Bằng chứng giao",
-                  type: "upload",
-                  relationTo: "media",
                 },
               ],
             },

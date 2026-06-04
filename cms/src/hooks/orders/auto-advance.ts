@@ -4,11 +4,13 @@ import type { CollectionBeforeChangeHook } from "payload";
  * Auto-advance status khi đã fill đủ field của bước hiện tại.
  *
  * Save → kiểm tra checklist bước hiện tại → đẩy sang bước tiếp.
- * Manager cứ điền dần dần là Order tự đi qua B1 → B2 → ... → done.
+ * User cứ điền dần dần là Order tự đi qua B1 → B2 → ... → done.
  *
- * Logic ngầm: chỉ auto-advance lên 1 bước/lần save (nếu user đột nhiên
- * điền cả B2+B3 cùng lúc thì lần save sau sẽ đẩy tiếp). Tránh nhảy 2-3
- * bước khó tracking.
+ * Đồng thời tự stamp ngày duyệt (allowanceApprovedAt, embroideryApprovedAt,
+ * sewingApprovedAt) khi checkbox vừa được tick — để track ai/khi nào duyệt.
+ *
+ * Logic ngầm: chỉ auto-advance lên 1 bước/lần save. Nếu user fill nhiều
+ * bước cùng lúc thì lần save sau sẽ đẩy tiếp.
  */
 
 interface OrderData {
@@ -18,23 +20,24 @@ interface OrderData {
   invoiceFile?: unknown;
   briefFile?: unknown;
   totalAmount?: number;
-  accountantConfirmed?: boolean;
-  confirmationVerified?: string;
   expectedDeliveryDate?: string;
-  documentMatch?: { status?: string; salesConfirmedMismatch?: boolean };
-  // B2
-  fabricAllowances?: unknown[];
+  // B2 — Định mức (link Sheet + manager tick)
+  fabricSheetUrl?: string;
+  allowanceApproved?: boolean;
+  allowanceApprovedAt?: string;
   allowanceApprovedBy?: unknown;
-  // B3
-  purchaseReceivedAt?: string;
-  // B4
-  supplierBriefSentAt?: string;
-  // B5
-  productionStartedAt?: string;
-  embroideryUpdates?: unknown[];
-  sewingUpdates?: unknown[];
-  // B6
-  qcResult?: string;
+  // B3 — Duyệt vải (1 ảnh)
+  fabricCheckPhoto?: unknown;
+  // B4 — Thêu (ảnh + sales tick)
+  embroideryPhoto?: unknown;
+  embroideryApproved?: boolean;
+  embroideryApprovedAt?: string;
+  // B5 — Hoàn thiện (ảnh + sales tick)
+  sewingPhoto?: unknown;
+  sewingApproved?: boolean;
+  sewingApprovedAt?: string;
+  // B6 — QC / ship
+  qcShipPhoto?: unknown;
   deliveryDate?: string;
 }
 
@@ -49,10 +52,7 @@ function nonEmpty(v: unknown): boolean {
 }
 
 function isB1Complete(d: OrderData, o: OrderData): boolean {
-  // Soft check: chỉ require các trường Sales tự điền được. Các flag AI
-  // (documentMatch, confirmationVerified) là quality check optional —
-  // không gate workflow. accountantConfirmed cũng optional cho dev nhẹ;
-  // KT có thể tick sau, không chặn quy trình.
+  // Soft check: chỉ require các trường Sales tự điền được.
   const customer = pick(d, o, "customer");
   const invoice = pick(d, o, "invoiceFile");
   const brief = pick(d, o, "briefFile");
@@ -70,28 +70,33 @@ function isB1Complete(d: OrderData, o: OrderData): boolean {
 }
 
 function isB2Complete(d: OrderData, o: OrderData): boolean {
-  const allowances = pick(d, o, "fabricAllowances");
-  const approver = pick(d, o, "allowanceApprovedBy");
-  return Array.isArray(allowances) && allowances.length > 0 && nonEmpty(approver);
+  const sheet = pick(d, o, "fabricSheetUrl");
+  const approved = pick(d, o, "allowanceApproved");
+  return nonEmpty(sheet) && approved === true;
 }
 
 function isB3Complete(d: OrderData, o: OrderData): boolean {
-  return nonEmpty(pick(d, o, "purchaseReceivedAt"));
+  // Có ảnh vải duyệt là đủ.
+  return nonEmpty(pick(d, o, "fabricCheckPhoto"));
 }
 
 function isB4Complete(d: OrderData, o: OrderData): boolean {
-  return nonEmpty(pick(d, o, "supplierBriefSentAt"));
+  // Có ảnh thêu + sales tick duyệt.
+  const photo = pick(d, o, "embroideryPhoto");
+  const approved = pick(d, o, "embroideryApproved");
+  return nonEmpty(photo) && approved === true;
 }
 
 function isB5Complete(d: OrderData, o: OrderData): boolean {
-  const start = pick(d, o, "productionStartedAt");
-  const emb = (pick(d, o, "embroideryUpdates") as unknown[] | undefined) ?? [];
-  const sew = (pick(d, o, "sewingUpdates") as unknown[] | undefined) ?? [];
-  return nonEmpty(start) && (emb.length > 0 || sew.length > 0);
+  // Có ảnh hoàn thiện + sales tick duyệt.
+  const photo = pick(d, o, "sewingPhoto");
+  const approved = pick(d, o, "sewingApproved");
+  return nonEmpty(photo) && approved === true;
 }
 
 function isB6Complete(d: OrderData, o: OrderData): boolean {
-  return pick(d, o, "qcResult") === "pass" && nonEmpty(pick(d, o, "deliveryDate"));
+  // Có ảnh QC/đóng gói + ngày giao.
+  return nonEmpty(pick(d, o, "qcShipPhoto")) && nonEmpty(pick(d, o, "deliveryDate"));
 }
 
 const ADVANCE_RULES: Array<{
@@ -107,14 +112,54 @@ const ADVANCE_RULES: Array<{
   { from: "b6", to: "done", check: isB6Complete },
 ];
 
+/**
+ * Khi checkbox approve vừa được tick (false → true) trong lần save này,
+ * tự stamp ngày + user vào field *ApprovedAt / *ApprovedBy tương ứng.
+ */
+function stampApprovalDates(
+  data: OrderData,
+  original: OrderData,
+  userId: string | undefined,
+): void {
+  const today = new Date().toISOString();
+  // B2
+  if (
+    data.allowanceApproved === true &&
+    !original.allowanceApproved &&
+    !data.allowanceApprovedAt
+  ) {
+    data.allowanceApprovedAt = today;
+    if (userId && !data.allowanceApprovedBy) data.allowanceApprovedBy = userId;
+  }
+  // B4
+  if (
+    data.embroideryApproved === true &&
+    !original.embroideryApproved &&
+    !data.embroideryApprovedAt
+  ) {
+    data.embroideryApprovedAt = today;
+  }
+  // B5
+  if (
+    data.sewingApproved === true &&
+    !original.sewingApproved &&
+    !data.sewingApprovedAt
+  ) {
+    data.sewingApprovedAt = today;
+  }
+}
+
 export const autoAdvanceStage: CollectionBeforeChangeHook = ({
   data,
   originalDoc,
   operation,
+  req,
 }) => {
   if (operation !== "update") return data;
   const d = data as OrderData;
   const o = (originalDoc ?? {}) as OrderData;
+
+  stampApprovalDates(d, o, (req?.user as { id?: string } | undefined)?.id);
 
   const current = d.status ?? o.status;
   // Manual override: nếu user đổi status sang giá trị khác (paused/cancelled
