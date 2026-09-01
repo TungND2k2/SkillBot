@@ -9,6 +9,12 @@
  * All data lives in Payload CMS. This process never touches MongoDB directly.
  */
 import "dotenv/config";
+import { setDefaultResultOrder } from "node:dns";
+
+// Một số VM có route IPv6 ra ngoài bị treo (ETIMEDOUT) dù IPv4 vẫn thông —
+// undici (fetch) mặc định thử cả 2 nên hay bị fail/timeout khi gọi Telegram
+// API. Ép ưu tiên IPv4 để tránh treo.
+setDefaultResultOrder("ipv4first");
 
 import { loadConfig } from "./config.js";
 import { logger } from "./utils/logger.js";
