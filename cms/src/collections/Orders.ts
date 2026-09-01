@@ -68,8 +68,9 @@ export const Orders: CollectionConfig = {
     ],
     group: "Sản xuất",
     components: {
-      beforeListTable: ["/components/admin/OrdersExportButton"],
+      beforeListTable: ["/components/admin/OrdersListToolbar"],
     },
+
   },
   access: {
     // sales chỉ thấy đơn của mình; manager/admin/accountant thấy hết
