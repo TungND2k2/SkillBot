@@ -3,59 +3,62 @@
    Deep Industrial Slate/Navy Theme for Garment & Apparel ERP
    ───────────────────────────────────────────────────────────── */
 
-/* ── 1. Root & Theme Variable Overrides (Force High Specificity) ── */
+/* ── 1. Global Reset & Theme Variables Override ── */
 :root,
 html,
 html[data-theme="dark"],
 html[data-theme="light"],
 body {
-  --theme-bg: #090d16;
-  --theme-input-bg: #0f172a;
-  --theme-elevation-0: #090d16;
-  --theme-elevation-50: #0f172a;
-  --theme-elevation-100: #161f30;
-  --theme-elevation-150: #1e293b;
-  --theme-elevation-200: #2a3b52;
-  --theme-elevation-250: #3b506e;
-  --theme-elevation-300: #64748b;
-  --theme-elevation-400: #94a3b8;
-  --theme-elevation-500: #cbd5e1;
-  --theme-elevation-600: #e2e8f0;
-  --theme-elevation-700: #f1f5f9;
-  --theme-elevation-800: #f8fafc;
-  --theme-elevation-900: #ffffff;
-  --theme-elevation-1000: #ffffff;
+  --theme-bg: #090d16 !important;
+  --theme-input-bg: #0f172a !important;
+  --theme-elevation-0: #090d16 !important;
+  --theme-elevation-50: #0f172a !important;
+  --theme-elevation-100: #161f30 !important;
+  --theme-elevation-150: #1e293b !important;
+  --theme-elevation-200: #2a3b52 !important;
+  --theme-elevation-250: #3b506e !important;
+  --theme-elevation-300: #64748b !important;
+  --theme-elevation-400: #94a3b8 !important;
+  --theme-elevation-500: #cbd5e1 !important;
+  --theme-elevation-600: #e2e8f0 !important;
+  --theme-elevation-700: #f1f5f9 !important;
+  --theme-elevation-800: #f8fafc !important;
+  --theme-elevation-900: #ffffff !important;
+  --theme-elevation-1000: #ffffff !important;
 
-  --theme-text: #f1f5f9;
-  --theme-text-muted: #94a3b8;
+  --theme-text: #f1f5f9 !important;
+  --theme-text-muted: #94a3b8 !important;
+  --theme-border-color: #1e293b !important;
 
-  /* ERP Electric Blue & Emerald Action Tokens */
-  --theme-success-50: 238 244 255;
-  --theme-success-100: 219 234 254;
-  --theme-success-200: 191 219 254;
-  --theme-success-400: 96 165 250;
-  --theme-success-500: 37 99 235;
-  --theme-success-600: 29 78 216;
+  /* ERP Action Accents */
+  --theme-success-50: #eff6ff !important;
+  --theme-success-100: #dbeafe !important;
+  --theme-success-200: #bfdbfe !important;
+  --theme-success-400: #60a5fa !important;
+  --theme-success-500: #2563eb !important;
+  --theme-success-600: #1d4ed8 !important;
 
-  --style-radius-s: 6px;
-  --style-radius-m: 8px;
-  --style-radius-l: 12px;
+  --style-radius-s: 6px !important;
+  --style-radius-m: 8px !important;
+  --style-radius-l: 12px !important;
 
   background-color: #090d16 !important;
   color: #f1f5f9 !important;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-  -webkit-font-smoothing: antialiased;
 }
 
-/* ── 2. App Structure & Canvas ── */
+/* ── 2. Canvas & App Layout ── */
 body,
 #app,
 .template-default,
 .template-default__wrap,
 .template-default__content,
+.template-default__body,
 .collection-list,
 .collection-edit,
-.dashboard {
+.dashboard,
+.render-fields,
+main {
   background-color: #090d16 !important;
   color: #f1f5f9 !important;
 }
@@ -64,7 +67,7 @@ body,
 .app-header {
   background-color: #0d1422 !important;
   border-bottom: 1px solid #1e293b !important;
-  padding: 10px 20px !important;
+  padding: 10px 24px !important;
   box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.5) !important;
   backdrop-filter: blur(12px) !important;
   z-index: 50 !important;
@@ -77,13 +80,14 @@ body,
 /* ── 4. Sidebar Navigation (Enterprise Navy) ── */
 .nav,
 .nav__wrap,
-.nav__scroll {
+.nav__scroll,
+nav {
   background-color: #090d16 !important;
   border-right: 1px solid #1e293b !important;
 }
 
 .nav__wrap {
-  padding: 12px 8px !important;
+  padding: 14px 8px !important;
 }
 
 .nav-group__label {
@@ -96,7 +100,8 @@ body,
   padding: 0 10px !important;
 }
 
-.nav__link {
+.nav__link,
+.nav a {
   border-radius: 8px !important;
   margin: 2px 4px !important;
   padding: 8px 12px !important;
@@ -154,7 +159,7 @@ body,
   justify-content: space-between !important;
 
   h1 {
-    font-size: 22px !important;
+    font-size: 24px !important;
     font-weight: 800 !important;
     letter-spacing: -0.02em !important;
     color: #ffffff !important;
@@ -162,14 +167,20 @@ body,
   }
 }
 
-/* List Controls (Search, Filters, Column selector) */
+/* Search & List Controls Toolbar */
 .list-controls,
-.search-filter {
+.search-filter,
+.collection-list__controls {
   margin-bottom: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
 }
 
 .search-filter__input,
-.list-controls input {
+.list-controls input,
+.search-filter input {
   background: #0f172a !important;
   border: 1px solid #1e293b !important;
   border-radius: 8px !important;
@@ -181,13 +192,15 @@ body,
   &:focus {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+    background: #111c30 !important;
     outline: none !important;
   }
 }
 
 .column-selector__toggle,
 .where-builder__add-filter,
-.list-controls .btn {
+.list-controls .btn,
+.search-filter .btn {
   background: #0f172a !important;
   border: 1px solid #1e293b !important;
   border-radius: 8px !important;
@@ -205,7 +218,8 @@ body,
 /* ── 6. High-Density Enterprise Table / Data Grid ── */
 .table,
 .table__wrap,
-.collection-list__wrap {
+.collection-list__wrap,
+.collection-list__table-wrap {
   background: #0f172a !important;
   border: 1px solid #1e293b !important;
   border-radius: 12px !important;
@@ -296,7 +310,8 @@ body,
 .btn--style-primary,
 .btn--style-secondary,
 .collection-list__header .btn,
-a.btn {
+a.btn,
+button.btn {
   border-radius: 8px !important;
   font-size: 12.5px !important;
   font-weight: 600 !important;
@@ -431,7 +446,7 @@ label {
 .field-type.group .group__content,
 .collapsible__content {
   border: 1px solid #1e293b !important;
-  border-left: 3px solid #3b82f6 !important;
+  border-left: 3.5px solid #3b82f6 !important;
   border-radius: 12px !important;
   background: #0f172a !important;
   padding: 20px !important;
