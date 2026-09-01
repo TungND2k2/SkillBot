@@ -12,7 +12,7 @@ import { z } from "zod";
 
 import { payload, PayloadError } from "../payload/client.js";
 import type { PayloadDoc, PayloadFindResponse, Where } from "../payload/types.js";
-import { formatDoc, formatList } from "./format.js";
+import { formatDoc, formatList, docLink } from "./format.js";
 
 /** Loose tool definition we accept across heterogeneous tool arrays. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -103,7 +103,7 @@ export function createCrudTools<T extends z.ZodRawShape>(opts: CrudOptions<T>): 
             });
             return ok(
               `Tìm thấy ${res.totalDocs} ${label.plural}` +
-                (res.docs.length === 0 ? "" : `:\n${formatList(res.docs, titleField)}`),
+                (res.docs.length === 0 ? "" : `:\n${formatList(res.docs, titleField, slug)}`),
             );
           } catch (e) {
             return err(e instanceof PayloadError ? e.message : String(e));
@@ -125,7 +125,7 @@ export function createCrudTools<T extends z.ZodRawShape>(opts: CrudOptions<T>): 
         async ({ id }) => {
           try {
             const doc = await payload.request<PayloadDoc>(`/api/${slug}/${encodeURIComponent(String(id))}`);
-            return ok(formatDoc(doc));
+            return ok(formatDoc(doc, slug));
           } catch (e) {
             return err(e instanceof PayloadError ? e.message : String(e));
           }
@@ -147,7 +147,7 @@ export function createCrudTools<T extends z.ZodRawShape>(opts: CrudOptions<T>): 
               `/api/${slug}`,
               { method: "POST", body: data },
             );
-            return ok(`✅ Đã tạo ${label.singular} #${res.doc.id}`);
+            return ok(`✅ Đã tạo ${label.singular} — ${docLink(slug, String(res.doc.id))}`);
           } catch (e) {
             return err(e instanceof PayloadError ? e.message : String(e));
           }
@@ -176,7 +176,7 @@ export function createCrudTools<T extends z.ZodRawShape>(opts: CrudOptions<T>): 
               `/api/${slug}/${encodeURIComponent(String(id))}`,
               { method: "PATCH", body: patch },
             );
-            return ok(`✅ Đã cập nhật ${label.singular} #${res.doc.id}`);
+            return ok(`✅ Đã cập nhật ${label.singular} — ${docLink(slug, String(res.doc.id))}`);
           } catch (e) {
             return err(e instanceof PayloadError ? e.message : String(e));
           }

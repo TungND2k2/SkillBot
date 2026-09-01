@@ -1,18 +1,37 @@
 /** Simple text helpers used across tool result rendering. */
 import type { PayloadDoc } from "../payload/types.js";
+import { getConfig } from "../config.js";
+
+/**
+ * Link cho user bấm vào xem chi tiết 1 bản ghi — ưu tiên trang portal
+ * (đẹp, đúng nghiệp vụ) nếu collection đó có trang detail; các collection
+ * còn lại fallback về trang edit của Payload admin (luôn tồn tại).
+ */
+const PORTAL_DETAIL_SLUGS = new Set(["orders"]);
+
+export function docLink(slug: string, id: string): string {
+  const base = getConfig().PUBLIC_FORM_BASE_URL.replace(/\/$/, "");
+  return PORTAL_DETAIL_SLUGS.has(slug)
+    ? `${base}/${slug}/${id}`
+    : `${base}/admin/collections/${slug}/${id}`;
+}
 
 /** Format a list of docs into a compact human-readable summary for Claude. */
-export function formatList(docs: PayloadDoc[], titleField: string = "id"): string {
+export function formatList(docs: PayloadDoc[], titleField: string = "id", slug?: string): string {
   if (docs.length === 0) return "(không có kết quả)";
   return docs
-    .map((d, i) => `${i + 1}. #${d.id} · ${String(d[titleField] ?? "—")}`)
+    .map((d, i) => {
+      const title = String(d[titleField] ?? "—");
+      const link = slug ? ` — ${docLink(slug, String(d.id))}` : ` (#${d.id})`;
+      return `${i + 1}. ${title}${link}`;
+    })
     .join("\n");
 }
 
 /** Render full document detail. Strips internal Payload fields. */
-export function formatDoc(doc: PayloadDoc): string {
+export function formatDoc(doc: PayloadDoc, slug?: string): string {
   const skip = new Set(["id", "createdAt", "updatedAt", "_id", "__v"]);
-  const lines = [`#${doc.id}`];
+  const lines = [slug ? `🔗 ${docLink(slug, String(doc.id))}` : `#${doc.id}`];
   for (const [k, v] of Object.entries(doc)) {
     if (skip.has(k)) continue;
     if (v === null || v === undefined || v === "") continue;
