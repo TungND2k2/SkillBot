@@ -3,7 +3,6 @@
    Masterpiece UI/UX for Apparel & Garment Manufacturing
    ───────────────────────────────────────────────────────────── */
 
-
 /* ── 1. Root & Theme Variable Overrides (Force High Specificity) ── */
 :root,
 html,
@@ -45,12 +44,12 @@ body {
 
   background-color: #030712 !important;
   color: #f8fafc !important;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif !important;
   -webkit-font-smoothing: antialiased;
   letter-spacing: -0.01em;
 }
 
-/* ── 2. Canvas & App Layout (Clean & Open) ── */
+/* ── 2. Canvas & App Layout ── */
 body,
 #app,
 .template-default,
@@ -66,31 +65,61 @@ main {
   color: #f8fafc !important;
 }
 
-/* ── 3. Top Header Bar (Ultra-Clean Glassmorphism) ── */
+/* ── 3. Top Header Bar (Ultra-Clean Glassmorphism Navbar) ── */
 .app-header {
-  background: rgba(8, 13, 26, 0.8) !important;
+  background: rgba(8, 13, 26, 0.85) !important;
   backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
   padding: 10px 24px !important;
   box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.6) !important;
   z-index: 50 !important;
+  height: 56px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+
+  .app-header__step-nav,
+  .step-nav {
+    display: flex !important;
+    align-items: center !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+
+    a {
+      color: #38bdf8 !important;
+      text-decoration: none !important;
+
+      &:hover {
+        text-decoration: underline !important;
+      }
+    }
+
+    span,
+    .step-nav__separator {
+      color: #475569 !important;
+      margin: 0 8px !important;
+    }
+  }
 
   .app-header__controls {
-    gap: 14px !important;
+    gap: 12px !important;
+    display: flex !important;
+    align-items: center !important;
   }
 }
 
-/* ── 4. Sidebar Navigation (Obsidian Slate with Neon Blue Indicator) ── */
+/* ── 4. Sidebar Navigation (Sleek Obsidian Navy with Custom Icons) ── */
 .nav,
 .nav__wrap,
 .nav__scroll,
 nav {
   background-color: #050811 !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.07) !important;
+  width: 250px !important;
 }
 
 .nav__wrap {
-  padding: 16px 10px !important;
+  padding: 14px 8px !important;
 }
 
 .nav-group__label {
@@ -99,11 +128,10 @@ nav {
   font-size: 10px !important;
   font-weight: 800 !important;
   color: #475569 !important;
-  margin: 22px 8px 6px 8px !important;
+  margin: 20px 8px 6px 8px !important;
   padding: 0 4px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+  padding-bottom: 4px !important;
 }
 
 .nav__link,
@@ -121,8 +149,8 @@ nav {
   gap: 10px !important;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.04) !important;
-    border-color: rgba(255, 255, 255, 0.06) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
     color: #ffffff !important;
     transform: translateX(2px);
   }
@@ -130,9 +158,9 @@ nav {
 
 .nav__link--active,
 .nav__link[aria-current="page"] {
-  background: linear-gradient(90deg, rgba(37, 99, 235, 0.16) 0%, rgba(37, 99, 235, 0.02) 100%) !important;
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.02) 100%) !important;
   color: #38bdf8 !important;
-  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
   font-weight: 700 !important;
   position: relative !important;
 
@@ -149,6 +177,21 @@ nav {
   }
 }
 
+/* ── Auto-Inject Collection Emoji Icons on Sidebar ── */
+.nav a[href*="/collections/users"]::before { content: "👤"; font-size: 13px; margin-right: 2px; }
+.nav a[href*="/collections/media"]::before { content: "📁"; font-size: 13px; margin-right: 2px; }
+.nav a[href*="/collections/telegram"]::before { content: "🤖"; font-size: 13px; margin-right: 2px; }
+.nav a[href*="/collections/customers"]::before { content: "🤝"; font-size: 13px; margin-right: 2px; }
+.nav a[href*="/collections/suppliers"]::before { content: "🏭"; font-size: 13px; margin-right: 2px; }
+.nav a[href*="/collections/orders"]::before { content: "📦"; font-size: 13px; margin-right: 2px; }
+.nav a[href*="/collections/fabrics"]::before { content: "🧵"; font-size: 13px; margin-right: 2px; }
+.nav a[href*="/collections/inventory"]::before { content: "📊"; font-size: 13px; margin-right: 2px; }
+.nav a[href*="/collections/allowances"]::before { content: "📐"; font-size: 13px; margin-right: 2px; }
+.nav a[href*="/collections/qc-logs"]::before { content: "🔍"; font-size: 13px; margin-right: 2px; }
+.nav a[href*="/collections/feedbacks"]::before { content: "💬"; font-size: 13px; margin-right: 2px; }
+.nav a[href*="/collections/reminders"]::before { content: "⏰"; font-size: 13px; margin-right: 2px; }
+.nav a[href*="/collections/order-intake"]::before { content: "🔗"; font-size: 13px; margin-right: 2px; }
+
 /* ── 5. Main Collection View Layout (Open, Airy, Non-boxed) ── */
 .collection-list {
   padding: 24px 36px !important;
@@ -156,7 +199,6 @@ nav {
   margin: 0 auto !important;
 }
 
-/* Reset the wrap to transparent so title and toolbar breathe */
 .collection-list__wrap {
   background: transparent !important;
   border: none !important;
@@ -178,9 +220,6 @@ nav {
     letter-spacing: -0.03em !important;
     color: #ffffff !important;
     margin: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
   }
 }
 
@@ -324,7 +363,7 @@ nav {
   font-weight: 800 !important;
 }
 
-/* ── 8. Primary & Secondary Buttons (Glow Accents) ── */
+/* ── 8. Primary & Secondary Buttons ── */
 .btn,
 .btn--style-primary,
 .btn--style-secondary,
@@ -372,7 +411,7 @@ a[href*="/create"],
   }
 }
 
-/* ── 9. Form View & Document Edit (ERP Detail View) ── */
+/* ── 9. Form View & Document Edit ── */
 .collection-edit,
 .document-fields,
 .form {
@@ -506,18 +545,13 @@ label {
   }
 }
 
-/* ── 11. Empty State Styling (Clean & Minimalist) ── */
+/* ── 11. Empty State (Clean & Airy) ── */
 .collection-list__no-results,
 .no-results {
-  padding: 60px 20px !important;
+  padding: 48px 20px !important;
   text-align: center !important;
   color: #64748b !important;
   font-size: 13px !important;
-
-  p {
-    color: #94a3b8 !important;
-    margin-top: 6px !important;
-  }
 }
 
 /* ── 12. Custom Scrollbar ── */
