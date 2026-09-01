@@ -18,6 +18,7 @@ import { advanceOrderStatus } from "./orders.workflow.js";
 import { findLowStock, weeklyReport } from "./inventory.queries.js";
 import { formTools } from "./forms.tools.js";
 import { orderStatusSummary } from "./orders.summary.js";
+import { createOrderIntakeLink } from "./order-intake.tools.js";
 
 export const allTools = [
   // CRUD generic — auto-generated từ factory.
@@ -39,4 +40,5 @@ export const allTools = [
   findLowStock,
   weeklyReport,
   orderStatusSummary,
+  createOrderIntakeLink,
 ];

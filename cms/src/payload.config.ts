@@ -25,6 +25,7 @@ import { Reminders } from "./collections/Reminders";
 import { TelegramUsers } from "./collections/TelegramUsers";
 import { TelegramGroups } from "./collections/TelegramGroups";
 import { TelegramMembership } from "./collections/TelegramMembership";
+import { OrderIntakeLinks } from "./collections/OrderIntakeLinks";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -83,6 +84,7 @@ export default buildConfig({
     TelegramUsers,
     TelegramGroups,
     TelegramMembership,
+    OrderIntakeLinks,
     Media,
     Counters,
   ],

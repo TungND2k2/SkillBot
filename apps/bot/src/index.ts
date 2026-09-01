@@ -35,14 +35,18 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  // HTTP server cho Payload hooks gọi vào (extract / verify).
-  httpServer = startHttpServer();
-
   const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
   const adminChatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
 
   if (telegramToken) {
     telegram = new TelegramChannel(telegramToken, config);
+  }
+
+  // HTTP server cho Payload hooks gọi vào (extract / verify / notify).
+  // Tạo TelegramChannel trước để route notify-order-created gửi được tin.
+  httpServer = startHttpServer(telegram ?? undefined);
+
+  if (telegram) {
     telegram.start();
 
     const adminChatNum = adminChatId ? Number(adminChatId) : undefined;

@@ -12,6 +12,7 @@ import type { TelegramChannel } from "../telegram/channel.js";
 import { runOrderReminders } from "./order-reminders.js";
 import { runCalendarReminders } from "./calendar-reminders.js";
 import { runMissingSupplierWarnings } from "./missing-suppliers.js";
+import { runTatAlerts } from "./tat-alerts.js";
 
 interface InventoryRow {
   id: string;
@@ -149,6 +150,11 @@ export function buildCronJobs(opts: BuildCronJobsOptions = {}): CronJob[] {
       schedule: "25 * * * *", // mỗi giờ phút thứ 25 (lệch các cron khác)
       run: () =>
         runMissingSupplierWarnings({ telegram: tg, adminChatId: adminChat }),
+    });
+    jobs.push({
+      name: "daily-tat-digest",
+      schedule: "0 8 * * *", // 8h sáng mỗi ngày
+      run: () => runTatAlerts({ telegram: tg }),
     });
   }
 

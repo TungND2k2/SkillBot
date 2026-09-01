@@ -96,6 +96,16 @@ export const TelegramGroups: CollectionConfig = {
       },
     },
     {
+      name: "tatAlertTarget",
+      label: "Nhận cảnh báo TAT hằng ngày",
+      type: "checkbox",
+      defaultValue: false,
+      admin: {
+        description:
+          "Bật để group này nhận digest cảnh báo đơn sắp/quá hạn TAT mỗi sáng (cron daily-tat-digest).",
+      },
+    },
+    {
       name: "messageCount",
       label: "Tổng tin nhắn",
       type: "number",

@@ -57,4 +57,8 @@ export const botClient = {
       hasConfirmationKeyword: boolean;
       detectedKeywords: string[];
     }>("/api/verify-image", { mediaUrl, mediaType }),
+
+  /** Báo cho Telegram chat đã request 1 link tạo đơn rằng đơn đã được tạo xong. */
+  notifyOrderCreated: (chatId: number, text: string) =>
+    call<{ sent: boolean }>("/api/notify-order-created", { chatId, text }),
 };

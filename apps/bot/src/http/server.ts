@@ -22,6 +22,7 @@ import { compareDocuments } from "../extraction/compare.js";
 import { verifyConfirmationImage } from "../extraction/verify-image.js";
 import type { InvoiceExtract, BriefExtract } from "../extraction/types.js";
 import { registerChatRoutes } from "./chat.js";
+import type { TelegramChannel } from "../telegram/channel.js";
 
 export interface HttpServerHandle {
   stop: () => Promise<void>;
@@ -35,7 +36,7 @@ async function downloadFile(url: string): Promise<{ buffer: Buffer; mediaType: s
   return { buffer: Buffer.from(arr), mediaType: mt };
 }
 
-export function startHttpServer(): HttpServerHandle {
+export function startHttpServer(telegram?: TelegramChannel): HttpServerHandle {
   const cfg = getConfig();
   const app = new Hono();
 
@@ -135,6 +136,26 @@ export function startHttpServer(): HttpServerHandle {
       const msg = e instanceof Error ? e.message : String(e);
       logger.error("Verify", `image failed: ${msg}`);
       return c.json({ error: "verify-failed", message: msg }, 500);
+    }
+  });
+
+  // ── Notify: CMS → bot khi 1 order-intake link được nộp ─────────
+  const notifySchema = z.object({
+    chatId: z.number(),
+    text: z.string().min(1),
+  });
+  app.post("/api/notify-order-created", async (c) => {
+    const body = await c.req.json().catch(() => ({}));
+    const parsed = notifySchema.safeParse(body);
+    if (!parsed.success) return c.json({ error: "bad-request" }, 400);
+    if (!telegram) return c.json({ error: "telegram-disabled" }, 503);
+    try {
+      await telegram.sendMessage(parsed.data.chatId, parsed.data.text);
+      return c.json({ ok: true, data: { sent: true } });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error("Notify", `order-created failed: ${msg}`);
+      return c.json({ error: "send-failed", message: msg }, 500);
     }
   });
 

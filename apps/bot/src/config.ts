@@ -19,6 +19,9 @@ const ConfigSchema = z.object({
   BOT_HTTP_PORT: z.coerce.number().default(4001),
   INTERNAL_SECRET: z.string().min(8).default("change-me-internal-secret"),
 
+  // Base URL public để sinh link cho user điền form (vd link tạo đơn không token)
+  PUBLIC_FORM_BASE_URL: z.string().url().default("http://localhost:3001"),
+
   // Logging
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
 
