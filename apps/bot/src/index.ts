@@ -9,12 +9,14 @@
  * All data lives in Payload CMS. This process never touches MongoDB directly.
  */
 import "dotenv/config";
-import { setDefaultResultOrder } from "node:dns";
+import { setDefaultAutoSelectFamily } from "node:net";
 
-// Một số VM có route IPv6 ra ngoài bị treo (ETIMEDOUT) dù IPv4 vẫn thông —
-// undici (fetch) mặc định thử cả 2 nên hay bị fail/timeout khi gọi Telegram
-// API. Ép ưu tiên IPv4 để tránh treo.
-setDefaultResultOrder("ipv4first");
+// VM này IPv6 ra ngoài không route được, còn IPv4 tới Telegram chậm
+// (700ms-2s). Node's Happy Eyeballs (autoSelectFamily) đua IPv4/IPv6 song
+// song nhưng chỉ chờ ~250ms/attempt → luôn abort trước khi IPv4 kịp connect,
+// dù IPv4-only luôn thành công. Tắt hẳn racing này để fetch dùng thẳng IPv4.
+// (dns.setDefaultResultOrder KHÔNG đủ — chỉ đổi thứ tự, không tắt race.)
+setDefaultAutoSelectFamily(false);
 
 import { loadConfig } from "./config.js";
 import { logger } from "./utils/logger.js";
