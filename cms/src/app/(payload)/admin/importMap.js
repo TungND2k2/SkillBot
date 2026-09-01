@@ -1,4 +1,6 @@
 import { default as default_58e2c239282f21552c0a35e0a8db8a1a } from '../../../components/admin/WorkflowDiagram'
+import { default as default_erp_dashboard_a1b2c3d4e5f6071829a3b4c5d6e7f809 } from '../../../components/admin/ErpDashboard'
+import { default as default_orders_list_toolbar_b2c3d4e5f6071829a3b4c5d6e7f8091a } from '../../../components/admin/OrdersListToolbar'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -38,6 +40,8 @@ import { S3ClientUploadHandler as S3ClientUploadHandler_s3storage } from '@paylo
 /** @type import('payload').ImportMap */
 export const importMap = {
   "/components/admin/WorkflowDiagram#default": default_58e2c239282f21552c0a35e0a8db8a1a,
+  "/components/admin/ErpDashboard#default": default_erp_dashboard_a1b2c3d4e5f6071829a3b4c5d6e7f809,
+  "/components/admin/OrdersListToolbar#default": default_orders_list_toolbar_b2c3d4e5f6071829a3b4c5d6e7f8091a,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
