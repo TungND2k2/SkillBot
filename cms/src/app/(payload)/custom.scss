@@ -1,36 +1,37 @@
 /* ─────────────────────────────────────────────────────────────
    SkillBot Enterprise ERP Design System — Next-Gen Dark Theme
-   Inspired by Linear, Supabase & Raycast Design Systems
+   Masterpiece UI/UX for Apparel & Garment Manufacturing
    ───────────────────────────────────────────────────────────── */
 
-/* ── 1. Global Reset & Theme Tokens ── */
+
+/* ── 1. Root & Theme Variable Overrides (Force High Specificity) ── */
 :root,
 html,
 html[data-theme="dark"],
 html[data-theme="light"],
 body {
-  --theme-bg: #070b12 !important;
-  --theme-input-bg: #0c121e !important;
-  --theme-elevation-0: #070b12 !important;
-  --theme-elevation-50: #0c121e !important;
-  --theme-elevation-100: #121b2b !important;
-  --theme-elevation-150: #1a2638 !important;
-  --theme-elevation-200: #24344d !important;
-  --theme-elevation-250: #334869 !important;
-  --theme-elevation-300: #4b648b !important;
-  --theme-elevation-400: #7c93b3 !important;
-  --theme-elevation-500: #a1b3cb !important;
-  --theme-elevation-600: #cbd5e1 !important;
-  --theme-elevation-700: #e2e8f0 !important;
-  --theme-elevation-800: #f1f5f9 !important;
-  --theme-elevation-900: #f8fafc !important;
+  --theme-bg: #030712 !important;
+  --theme-input-bg: #0b0f19 !important;
+  --theme-elevation-0: #030712 !important;
+  --theme-elevation-50: #080d1a !important;
+  --theme-elevation-100: #0f172a !important;
+  --theme-elevation-150: #1e293b !important;
+  --theme-elevation-200: #334155 !important;
+  --theme-elevation-250: #475569 !important;
+  --theme-elevation-300: #64748b !important;
+  --theme-elevation-400: #94a3b8 !important;
+  --theme-elevation-500: #cbd5e1 !important;
+  --theme-elevation-600: #e2e8f0 !important;
+  --theme-elevation-700: #f1f5f9 !important;
+  --theme-elevation-800: #f8fafc !important;
+  --theme-elevation-900: #ffffff !important;
   --theme-elevation-1000: #ffffff !important;
 
-  --theme-text: #f1f5f9 !important;
-  --theme-text-muted: #8294ac !important;
-  --theme-border-color: #1a2638 !important;
+  --theme-text: #f8fafc !important;
+  --theme-text-muted: #94a3b8 !important;
+  --theme-border-color: rgba(255, 255, 255, 0.08) !important;
 
-  /* ERP Electric Blue & Action Tokens */
+  /* ERP Action Tokens */
   --theme-success-50: #eff6ff !important;
   --theme-success-100: #dbeafe !important;
   --theme-success-200: #bfdbfe !important;
@@ -42,13 +43,14 @@ body {
   --style-radius-m: 8px !important;
   --style-radius-l: 12px !important;
 
-  background-color: #070b12 !important;
-  color: #f1f5f9 !important;
+  background-color: #030712 !important;
+  color: #f8fafc !important;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
   -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
 }
 
-/* ── 2. Canvas & Layout ── */
+/* ── 2. Canvas & App Layout (Clean & Open) ── */
 body,
 #app,
 .template-default,
@@ -60,31 +62,31 @@ body,
 .dashboard,
 .render-fields,
 main {
-  background-color: #070b12 !important;
-  color: #f1f5f9 !important;
+  background-color: #030712 !important;
+  color: #f8fafc !important;
 }
 
-/* ── 3. Top Header Bar (Glassmorphism) ── */
+/* ── 3. Top Header Bar (Ultra-Clean Glassmorphism) ── */
 .app-header {
-  background: rgba(12, 18, 30, 0.85) !important;
-  backdrop-filter: blur(16px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+  background: rgba(8, 13, 26, 0.8) !important;
+  backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
   padding: 10px 24px !important;
-  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.6) !important;
   z-index: 50 !important;
 
   .app-header__controls {
-    gap: 12px !important;
+    gap: 14px !important;
   }
 }
 
-/* ── 4. Sidebar Navigation (Sleek Obsidian Navy) ── */
+/* ── 4. Sidebar Navigation (Obsidian Slate with Neon Blue Indicator) ── */
 .nav,
 .nav__wrap,
 .nav__scroll,
 nav {
-  background-color: #070b12 !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.07) !important;
+  background-color: #050811 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
 }
 
 .nav__wrap {
@@ -96,9 +98,12 @@ nav {
   letter-spacing: 0.12em !important;
   font-size: 10px !important;
   font-weight: 800 !important;
-  color: #4b648b !important;
-  margin: 20px 8px 6px 8px !important;
+  color: #475569 !important;
+  margin: 22px 8px 6px 8px !important;
   padding: 0 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
 }
 
 .nav__link,
@@ -106,9 +111,9 @@ nav {
   border-radius: 8px !important;
   margin: 2px 0 !important;
   padding: 8px 12px !important;
-  font-size: 12.5px !important;
+  font-size: 13px !important;
   font-weight: 500 !important;
-  color: #a1b3cb !important;
+  color: #94a3b8 !important;
   border: 1px solid transparent !important;
   transition: all 0.15s ease-in-out !important;
   display: flex !important;
@@ -117,7 +122,7 @@ nav {
 
   &:hover {
     background: rgba(255, 255, 255, 0.04) !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
     color: #ffffff !important;
     transform: translateX(2px);
   }
@@ -125,9 +130,9 @@ nav {
 
 .nav__link--active,
 .nav__link[aria-current="page"] {
-  background: linear-gradient(90deg, rgba(37, 99, 235, 0.18) 0%, rgba(37, 99, 235, 0.04) 100%) !important;
-  color: #60a5fa !important;
-  border: 1px solid rgba(59, 130, 246, 0.35) !important;
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.16) 0%, rgba(37, 99, 235, 0.02) 100%) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
   font-weight: 700 !important;
   position: relative !important;
 
@@ -138,36 +143,44 @@ nav {
     top: 6px;
     bottom: 6px;
     width: 3.5px;
-    background: #3b82f6;
+    background: #38bdf8;
     border-radius: 0 4px 4px 0;
-    box-shadow: 0 0 10px #3b82f6;
+    box-shadow: 0 0 12px #38bdf8;
   }
 }
 
-/* ── 5. Main Collection Container & Card Styling ── */
+/* ── 5. Main Collection View Layout (Open, Airy, Non-boxed) ── */
 .collection-list {
   padding: 24px 36px !important;
   max-width: 1600px !important;
   margin: 0 auto !important;
 }
 
+/* Reset the wrap to transparent so title and toolbar breathe */
+.collection-list__wrap {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
 .collection-list__header {
-  margin-bottom: 24px !important;
-  padding-bottom: 18px !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  margin-bottom: 20px !important;
+  padding-bottom: 16px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
 
   h1 {
-    font-size: 22px !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.02em !important;
+    font-size: 24px !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.03em !important;
     color: #ffffff !important;
     margin: 0 !important;
     display: flex !important;
     align-items: center !important;
-    gap: 10px !important;
+    gap: 12px !important;
   }
 }
 
@@ -185,19 +198,19 @@ nav {
 .search-filter__input,
 .list-controls input,
 .search-filter input {
-  background: #0c121e !important;
-  border: 1px solid #1a2638 !important;
+  background: #0b0f19 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 8px !important;
-  color: #f1f5f9 !important;
+  color: #f8fafc !important;
   font-size: 13px !important;
-  padding: 8px 14px 8px 36px !important;
+  padding: 9px 14px 9px 36px !important;
   transition: all 0.15s ease !important;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
 
   &:focus {
     border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25), inset 0 1px 2px rgba(0, 0, 0, 0.2) !important;
-    background: #111a2a !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+    background: #0f172a !important;
     outline: none !important;
   }
 }
@@ -206,31 +219,30 @@ nav {
 .where-builder__add-filter,
 .list-controls .btn,
 .search-filter .btn {
-  background: #0c121e !important;
-  border: 1px solid #1a2638 !important;
+  background: #0b0f19 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 8px !important;
-  color: #8294ac !important;
+  color: #94a3b8 !important;
   font-size: 12px !important;
   font-weight: 600 !important;
-  padding: 7px 12px !important;
+  padding: 8px 14px !important;
 
   &:hover {
     background: #121b2b !important;
     color: #ffffff !important;
-    border-color: #24344d !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
   }
 }
 
-/* ── 7. Luxury Data Grid & Card Enclosure ── */
+/* ── 7. High-Density Luxury Data Grid ── */
 .table,
 .table__wrap,
-.collection-list__wrap,
 .collection-list__table-wrap {
-  background: #0c121e !important;
-  border: 1px solid #1a2638 !important;
-  border-radius: 14px !important;
+  background: #080d1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
   overflow: hidden !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 20px 40px -15px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.6) !important;
   position: relative !important;
 }
 
@@ -240,30 +252,30 @@ nav {
   width: 100% !important;
 
   thead th {
-    background: #121b2b !important;
-    border-bottom: 1px solid #1a2638 !important;
-    color: #7c93b3 !important;
+    background: #0f172a !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #64748b !important;
     font-size: 11px !important;
-    font-weight: 700 !important;
+    font-weight: 800 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.08em !important;
-    padding: 12px 16px !important;
+    padding: 13px 16px !important;
     position: sticky !important;
     top: 0 !important;
     z-index: 10 !important;
   }
 
   tbody tr {
-    background-color: #0c121e !important;
-    border-bottom: 1px solid #152030 !important;
-    transition: all 0.12s ease !important;
+    background-color: #080d1a !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+    transition: background-color 0.12s ease !important;
 
     &:nth-child(even) {
-      background-color: #090e17 !important;
+      background-color: #060913 !important;
     }
 
     &:hover {
-      background-color: rgba(37, 99, 235, 0.09) !important;
+      background-color: rgba(37, 99, 235, 0.08) !important;
     }
   }
 
@@ -271,7 +283,7 @@ nav {
     padding: 13px 16px !important;
     font-size: 13px !important;
     color: #cbd5e1 !important;
-    border-bottom: 1px solid #152030 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
     vertical-align: middle !important;
 
     a {
@@ -304,15 +316,15 @@ nav {
 
 .cell-totalAmount {
   color: #38bdf8 !important;
-  font-weight: 700 !important;
+  font-weight: 800 !important;
 }
 
 .cell-owedAmount {
   color: #fbbf24 !important;
-  font-weight: 700 !important;
+  font-weight: 800 !important;
 }
 
-/* ── 8. Buttons & Micro-Interactions ── */
+/* ── 8. Primary & Secondary Buttons (Glow Accents) ── */
 .btn,
 .btn--style-primary,
 .btn--style-secondary,
@@ -324,7 +336,7 @@ button.btn {
   font-weight: 700 !important;
   letter-spacing: 0.01em !important;
   padding: 8px 16px !important;
-  transition: all 0.15s ease !important;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 6px !important;
@@ -338,29 +350,29 @@ a[href*="/create"],
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
   border: 1px solid #3b82f6 !important;
   color: #ffffff !important;
-  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.4) !important;
+  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.4) !important;
 
   &:hover {
     background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
-    box-shadow: 0 4px 18px rgba(37, 99, 235, 0.6) !important;
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.6) !important;
     transform: translateY(-1px);
     color: #ffffff !important;
   }
 }
 
 .btn--style-secondary {
-  background: #0c121e !important;
-  border: 1px solid #1a2638 !important;
+  background: #0b0f19 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   color: #cbd5e1 !important;
 
   &:hover {
     background: #121b2b !important;
-    border-color: #24344d !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
     color: #ffffff !important;
   }
 }
 
-/* ── 9. Form View & Document Edit ── */
+/* ── 9. Form View & Document Edit (ERP Detail View) ── */
 .collection-edit,
 .document-fields,
 .form {
@@ -369,19 +381,19 @@ a[href*="/create"],
 }
 
 .doc-header {
-  border-bottom: 1px solid #1a2638 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
   padding-bottom: 16px !important;
   margin-bottom: 24px !important;
 
   h1,
   .doc-header__title {
-    font-size: 20px !important;
-    font-weight: 800 !important;
+    font-size: 22px !important;
+    font-weight: 900 !important;
     color: #ffffff !important;
   }
 }
 
-/* Form inputs */
+/* Form inputs & controls */
 .field-type input[type="text"],
 .field-type input[type="email"],
 .field-type input[type="password"],
@@ -390,18 +402,18 @@ a[href*="/create"],
 .field-type textarea,
 .react-select__control {
   border-radius: 8px !important;
-  border: 1px solid #1a2638 !important;
-  background: #0c121e !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: #0b0f19 !important;
   color: #f8fafc !important;
   font-size: 13px !important;
-  padding: 8px 12px !important;
+  padding: 9px 12px !important;
   transition: all 0.15s ease !important;
 
   &:focus,
   &:focus-within {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
-    background: #111a2a !important;
+    background: #0f172a !important;
     outline: none !important;
   }
 }
@@ -409,16 +421,16 @@ a[href*="/create"],
 .field-label,
 label {
   font-size: 11px !important;
-  font-weight: 700 !important;
+  font-weight: 800 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.06em !important;
-  color: #7c93b3 !important;
+  color: #64748b !important;
   margin-bottom: 6px !important;
 }
 
 .field-description {
   font-size: 11.5px !important;
-  color: #4b648b !important;
+  color: #475569 !important;
   margin-top: 4px !important;
 }
 
@@ -426,8 +438,8 @@ label {
 .tabs-field__tabs {
   gap: 6px !important;
   padding: 4px !important;
-  background: #070b12 !important;
-  border: 1px solid #1a2638 !important;
+  background: #050811 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 10px !important;
 }
 
@@ -436,33 +448,33 @@ label {
   padding: 8px 16px !important;
   font-size: 12px !important;
   font-weight: 600 !important;
-  color: #7c93b3 !important;
+  color: #64748b !important;
 
   &:hover {
-    background: #121b2b !important;
+    background: #0f172a !important;
     color: #ffffff !important;
   }
 }
 
 .tabs-field__tab-button--active {
-  background: #1a2638 !important;
+  background: #1e293b !important;
   color: #38bdf8 !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 }
 
 .field-type.group .group__content,
 .collapsible__content {
-  border: 1px solid #1a2638 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-left: 3.5px solid #3b82f6 !important;
   border-radius: 12px !important;
-  background: #0c121e !important;
+  background: #080d1a !important;
   padding: 20px !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
 }
 
 .collapsible__toggle-wrap {
-  background: #0c121e !important;
-  border: 1px solid #1a2638 !important;
+  background: #080d1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 8px !important;
   font-weight: 700 !important;
   color: #f1f5f9 !important;
@@ -472,68 +484,57 @@ label {
 .paginator,
 .collection-list__pagination {
   padding: 12px 16px !important;
-  border-top: 1px solid #1a2638 !important;
-  background: #090e17 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+  background: #050811 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
   font-size: 12px !important;
-  color: #8294ac !important;
+  color: #94a3b8 !important;
 
   .btn {
-    background: #121b2b !important;
-    border: 1px solid #1a2638 !important;
+    background: #0f172a !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
     color: #cbd5e1 !important;
-    padding: 4px 10px !important;
+    padding: 5px 12px !important;
     font-size: 11.5px !important;
 
     &:hover {
-      background: #1a2638 !important;
+      background: #1e293b !important;
       color: #ffffff !important;
     }
   }
 }
 
-/* ── 11. Status Badges & Pills ── */
-.pill {
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  padding: 3px 10px !important;
-  border-radius: 999px !important;
-  border: 1px solid transparent !important;
-  letter-spacing: 0.02em !important;
-}
+/* ── 11. Empty State Styling (Clean & Minimalist) ── */
+.collection-list__no-results,
+.no-results {
+  padding: 60px 20px !important;
+  text-align: center !important;
+  color: #64748b !important;
+  font-size: 13px !important;
 
-/* ── 12. Login Screen (Enterprise Gateway) ── */
-.template-default__wrap--login,
-.login__form-wrap {
-  background: radial-gradient(circle at 50% 30%, #172554 0%, #070b12 80%) !important;
-
-  .form {
-    border: 1px solid #1a2638 !important;
-    border-radius: 16px !important;
-    background: #0c121e !important;
-    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8) !important;
-    padding: 36px 32px !important;
+  p {
+    color: #94a3b8 !important;
+    margin-top: 6px !important;
   }
 }
 
-/* ── 13. Custom Scrollbar ── */
+/* ── 12. Custom Scrollbar ── */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #070b12;
+  background: #030712;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1a2638;
+  background: #1e293b;
   border-radius: 999px;
-  border: 2px solid #070b12;
 
   &:hover {
-    background: #24344d;
+    background: #334155;
   }
 }

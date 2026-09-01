@@ -22,19 +22,25 @@ import type { PayloadFindResponse } from "../payload/types.js";
 
 interface OrderDoc {
   id: string;
+  createdAt: string;
+  updatedAt: string;
   orderCode: string;
   customer?: string | { name?: string };
   status: string;
   expectedDeliveryDate?: string;
   stageStartedAt?: string;
+  [key: string]: unknown;
 }
 
 interface TelegramGroupDoc {
   id: string;
+  createdAt: string;
+  updatedAt: string;
   telegramChatId: string;
   title?: string;
   active?: boolean;
   tatAlertTarget?: boolean;
+  [key: string]: unknown;
 }
 
 function customerName(c: OrderDoc["customer"]): string {

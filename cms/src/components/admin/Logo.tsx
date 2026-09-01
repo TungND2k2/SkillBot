@@ -7,32 +7,32 @@ export const Logo = () => (
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      gap: 12,
-      marginBottom: 16,
+      gap: 14,
+      marginBottom: 20,
     }}
   >
     <div
       style={{
-        width: 54,
-        height: 54,
-        borderRadius: 14,
-        background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+        width: 60,
+        height: 60,
+        borderRadius: 16,
+        background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        boxShadow: "0 10px 25px rgba(37, 99, 235, 0.35)",
-        border: "1px solid rgba(255, 255, 255, 0.2)",
+        boxShadow: "0 12px 30px rgba(37, 99, 235, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.4)",
+        border: "1px solid rgba(255, 255, 255, 0.25)",
       }}
     >
       <svg
-        width="28"
-        height="28"
+        width="32"
+        height="32"
         viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M3 21h18M3 7v14M21 7v14M6 11h3M15 11h3M6 15h3M15 15h3M3 7l9-4 9 4"
+          d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
           stroke="#ffffff"
           strokeWidth="2"
           strokeLinecap="round"
@@ -43,25 +43,26 @@ export const Logo = () => (
     <div style={{ textAlign: "center" }}>
       <div
         style={{
-          fontSize: 21,
-          fontWeight: 800,
+          fontSize: 22,
+          fontWeight: 900,
           letterSpacing: "-0.03em",
-          color: "rgb(var(--theme-elevation-900))",
+          color: "#ffffff",
+          fontFamily: "Inter, sans-serif",
         }}
       >
-        SKILLBOT <span style={{ color: "#3b82f6", fontWeight: 600 }}>ERP</span>
+        SKILLBOT <span style={{ color: "#38bdf8", fontWeight: 700 }}>ERP</span>
       </div>
       <div
         style={{
-          fontSize: 12,
-          color: "rgb(var(--theme-elevation-400))",
-          marginTop: 2,
-          letterSpacing: "0.02em",
+          fontSize: 11,
+          color: "#94a3b8",
+          marginTop: 4,
+          letterSpacing: "0.08em",
           textTransform: "uppercase",
-          fontWeight: 600,
+          fontWeight: 700,
         }}
       >
-        Hệ Thống Quản Trị Sản Xuất May Thêu
+        Hệ Thống Quản Trị Sản Xuất May Thêu Xuất Khẩu
       </div>
     </div>
   </div>
