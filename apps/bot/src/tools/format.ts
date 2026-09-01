@@ -3,17 +3,13 @@ import type { PayloadDoc } from "../payload/types.js";
 import { getConfig } from "../config.js";
 
 /**
- * Link cho user bấm vào xem chi tiết 1 bản ghi — ưu tiên trang portal
- * (đẹp, đúng nghiệp vụ) nếu collection đó có trang detail; các collection
- * còn lại fallback về trang edit của Payload admin (luôn tồn tại).
+ * Link cho user bấm vào xem chi tiết 1 bản ghi — trỏ vào Payload admin
+ * (khớp phiên đăng nhập /admin user đã có sẵn, không cần login riêng
+ * như portal — portal dùng JWT/localStorage tách biệt hoàn toàn).
  */
-const PORTAL_DETAIL_SLUGS = new Set(["orders"]);
-
 export function docLink(slug: string, id: string): string {
   const base = getConfig().PUBLIC_FORM_BASE_URL.replace(/\/$/, "");
-  return PORTAL_DETAIL_SLUGS.has(slug)
-    ? `${base}/${slug}/${id}`
-    : `${base}/admin/collections/${slug}/${id}`;
+  return `${base}/admin/collections/${slug}/${id}`;
 }
 
 /** Format a list of docs into a compact human-readable summary for Claude. */
