@@ -767,9 +767,8 @@ export const Orders: CollectionConfig = {
       required: true,
       defaultValue: "b1",
       admin: {
-        readOnly: true,
         position: "sidebar",
-        description: "Tự đổi theo dữ liệu đã điền — không sửa tay.",
+        description: "Tự đổi theo tiến độ hoàn thành hoặc Quản lý chuyển bước.",
       },
       options: STATUS_SELECT_OPTIONS,
     },
@@ -780,7 +779,62 @@ export const Orders: CollectionConfig = {
       admin: { hidden: true },
     },
 
-    // ── Hidden — timing tự compute, reminders dedupe
+    // ── Quyền Quản Lý Xác Nhận Chuyển Bước (Manager Override) ──
+    {
+      type: "collapsible",
+      label: "🛡 Quản Lý Xác Nhận Chuyển Bước",
+      admin: {
+        position: "sidebar",
+        initCollapsed: true,
+        description: "Tích chọn để bỏ qua yêu cầu bắt buộc ảnh/file và cho phép chuyển bước.",
+      },
+      fields: [
+        {
+          name: "managerConfirmed",
+          label: "👑 Duyệt toàn bộ (Master Override)",
+          type: "checkbox",
+          defaultValue: false,
+        },
+        {
+          name: "b1ManagerConfirmed",
+          label: "Duyệt B1 (Nhận đơn)",
+          type: "checkbox",
+          defaultValue: false,
+        },
+        {
+          name: "b2ManagerConfirmed",
+          label: "Duyệt B2 (Định mức BOM)",
+          type: "checkbox",
+          defaultValue: false,
+        },
+        {
+          name: "b3ManagerConfirmed",
+          label: "Duyệt B3 (Duyệt vải & Mua NPL)",
+          type: "checkbox",
+          defaultValue: false,
+        },
+        {
+          name: "b4ManagerConfirmed",
+          label: "Duyệt B4 (Gửi NCC)",
+          type: "checkbox",
+          defaultValue: false,
+        },
+        {
+          name: "b5ManagerConfirmed",
+          label: "Duyệt B5 (Thêu & May)",
+          type: "checkbox",
+          defaultValue: false,
+        },
+        {
+          name: "b6ManagerConfirmed",
+          label: "Duyệt B6 (QC & Đóng gói)",
+          type: "checkbox",
+          defaultValue: false,
+        },
+      ],
+    },
+
+    // ── Hidden — timing tự compute, reminders dedupe & stage history ──
     {
       name: "stageStartedAt",
       type: "date",
@@ -790,6 +844,24 @@ export const Orders: CollectionConfig = {
       name: "expectedStageEndAt",
       type: "date",
       admin: { hidden: true },
+    },
+    {
+      name: "stageTimings",
+      label: "Lịch sử công đoạn (Audit Trail)",
+      type: "array",
+      admin: {
+        initCollapsed: true,
+        readOnly: true,
+        description: "Lưu vết người thực hiện, thời gian bắt đầu/kết thúc từng bước",
+      },
+      fields: [
+        { name: "stage", label: "Bước", type: "text" },
+        { name: "startedAt", label: "Bắt đầu", type: "date" },
+        { name: "completedAt", label: "Hoàn tất", type: "date" },
+        { name: "updatedBy", label: "Người làm", type: "relationship", relationTo: "users" },
+        { name: "managerConfirmed", label: "Quản lý duyệt", type: "checkbox" },
+        { name: "notes", label: "Ghi chú", type: "text" },
+      ],
     },
     {
       name: "remindersSent",
@@ -802,6 +874,7 @@ export const Orders: CollectionConfig = {
         { name: "sentAt", type: "date" },
       ],
     },
+
     // Workflow ref đã bỏ — dùng STAGES hard-code, không cần
   ],
   timestamps: true,

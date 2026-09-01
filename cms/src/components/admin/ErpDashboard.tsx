@@ -1,146 +1,165 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { getOrderAlertStatus } from "../../lib/workflow-stages";
+
+interface StatsData {
+  totalOrders: number;
+  activePipeline: number;
+  approachingCount: number;
+  overdueCount: number;
+  criticalOverdueCount: number;
+  stalledCount: number;
+  totalRevenue: number;
+}
 
 export const ErpDashboard: React.FC = () => {
+  const [stats, setStats] = useState<StatsData>({
+    totalOrders: 0,
+    activePipeline: 0,
+    approachingCount: 0,
+    overdueCount: 0,
+    criticalOverdueCount: 0,
+    stalledCount: 0,
+    totalRevenue: 0,
+  });
+
+  useEffect(() => {
+    let cancel = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/orders?limit=500&depth=0", { credentials: "include" });
+        if (!res.ok) return;
+        const data = await res.json();
+        const docs = data.docs || [];
+
+        let revenue = 0;
+        let active = 0;
+        let approaching = 0;
+        let overdue = 0;
+        let critical = 0;
+        let stalled = 0;
+
+        for (const o of docs) {
+          revenue += o.totalAmount || 0;
+          if (["b1", "b2", "b3", "b4", "b5", "b6"].includes(o.status)) {
+            active += 1;
+          }
+
+          const alert = getOrderAlertStatus(o);
+          if (alert.level === "approaching") approaching += 1;
+          else if (alert.level === "overdue") overdue += 1;
+          else if (alert.level === "critical_overdue") critical += 1;
+          else if (alert.level === "stalled") stalled += 1;
+        }
+
+        if (!cancel) {
+          setStats({
+            totalOrders: docs.length,
+            activePipeline: active,
+            approachingCount: approaching,
+            overdueCount: overdue,
+            criticalOverdueCount: critical,
+            stalledCount: stalled,
+            totalRevenue: revenue,
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+    return () => {
+      cancel = true;
+    };
+  }, []);
+
+  const fmtMoney = (n: number) => `$${n.toLocaleString()}`;
+
   return (
     <div
       style={{
-        marginBottom: "28px",
-        borderRadius: "14px",
-        border: "1px solid rgb(var(--theme-elevation-150))",
-        background: "rgb(var(--theme-elevation-50))",
+        margin: "0 0 24px 0",
         padding: "24px",
-        boxShadow: "0 4px 20px -4px rgba(0, 0, 0, 0.15)",
+        borderRadius: "14px",
+        background: "linear-gradient(180deg, #0d1527 0%, #090d16 100%)",
+        border: "1px solid #1e293b",
+        boxShadow: "0 10px 30px -10px rgba(0, 0, 0, 0.5)",
       }}
     >
-      {/* Top Banner */}
+      {/* Header Banner */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           flexWrap: "wrap",
-          gap: "16px",
-          paddingBottom: "20px",
-          borderBottom: "1px solid rgb(var(--theme-elevation-150))",
+          gap: "12px",
           marginBottom: "20px",
+          paddingBottom: "16px",
+          borderBottom: "1px solid #1e293b",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "12px",
-              background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#ffffff",
-              fontWeight: 800,
-              fontSize: "18px",
-              boxShadow: "0 4px 14px rgba(37, 99, 235, 0.35)",
-            }}
-          >
-            🏭
-          </div>
-          <div>
-            <div
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span style={{ fontSize: "20px" }}>🏭</span>
+            <h2 style={{ fontSize: "18px", fontWeight: 800, color: "#ffffff", margin: 0, letterSpacing: "-0.01em" }}>
+              Trung Tâm Điều Hành Sản Xuất SkillBot ERP
+            </h2>
+            <span
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
+                fontSize: "11px",
+                fontWeight: 700,
+                padding: "3px 10px",
+                borderRadius: "999px",
+                background: "rgba(16, 185, 129, 0.15)",
+                color: "#10b981",
+                border: "1px solid rgba(16, 185, 129, 0.3)",
               }}
             >
-              <h2
-                style={{
-                  fontSize: "18px",
-                  fontWeight: 700,
-                  margin: 0,
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                Trung Tâm Điều Hành Sản Xuất ERP
-              </h2>
-              <span
-                style={{
-                  fontSize: "10.5px",
-                  fontWeight: 700,
-                  padding: "2px 8px",
-                  borderRadius: "999px",
-                  background: "rgba(16, 185, 129, 0.15)",
-                  color: "#10b981",
-                  border: "1px solid rgba(16, 185, 129, 0.3)",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "4px",
-                }}
-              >
-                <span
-                  style={{
-                    width: "6px",
-                    height: "6px",
-                    borderRadius: "50%",
-                    background: "#10b981",
-                    display: "inline-block",
-                  }}
-                />
-                Hệ thống hoạt động
-              </span>
-            </div>
-            <p
-              style={{
-                fontSize: "12.5px",
-                color: "rgb(var(--theme-elevation-400))",
-                margin: "4px 0 0 0",
-              }}
-            >
-              Kiểm soát tiến độ 6 bước, định mức vật tư BOM, tồn kho NPL và KCS chất lượng
-            </p>
+              ● LIVE STATS
+            </span>
           </div>
+          <p style={{ fontSize: "12.5px", color: "#94a3b8", margin: "4px 0 0 0" }}>
+            Kiểm soát tiến độ TAT quy trình B1 → B6 · Cảnh báo tự động đa cấp độ
+          </p>
         </div>
 
-        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "10px" }}>
           <Link
-            href="/admin/quy-trinh"
+            href="/admin/collections/orders"
             style={{
-              padding: "8px 14px",
-              borderRadius: "8px",
-              background: "rgba(37, 99, 235, 0.12)",
-              color: "#3b82f6",
-              border: "1px solid rgba(59, 130, 246, 0.3)",
-              fontSize: "12px",
-              fontWeight: 600,
-              textDecoration: "none",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
-          >
-            📊 Sơ đồ quy trình B1→B6
-          </Link>
-          <Link
-            href="/admin/collections/orders/create"
-            style={{
-              padding: "8px 16px",
+              padding: "7px 14px",
               borderRadius: "8px",
               background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
               color: "#ffffff",
               fontSize: "12px",
               fontWeight: 600,
               textDecoration: "none",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
               boxShadow: "0 2px 8px rgba(37, 99, 235, 0.3)",
             }}
           >
-            ➕ Tạo Đơn Hàng Mới
+            📋 Xem Sổ Cái Đơn Hàng ({stats.totalOrders})
+          </Link>
+          <Link
+            href="/admin/quy-trinh"
+            style={{
+              padding: "7px 14px",
+              borderRadius: "8px",
+              background: "#161f30",
+              border: "1px solid #1e293b",
+              color: "#cbd5e1",
+              fontSize: "12px",
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            🗂 Sơ Đồ B1 → B6
           </Link>
         </div>
       </div>
 
-      {/* 4 KPI Quick Metric Grid */}
+      {/* 4 Alert Level Cards */}
       <div
         style={{
           display: "grid",
@@ -149,128 +168,123 @@ export const ErpDashboard: React.FC = () => {
           marginBottom: "20px",
         }}
       >
+        {/* 🟡 Sắp đến hạn */}
         <div
           style={{
             padding: "14px 16px",
             borderRadius: "10px",
-            background: "rgb(var(--theme-elevation-100))",
-            border: "1px solid rgb(var(--theme-elevation-150))",
-            borderLeft: "4px solid #3b82f6",
+            background: "#0f172a",
+            border: "1px solid #1e293b",
+            borderLeft: "4px solid #eab308",
           }}
         >
-          <div style={{ fontSize: "11px", fontWeight: 600, color: "rgb(var(--theme-elevation-400))", textTransform: "uppercase" }}>
-            Đơn Hàng Trong Luồng
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase" }}>
+              🟡 Sắp Đến Hạn
+            </span>
+            <span style={{ fontSize: "10.5px", color: "#eab308", fontWeight: 700 }}>≤ 7 ngày</span>
           </div>
-          <div style={{ fontSize: "20px", fontWeight: 700, marginTop: "4px", fontFamily: "monospace" }}>
-            B1 → B6 Active
+          <div style={{ fontSize: "22px", fontWeight: 800, color: "#facc15", marginTop: "4px", fontFamily: "monospace" }}>
+            {stats.approachingCount} <span style={{ fontSize: "13px", fontWeight: 600, color: "#94a3b8" }}>Đơn</span>
           </div>
-          <div style={{ fontSize: "11px", color: "#3b82f6", marginTop: "4px" }}>
-            Tự động đẩy bước qua hook
-          </div>
+          <p style={{ fontSize: "11px", color: "#64748b", margin: "3px 0 0 0" }}>Cần đẩy nhanh KCS & đóng gói</p>
         </div>
 
+        {/* 🔴 Đơn muộn */}
         <div
           style={{
             padding: "14px 16px",
             borderRadius: "10px",
-            background: "rgb(var(--theme-elevation-100))",
-            border: "1px solid rgb(var(--theme-elevation-150))",
-            borderLeft: "4px solid #10b981",
+            background: "#0f172a",
+            border: "1px solid #1e293b",
+            borderLeft: "4px solid #f87171",
           }}
         >
-          <div style={{ fontSize: "11px", fontWeight: 600, color: "rgb(var(--theme-elevation-400))", textTransform: "uppercase" }}>
-            Định Mức BOM Kỹ Thuật
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase" }}>
+              🔴 Đơn Muộn
+            </span>
+            <span style={{ fontSize: "10.5px", color: "#f87171", fontWeight: 700 }}>Quá 1–14 ngày</span>
           </div>
-          <div style={{ fontSize: "20px", fontWeight: 700, marginTop: "4px", fontFamily: "monospace" }}>
-            Định Mức & Hao Phí
+          <div style={{ fontSize: "22px", fontWeight: 800, color: "#f87171", marginTop: "4px", fontFamily: "monospace" }}>
+            {stats.overdueCount} <span style={{ fontSize: "13px", fontWeight: 600, color: "#94a3b8" }}>Đơn</span>
           </div>
-          <div style={{ fontSize: "11px", color: "#10b981", marginTop: "4px" }}>
-            Kiểm soát tỷ lệ định mức vải
-          </div>
+          <p style={{ fontSize: "11px", color: "#64748b", margin: "3px 0 0 0" }}>Thúc tiến độ khẩn & báo khách</p>
         </div>
 
+        {/* 🔴 Trễ nghiêm trọng */}
         <div
           style={{
             padding: "14px 16px",
             borderRadius: "10px",
-            background: "rgb(var(--theme-elevation-100))",
-            border: "1px solid rgb(var(--theme-elevation-150))",
-            borderLeft: "4px solid #f59e0b",
+            background: "#0f172a",
+            border: "1px solid #1e293b",
+            borderLeft: "4px solid #ef4444",
           }}
         >
-          <div style={{ fontSize: "11px", fontWeight: 600, color: "rgb(var(--theme-elevation-400))", textTransform: "uppercase" }}>
-            Tồn Kho Nguyên Phụ Liệu
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase" }}>
+              🔴 Trễ Nghiêm Trọng
+            </span>
+            <span style={{ fontSize: "10.5px", color: "#ef4444", fontWeight: 700 }}>&gt; 14 ngày</span>
           </div>
-          <div style={{ fontSize: "20px", fontWeight: 700, marginTop: "4px", fontFamily: "monospace" }}>
-            Safety Stock Alert
+          <div style={{ fontSize: "22px", fontWeight: 800, color: "#ef4444", marginTop: "4px", fontFamily: "monospace" }}>
+            {stats.criticalOverdueCount} <span style={{ fontSize: "13px", fontWeight: 600, color: "#94a3b8" }}>Đơn</span>
           </div>
-          <div style={{ fontSize: "11px", color: "#f59e0b", marginTop: "4px" }}>
-            Cảnh báo mức an toàn kho
-          </div>
+          <p style={{ fontSize: "11px", color: "#64748b", margin: "3px 0 0 0" }}>Báo cáo giám đốc xử lý sự cố</p>
         </div>
 
+        {/* 🟠 Cần xử lý */}
         <div
           style={{
             padding: "14px 16px",
             borderRadius: "10px",
-            background: "rgb(var(--theme-elevation-100))",
-            border: "1px solid rgb(var(--theme-elevation-150))",
-            borderLeft: "4px solid #8b5cf6",
+            background: "#0f172a",
+            border: "1px solid #1e293b",
+            borderLeft: "4px solid #f97316",
           }}
         >
-          <div style={{ fontSize: "11px", fontWeight: 600, color: "rgb(var(--theme-elevation-400))", textTransform: "uppercase" }}>
-            Kiểm Định Chất Lượng KCS
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase" }}>
+              🟠 Cần Xử Lý (Kẹt)
+            </span>
+            <span style={{ fontSize: "10.5px", color: "#f97316", fontWeight: 700 }}>&gt; 7 ngày SLA</span>
           </div>
-          <div style={{ fontSize: "20px", fontWeight: 700, marginTop: "4px", fontFamily: "monospace" }}>
-            Biên Bản QC Logs
+          <div style={{ fontSize: "22px", fontWeight: 800, color: "#fb923c", marginTop: "4px", fontFamily: "monospace" }}>
+            {stats.stalledCount} <span style={{ fontSize: "13px", fontWeight: 600, color: "#94a3b8" }}>Đơn</span>
           </div>
-          <div style={{ fontSize: "11px", color: "#8b5cf6", marginTop: "4px" }}>
-            Theo dõi tỷ lệ đạt & khuyết tật
-          </div>
+          <p style={{ fontSize: "11px", color: "#64748b", margin: "3px 0 0 0" }}>Không cập nhật quá thời hạn bước</p>
         </div>
       </div>
 
-      {/* Pipeline Stages Quick Navigation */}
+      {/* Production Overview Bar */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "8px",
+          justifyContent: "space-between",
           flexWrap: "wrap",
-          paddingTop: "14px",
-          borderTop: "1px dashed rgb(var(--theme-elevation-150))",
+          gap: "12px",
+          padding: "12px 16px",
+          borderRadius: "10px",
+          background: "#090d16",
+          border: "1px solid #1e293b",
         }}
       >
-        <span style={{ fontSize: "11px", fontWeight: 700, color: "rgb(var(--theme-elevation-400))", textTransform: "uppercase" }}>
-          Lối tắt phân hệ:
-        </span>
-        {[
-          { label: "📦 Sổ cái Đơn hàng", href: "/admin/collections/orders" },
-          { label: "🧵 Danh mục Mã Vải", href: "/admin/collections/fabrics" },
-          { label: "🏭 Nhà cung cấp & Xưởng", href: "/admin/collections/suppliers" },
-          { label: "📊 Tồn kho NPL", href: "/admin/collections/inventory" },
-          { label: "📐 Định mức BOM", href: "/admin/collections/allowances" },
-          { label: "🔍 Biên bản KCS QC", href: "/admin/collections/qc-logs" },
-          { label: "🤖 Bot Cảnh Báo", href: "/admin/collections/reminders" },
-        ].map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            style={{
-              fontSize: "11.5px",
-              padding: "4px 10px",
-              borderRadius: "6px",
-              background: "rgb(var(--theme-elevation-100))",
-              color: "rgb(var(--theme-elevation-800))",
-              border: "1px solid rgb(var(--theme-elevation-150))",
-              textDecoration: "none",
-              fontWeight: 500,
-              transition: "all 0.1s ease",
-            }}
-          >
-            {item.label}
-          </Link>
-        ))}
+        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+          <div>
+            <span style={{ fontSize: "11px", color: "#94a3b8" }}>Đang trong luồng B1→B6: </span>
+            <strong style={{ color: "#38bdf8", fontSize: "13px" }}>{stats.activePipeline} đơn</strong>
+          </div>
+          <div>
+            <span style={{ fontSize: "11px", color: "#94a3b8" }}>Tổng doanh thu đơn: </span>
+            <strong style={{ color: "#10b981", fontSize: "13px", fontFamily: "monospace" }}>{fmtMoney(stats.totalRevenue)}</strong>
+          </div>
+        </div>
+
+        <div style={{ fontSize: "11.5px", color: "#64748b" }}>
+          Quy định: Mỗi bước cần File/Ảnh hoặc Quản lý tích xác nhận để chuyển bước.
+        </div>
       </div>
     </div>
   );

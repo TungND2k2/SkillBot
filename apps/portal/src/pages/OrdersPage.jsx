@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import {
   Search, Filter, Download, ChevronLeft, ChevronRight,
   ExternalLink, FileText, X, Eye, ArrowUpDown, Calendar,
+  Clock, AlertTriangle, ShieldAlert, AlertCircle,
 } from 'lucide-react';
 import { listDocs } from '../api/payload';
 import useAuth from '../hooks/useAuth';
@@ -13,42 +14,89 @@ import * as XLSX from 'xlsx';
 
 const STATUS_TABS = [
   { key: '', label: 'Tất cả đơn' },
-  { key: 'b1,b2,b3,b4,b5,b6', label: '⚡ Đang thực hiện' },
+  { key: 'b1,b2,b3,b4,b5,b6', label: '⚡ Đang may (B1-B6)' },
   { key: 'b1', label: 'B1 Nhận đơn' },
   { key: 'b2', label: 'B2 Định mức' },
   { key: 'b3', label: 'B3 Mua NPL' },
-  { key: 'b4', label: 'B4 Sản xuất' },
-  { key: 'b5', label: 'B5 QC' },
-  { key: 'b6', label: 'B6 Giao hàng' },
+  { key: 'b4', label: 'B4 Gửi NCC' },
+  { key: 'b5', label: 'B5 Thêu & May' },
+  { key: 'b6', label: 'B6 QC & Giao' },
   { key: 'done', label: 'Hoàn thành' },
   { key: 'cancelled', label: 'Đã hủy' },
 ];
 
-const QUANTITY_FILTERS = [
-  { label: 'Tất cả SL', min: null, max: null },
-  { label: '< 100 sp', min: null, max: 99 },
-  { label: '100 – 300 sp', min: 100, max: 300 },
-  { label: '300 – 500 sp', min: 300, max: 500 },
-  { label: '500 – 1.000 sp', min: 500, max: 1000 },
-  { label: '> 1.000 sp', min: 1001, max: null },
+const ALERT_TABS = [
+  { key: 'all', label: 'Tất cả cảnh báo' },
+  { key: 'approaching', label: '🟡 Sắp đến hạn (≤ 7d)' },
+  { key: 'overdue', label: '🔴 Đơn muộn (1-14d)' },
+  { key: 'critical_overdue', label: '🔴 Trễ nghiêm trọng (> 14d)' },
+  { key: 'stalled', label: '🟠 Cần xử lý (Kẹt bước)' },
 ];
 
-const VALUE_FILTERS = [
-  { label: 'Tất cả giá trị', min: null, max: null },
-  { label: '< $1,000', min: null, max: 999 },
-  { label: '$1,000 – $5,000', min: 1000, max: 5000 },
-  { label: '> $5,000', min: 5001, max: null },
-];
+const STAGE_MAX_DAYS = { b1: 2, b2: 4, b3: 7, b4: 1, b5: 35, b6: 3 };
+
+function getOrderAlert(o) {
+  if (!o.status || o.status === 'done' || o.status === 'cancelled') {
+    return { level: 'normal', label: 'Bình thường', color: 'text-emerald-400', bg: 'bg-emerald-500/10' };
+  }
+  const now = new Date();
+
+  // 1. Kẹt bước
+  const maxDays = STAGE_MAX_DAYS[o.status] || 7;
+  const startIso = o.stageStartedAt || o.updatedAt || o.createdAt;
+  if (startIso) {
+    const daysInStage = (now.getTime() - new Date(startIso).getTime()) / 86_400_000;
+    if (daysInStage > maxDays + 7) {
+      return {
+        level: 'stalled',
+        label: '🟠 Cần xử lý',
+        color: 'text-orange-400',
+        bg: 'bg-orange-500/10',
+        border: 'border-orange-500/30',
+      };
+    }
+  }
+
+  // 2. TAT
+  if (o.expectedDeliveryDate) {
+    const diffDays = Math.ceil((new Date(o.expectedDeliveryDate).getTime() - now.getTime()) / 86_400_000);
+    if (diffDays < -14) {
+      return {
+        level: 'critical_overdue',
+        label: '🔴 Trễ nặng',
+        color: 'text-red-500',
+        bg: 'bg-red-500/20',
+        border: 'border-red-500/50',
+      };
+    }
+    if (diffDays < 0) {
+      return {
+        level: 'overdue',
+        label: '🔴 Đơn muộn',
+        color: 'text-red-400',
+        bg: 'bg-red-500/10',
+        border: 'border-red-500/30',
+      };
+    }
+    if (diffDays <= 7) {
+      return {
+        level: 'approaching',
+        label: '🟡 Sắp hạn',
+        color: 'text-yellow-400',
+        bg: 'bg-yellow-500/10',
+        border: 'border-yellow-500/30',
+      };
+    }
+  }
+
+  return { level: 'normal', label: 'Bình thường', color: 'text-blue-400', bg: 'bg-blue-500/10' };
+}
 
 const fmtDate = (d) => (d ? new Date(d).toLocaleDateString('vi-VN') : '—');
 const fmtMoney = (n) => (n != null ? `$${n.toLocaleString()}` : '—');
 
 export default function OrdersPage() {
   const navigate = useNavigate();
-  const { role, isSales, isInput, isAdmin, isManager } = useAuth();
-  const canViewFinance = ['admin', 'manager', 'accountant'].includes(role);
-  const canViewDA = ['admin', 'manager', 'qc'].includes(role);
-
   const [orders, setOrders] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -58,10 +106,7 @@ export default function OrdersPage() {
   // Filters
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('');
-  const [countryFilter, setCountryFilter] = useState('');
-  const [qtyFilter, setQtyFilter] = useState(0);
-  const [valueFilter, setValueFilter] = useState(0);
-  const [showFilters, setShowFilters] = useState(false);
+  const [alertFilter, setAlertFilter] = useState('all');
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -76,20 +121,19 @@ export default function OrdersPage() {
         }
       }
 
-      if (countryFilter) where.country = { contains: countryFilter };
-
-      const qf = QUANTITY_FILTERS[qtyFilter];
-      if (qf.min != null) where.totalQuantity = { ...(where.totalQuantity || {}), greater_than_equal: qf.min };
-      if (qf.max != null) where.totalQuantity = { ...(where.totalQuantity || {}), less_than_equal: qf.max };
-
-      const vf = VALUE_FILTERS[valueFilter];
-      if (vf.min != null) where.totalAmount = { ...(where.totalAmount || {}), greater_than_equal: vf.min };
-      if (vf.max != null) where.totalAmount = { ...(where.totalAmount || {}), less_than_equal: vf.max };
-
       if (search) where.orderCode = { contains: search };
 
-      const result = await listDocs('orders', { where, page, limit: 20, sort: '-orderDate', depth: 1 });
-      setOrders(result.docs || []);
+      const result = await listDocs('orders', { where, page, limit: 50, sort: '-orderDate', depth: 1 });
+      const docs = result.docs || [];
+
+      // Filter by alert level if active
+      const filtered = docs.filter((o) => {
+        if (alertFilter === 'all') return true;
+        const alert = getOrderAlert(o);
+        return alert.level === alertFilter;
+      });
+
+      setOrders(filtered);
       setTotal(result.totalDocs || 0);
       setTotalPages(result.totalPages || 1);
     } catch (err) {
@@ -97,318 +141,161 @@ export default function OrdersPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, activeTab, countryFilter, qtyFilter, valueFilter]);
+  }, [page, search, activeTab, alertFilter]);
 
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
 
-  const exportExcel = () => {
-    const data = orders.map((o) => ({
-      'Ngày đặt': fmtDate(o.orderDate),
-      'Mã đơn': o.orderCode,
-      ...(canViewDA ? { 'Mã DA': o.brandCode } : {}),
-      'Mã Sales': o.salespersonCode,
-      'Quốc gia': o.country,
-      ...(canViewDA ? { 'Số lượng': o.totalQuantity } : {}),
-      ...(canViewFinance ? { 'Tổng ($)': o.totalAmount, 'Cọc ($)': o.deposit, 'Nợ ($)': o.owedAmount } : {}),
-      'Trạng thái': o.status,
-    }));
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Sổ đơn hàng');
-    XLSX.writeFile(wb, `don-hang-${new Date().toISOString().slice(0, 10)}.xlsx`);
-  };
-
-  const clearFilters = () => {
-    setSearch('');
-    setActiveTab('');
-    setCountryFilter('');
-    setQtyFilter(0);
-    setValueFilter(0);
-    setPage(1);
-  };
-
-  const hasFilters = search || activeTab || countryFilter || qtyFilter > 0 || valueFilter > 0;
-
   return (
     <div className="p-6 max-w-[1600px] mx-auto space-y-5">
-      {/* Header bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-erp-border">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-            <span>Sổ Quản Lý Đơn Hàng Sản Xuất</span>
-          </h1>
-          <p className="text-xs text-erp-text-muted mt-1">
-            Tổng số {total} đơn hàng ghi nhận trong hệ thống
+          <h1 className="text-xl font-extrabold text-white tracking-tight">Sổ Cái Đơn Hàng Sản Xuất</h1>
+          <p className="text-xs text-erp-text-muted mt-0.5">
+            Quản lý và giám sát luồng sản xuất B1 → B6 theo định mức TAT
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button onClick={exportExcel} className="btn btn-success text-xs">
-            <Download size={14} />
-            <span>Xuất file Excel</span>
-          </button>
-        </div>
-      </div>
 
-      {/* Status Segmented Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 border-b border-erp-border">
-        {STATUS_TABS.map((tab) => {
-          const isActive = activeTab === tab.key;
-          return (
-            <button
-              key={tab.key}
-              onClick={() => {
-                setActiveTab(tab.key);
-                setPage(1);
-              }}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all ${
-                isActive
-                  ? 'bg-erp-primary text-white shadow-erp-sm'
-                  : 'text-erp-text-muted hover:text-white hover:bg-white/[0.04]'
-              }`}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Search & Filter bar */}
-      <div className="erp-card p-3.5 space-y-3">
         <div className="flex items-center gap-3">
-          <div className="relative flex-1">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-erp-text-dim" />
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-erp-text-muted" size={14} />
             <input
-              className="erp-input pl-9"
-              placeholder="Tìm kiếm nhanh theo mã đơn hàng..."
+              type="text"
+              placeholder="Tìm mã đơn hàng..."
               value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
+              onChange={(e) => setSearch(e.target.value)}
+              className="erp-input pl-8 py-1.5 text-xs w-48 sm:w-64"
             />
           </div>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`btn text-xs ${showFilters ? 'btn-primary' : 'btn-secondary'}`}
-          >
-            <Filter size={13} />
-            <span>Bộ lọc nâng cao</span>
-          </button>
-          {hasFilters && (
-            <button
-              onClick={clearFilters}
-              className="btn btn-secondary text-red-400 hover:text-red-300 text-xs border-red-500/20"
-            >
-              <X size={13} />
-              <span>Xóa lọc</span>
-            </button>
-          )}
         </div>
-
-        {/* Extended filter drawer */}
-        {showFilters && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-erp-border"
-          >
-            <div>
-              <label className="text-[11px] font-semibold text-erp-text-muted uppercase mb-1 block">
-                Quốc gia đến
-              </label>
-              <input
-                className="erp-input"
-                placeholder="VD: USA, Japan, VN..."
-                value={countryFilter}
-                onChange={(e) => {
-                  setCountryFilter(e.target.value);
-                  setPage(1);
-                }}
-              />
-            </div>
-            <div>
-              <label className="text-[11px] font-semibold text-erp-text-muted uppercase mb-1 block">
-                Khoảng số lượng (sp)
-              </label>
-              <select
-                className="erp-input"
-                value={qtyFilter}
-                onChange={(e) => {
-                  setQtyFilter(+e.target.value);
-                  setPage(1);
-                }}
-              >
-                {QUANTITY_FILTERS.map((q, i) => (
-                  <option key={i} value={i}>
-                    {q.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="text-[11px] font-semibold text-erp-text-muted uppercase mb-1 block">
-                Giá trị đơn hàng ($)
-              </label>
-              <select
-                className="erp-input"
-                value={valueFilter}
-                onChange={(e) => {
-                  setValueFilter(+e.target.value);
-                  setPage(1);
-                }}
-              >
-                {VALUE_FILTERS.map((v, i) => (
-                  <option key={i} value={i}>
-                    {v.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </motion.div>
-        )}
       </div>
 
-      {/* Main Data Table */}
-      {loading ? (
-        <div className="erp-card p-12 text-center text-erp-text-muted text-sm flex flex-col items-center justify-center gap-3">
-          <span className="w-7 h-7 border-2 border-erp-border border-t-erp-primary-light rounded-full animate-spin" />
-          <span>Đang tải danh sách đơn hàng...</span>
-        </div>
-      ) : orders.length === 0 ? (
-        <EmptyState
-          icon={FileText}
-          title="Không tìm thấy đơn hàng"
-          description="Không có đơn hàng nào phù hợp với điều kiện tìm kiếm và bộ lọc hiện tại."
-          actionLabel="Xóa toàn bộ bộ lọc"
-          onAction={clearFilters}
-        />
-      ) : (
-        <div className="erp-card overflow-hidden">
+      {/* Stage Tabs */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+        {STATUS_TABS.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => {
+              setActiveTab(t.key);
+              setPage(1);
+            }}
+            className={`px-3 py-1.5 rounded-md font-semibold whitespace-nowrap transition-colors ${
+              activeTab === t.key
+                ? 'bg-erp-primary text-white'
+                : 'bg-erp-card text-erp-text-muted hover:text-white border border-erp-border'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* 4 Alert Level Filter Bar */}
+      <div className="flex items-center gap-2 overflow-x-auto text-xs py-1">
+        <span className="text-[11px] font-bold text-erp-text-muted uppercase">Lọc cảnh báo:</span>
+        {ALERT_TABS.map((a) => (
+          <button
+            key={a.key}
+            onClick={() => setAlertFilter(a.key)}
+            className={`px-2.5 py-1 rounded text-xs font-semibold whitespace-nowrap transition-colors ${
+              alertFilter === a.key
+                ? 'bg-blue-600/30 text-blue-300 border border-blue-500'
+                : 'bg-erp-card text-erp-text-muted hover:text-white border border-erp-border'
+            }`}
+          >
+            {a.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Data Table */}
+      <div className="erp-card overflow-hidden">
+        {loading ? (
+          <div className="py-24 text-center text-erp-text-muted text-xs">
+            Đang tải dữ liệu đơn hàng...
+          </div>
+        ) : orders.length === 0 ? (
+          <EmptyState
+            icon={FileText}
+            title="Không tìm thấy đơn hàng"
+            description="Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm."
+          />
+        ) : (
           <div className="overflow-x-auto">
-            <table className="erp-table">
+            <table className="data-table">
               <thead>
                 <tr>
                   <th>Mã đơn</th>
-                  <th>Ngày đặt</th>
-                  {canViewDA && <th>Mã DA</th>}
-                  <th>Mã Sales</th>
-                  <th>Quốc gia</th>
-                  {canViewDA && <th className="text-right">Số lượng</th>}
-                  {canViewFinance && (
-                    <>
-                      <th className="text-right">Tổng ($)</th>
-                      <th className="text-right">Cọc ($)</th>
-                      <th className="text-right">Còn nợ ($)</th>
-                    </>
-                  )}
-                  <th className="text-center">Trạng thái</th>
-                  <th className="text-center">Hành động</th>
+                  <th>Mã DA</th>
+                  <th>Khách hàng</th>
+                  <th>SL</th>
+                  <th>Tổng tiền</th>
+                  <th>Đã cọc</th>
+                  <th>Còn nợ</th>
+                  <th>Hạn trả (TAT)</th>
+                  <th>Bước</th>
+                  <th>Cảnh báo</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
-                {orders.map((o) => (
-                  <tr
-                    key={o.id}
-                    onClick={() => navigate(`/orders/${o.id}`)}
-                    className="cursor-pointer hover:bg-erp-primary/5"
-                  >
-                    <td className="font-mono text-erp-primary-light font-bold text-xs">
-                      {o.orderCode || `#${o.id?.slice(-6)}`}
-                    </td>
-                    <td className="text-xs text-erp-text-muted tabular-nums">
-                      {fmtDate(o.orderDate)}
-                    </td>
-                    {canViewDA && (
-                      <td className="text-xs font-mono text-erp-text">
+                {orders.map((o) => {
+                  const alert = getOrderAlert(o);
+                  return (
+                    <tr
+                      key={o.id}
+                      onClick={() => navigate(`/orders/${o.id}`)}
+                      className="cursor-pointer hover:bg-erp-primary/5"
+                    >
+                      <td className="font-mono text-erp-primary-light font-bold text-xs">
+                        {o.orderCode || `#${o.id?.slice(-6)}`}
+                      </td>
+                      <td className="text-xs font-semibold text-white">
                         {o.brandCode || '—'}
                       </td>
-                    )}
-                    <td className="text-xs text-erp-text font-medium">
-                      {o.salespersonCode || '—'}
-                    </td>
-                    <td className="text-xs text-erp-text-muted">
-                      {o.country || '—'}
-                    </td>
-                    {canViewDA && (
-                      <td className="text-xs text-right font-semibold tabular-nums text-white">
+                      <td className="text-xs font-medium text-erp-text truncate max-w-[140px]">
+                        {typeof o.customer === 'object' ? o.customer?.name : '—'}
+                      </td>
+                      <td className="text-xs tabular-nums text-white">
                         {o.totalQuantity?.toLocaleString() || 0}
                       </td>
-                    )}
-                    {canViewFinance && (
-                      <>
-                        <td className="text-xs text-right font-semibold tabular-nums text-white">
-                          {fmtMoney(o.totalAmount)}
-                        </td>
-                        <td className="text-xs text-right text-erp-text-muted tabular-nums">
-                          {fmtMoney(o.deposit)}
-                        </td>
-                        <td
-                          className={`text-xs text-right font-bold tabular-nums ${
-                            (o.owedAmount || 0) > 0 ? 'text-amber-400' : 'text-emerald-400'
-                          }`}
-                        >
-                          {fmtMoney(o.owedAmount)}
-                        </td>
-                      </>
-                    )}
-                    <td className="text-center">
-                      <StatusBadge status={o.status} size="xs" />
-                    </td>
-                    <td className="text-center" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center justify-center gap-1.5">
-                        <button
-                          onClick={() => navigate(`/orders/${o.id}`)}
-                          className="btn btn-secondary text-[11px] px-2 py-1"
-                        >
-                          Chi tiết
-                        </button>
-                        <a
-                          href={`http://localhost:3001/admin/collections/orders/${o.id}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="p-1 rounded text-erp-text-muted hover:text-white hover:bg-white/5"
-                          title="CMS"
-                        >
-                          <ExternalLink size={13} />
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      <td className="text-xs font-bold font-mono text-erp-primary-light tabular-nums">
+                        {fmtMoney(o.totalAmount)}
+                      </td>
+                      <td className="text-xs font-mono text-emerald-400 tabular-nums">
+                        {fmtMoney(o.deposit)}
+                      </td>
+                      <td className="text-xs font-mono font-bold text-amber-400 tabular-nums">
+                        {fmtMoney(o.owedAmount)}
+                      </td>
+                      <td className="text-xs font-mono text-erp-text-muted">
+                        {fmtDate(o.expectedDeliveryDate)}
+                      </td>
+                      <td>
+                        <StatusBadge status={o.status} />
+                      </td>
+                      <td>
+                        {alert.level !== 'normal' && (
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10.5px] font-bold ${alert.bg} ${alert.color} border border-current/20`}>
+                            {alert.label}
+                          </span>
+                        )}
+                      </td>
+                      <td className="text-right">
+                        <span className="text-xs text-erp-primary-light font-semibold">
+                          Chi tiết ↗
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between px-5 py-3 border-t border-erp-border bg-[#0d1420]">
-              <p className="text-xs text-erp-text-muted">
-                Trang <strong className="text-white">{page}</strong> / {totalPages} · Tổng{' '}
-                <strong className="text-white">{total}</strong> đơn hàng
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPage(Math.max(1, page - 1))}
-                  disabled={page <= 1}
-                  className="btn btn-secondary text-xs px-2.5 py-1 disabled:opacity-30"
-                >
-                  <ChevronLeft size={14} /> Trước
-                </button>
-                <button
-                  onClick={() => setPage(Math.min(totalPages, page + 1))}
-                  disabled={page >= totalPages}
-                  className="btn btn-secondary text-xs px-2.5 py-1 disabled:opacity-30"
-                >
-                  Sau <ChevronRight size={14} />
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
-

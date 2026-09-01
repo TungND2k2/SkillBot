@@ -3,20 +3,22 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { OrderSlideDrawer, OrderData } from "./OrderSlideDrawer";
+import { getOrderAlertStatus } from "../../lib/workflow-stages";
 
 const COLUMNS = [
-  { key: "b1", label: "B1: Nhận đơn & Hợp đồng", color: "#3b82f6" },
-  { key: "b2", label: "B2: Định mức BOM vải", color: "#6366f1" },
-  { key: "b3", label: "B3: Nhập NPL về kho", color: "#8b5cf6" },
-  { key: "b4", label: "B4: May & Thêu xưởng", color: "#ec4899" },
-  { key: "b5", label: "B5: Kiểm định KCS QC", color: "#f59e0b" },
-  { key: "b6", label: "B6: Đóng gói & Xuất hàng", color: "#10b981" },
+  { key: "b1", label: "B1: Nhận đơn (1-2d)", color: "#3b82f6" },
+  { key: "b2", label: "B2: Định mức (1-4d)", color: "#6366f1" },
+  { key: "b3", label: "B3: Mua NPL (3-7d)", color: "#8b5cf6" },
+  { key: "b4", label: "B4: Gửi NCC (1d)", color: "#ec4899" },
+  { key: "b5", label: "B5: Thêu & May (24-35d)", color: "#f59e0b" },
+  { key: "b6", label: "B6: QC & Giao (1-3d)", color: "#10b981" },
 ];
 
 export const OrdersKanbanBoard: React.FC = () => {
   const [orders, setOrders] = useState<OrderData[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [alertFilter, setAlertFilter] = useState<string>("all");
   const [selectedOrder, setSelectedOrder] = useState<OrderData | null>(null);
 
   const fetchOrders = async () => {
@@ -39,6 +41,9 @@ export const OrdersKanbanBoard: React.FC = () => {
   }, []);
 
   const filteredOrders = orders.filter((o) => {
+    const alert = getOrderAlertStatus(o);
+    if (alertFilter !== "all" && alert.level !== alertFilter) return false;
+
     if (!search) return true;
     const s = search.toLowerCase();
     const code = o.orderCode?.toLowerCase() || "";
@@ -52,7 +57,7 @@ export const OrdersKanbanBoard: React.FC = () => {
 
   return (
     <div style={{ marginTop: "12px", marginBottom: "24px" }}>
-      {/* Board Controls */}
+      {/* Board Controls & Alert Filters */}
       <div
         style={{
           display: "flex",
@@ -63,14 +68,13 @@ export const OrdersKanbanBoard: React.FC = () => {
           flexWrap: "wrap",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, maxWidth: "400px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, maxWidth: "600px", flexWrap: "wrap" }}>
           <input
             type="text"
             placeholder="🔍 Tìm nhanh theo mã đơn, mã DA, khách hàng..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
-              width: "100%",
               padding: "7px 12px",
               borderRadius: "8px",
               background: "#0f172a",
@@ -78,8 +82,30 @@ export const OrdersKanbanBoard: React.FC = () => {
               color: "#f8fafc",
               fontSize: "12.5px",
               outline: "none",
+              minWidth: "220px",
             }}
           />
+
+          {/* Quick Alert Filter */}
+          <select
+            value={alertFilter}
+            onChange={(e) => setAlertFilter(e.target.value)}
+            style={{
+              padding: "7px 10px",
+              borderRadius: "8px",
+              background: "#0f172a",
+              border: "1px solid #1e293b",
+              color: "#cbd5e1",
+              fontSize: "12px",
+              outline: "none",
+            }}
+          >
+            <option value="all">⚡ Tất cả cảnh báo ({orders.length})</option>
+            <option value="approaching">🟡 Sắp đến hạn (≤ 7 ngày)</option>
+            <option value="overdue">🔴 Đơn muộn (1–14 ngày)</option>
+            <option value="critical_overdue">🔴 Trễ nghiêm trọng (&gt; 14 ngày)</option>
+            <option value="stalled">🟠 Cần xử lý (Kẹt bước)</option>
+          </select>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -213,8 +239,7 @@ export const OrdersKanbanBoard: React.FC = () => {
                   ) : (
                     colOrders.map((order) => {
                       const custName = typeof order.customer === "object" ? order.customer?.name : "—";
-                      const isOverdue =
-                        order.expectedDeliveryDate && new Date(order.expectedDeliveryDate) < new Date();
+                      const alert = getOrderAlertStatus(order);
 
                       return (
                         <div
@@ -224,7 +249,7 @@ export const OrdersKanbanBoard: React.FC = () => {
                             padding: "12px",
                             borderRadius: "8px",
                             background: "#0f172a",
-                            border: "1px solid #1e293b",
+                            border: `1px solid ${alert.level !== "normal" ? alert.badgeBorder : "#1e293b"}`,
                             cursor: "pointer",
                             transition: "all 0.15s ease",
                             boxShadow: "0 2px 6px rgba(0, 0, 0, 0.25)",
@@ -235,10 +260,31 @@ export const OrdersKanbanBoard: React.FC = () => {
                             e.currentTarget.style.transform = "translateY(-2px)";
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = "#1e293b";
+                            e.currentTarget.style.borderColor = alert.level !== "normal" ? alert.badgeBorder : "#1e293b";
                             e.currentTarget.style.transform = "translateY(0)";
                           }}
                         >
+                          {/* Alert Badge Header */}
+                          {alert.level !== "normal" && (
+                            <div
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "4px",
+                                fontSize: "10px",
+                                fontWeight: 700,
+                                padding: "2px 6px",
+                                borderRadius: "4px",
+                                background: alert.badgeBg,
+                                color: alert.color,
+                                border: `1px solid ${alert.badgeBorder}`,
+                                marginBottom: "8px",
+                              }}
+                            >
+                              {alert.label}: {alert.message}
+                            </div>
+                          )}
+
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
                             <span style={{ fontSize: "13px", fontWeight: 800, color: "#38bdf8", fontFamily: "monospace" }}>
                               {order.orderCode || `#${order.id?.slice(-6)}`}
@@ -269,7 +315,7 @@ export const OrdersKanbanBoard: React.FC = () => {
                               fontSize: "10.5px",
                             }}
                           >
-                            <span style={{ color: isOverdue ? "#ef4444" : "#64748b", fontWeight: isOverdue ? 700 : 500 }}>
+                            <span style={{ color: alert.color, fontWeight: alert.level !== "normal" ? 700 : 500 }}>
                               Hạn: {fmtDate(order.expectedDeliveryDate)}
                             </span>
                             <span style={{ color: "#3b82f6", fontWeight: 600 }}>Chi tiết ↗</span>
