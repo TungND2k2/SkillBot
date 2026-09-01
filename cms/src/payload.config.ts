@@ -50,6 +50,8 @@ export default buildConfig({
         Logo: "/components/admin/Logo",
       },
       providers: ["/components/admin/ChatProvider"],
+      // Banner thống kê KPI & lối tắt ERP trên trang chủ Admin
+      beforeDashboard: ["/components/admin/ErpDashboard"],
       // Nav link "Quy trình" trên sidebar
       beforeNavLinks: ["/components/admin/WorkflowNavLink"],
       // Custom view "Quy trình" — read-only diagram cho manager xem flow B1-B6
@@ -64,6 +66,7 @@ export default buildConfig({
         },
       },
     },
+
   },
   collections: [
     Users,

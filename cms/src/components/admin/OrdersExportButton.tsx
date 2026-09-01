@@ -2,11 +2,8 @@
 import React, { useState } from "react";
 
 /**
- * Nút "Xuất Excel" trên trang list Orders. Mở popover nhỏ cho phép user
- * chọn khoảng thời gian + nước + khoảng giá trị, rồi tải file CSV.
- *
- * Backend: /api/orders-export — apply where lên payload.find với access
- * theo session user (sales chỉ export đơn của mình).
+ * Nút "Xuất Excel" trên trang danh sách Đơn hàng (Orders).
+ * Hỗ trợ giao diện Enterprise ERP Popover với bộ lọc khoảng thời gian, thị trường, khoảng giá trị.
  */
 export default function OrdersExportButton() {
   const [open, setOpen] = useState(false);
@@ -32,17 +29,22 @@ export default function OrdersExportButton() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         style={{
-          background: "#059669",
-          color: "#fff",
-          border: 0,
-          padding: "8px 14px",
+          background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+          color: "#ffffff",
+          border: "1px solid #3b82f6",
+          padding: "7px 14px",
           borderRadius: 8,
-          fontSize: 13,
+          fontSize: 12.5,
           fontWeight: 600,
           cursor: "pointer",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          boxShadow: "0 2px 8px rgba(37, 99, 235, 0.25)",
         }}
       >
-        📊 Xuất Excel
+        <span>📊</span>
+        <span>Xuất Excel Đơn Hàng</span>
       </button>
 
       {open && (
@@ -52,97 +54,124 @@ export default function OrdersExportButton() {
             top: "100%",
             left: 0,
             marginTop: 6,
-            background: "#fff",
-            color: "#111",
-            border: "1px solid #e5e7eb",
-            borderRadius: 10,
-            padding: 14,
-            width: 320,
-            boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-            zIndex: 50,
+            background: "rgb(var(--theme-elevation-50))",
+            color: "rgb(var(--theme-elevation-900))",
+            border: "1px solid rgb(var(--theme-elevation-200))",
+            borderRadius: 12,
+            padding: 18,
+            width: 340,
+            boxShadow: "0 14px 35px -5px rgba(0, 0, 0, 0.35)",
+            zIndex: 100,
           }}
         >
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              marginBottom: 12,
+              paddingBottom: 8,
+              borderBottom: "1px solid rgb(var(--theme-elevation-150))",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span>Bộ Lọc Xuất Dữ Liệu</span>
+            <span style={{ fontSize: 11, color: "rgb(var(--theme-elevation-400))", fontWeight: 500 }}>
+              XLSX / CSV
+            </span>
+          </div>
+
           <div style={{ display: "grid", gap: 10 }}>
-            <label style={{ fontSize: 12, fontWeight: 600 }}>
-              Từ ngày
-              <input
-                type="date"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-                style={inputStyle}
-              />
-            </label>
-            <label style={{ fontSize: 12, fontWeight: 600 }}>
-              Đến ngày
-              <input
-                type="date"
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-                style={inputStyle}
-              />
-            </label>
-            <label style={{ fontSize: 12, fontWeight: 600 }}>
-              Thị trường (nước khách)
-              <input
-                type="text"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                placeholder="vd: Japan"
-                style={inputStyle}
-              />
-            </label>
-            <div style={{ display: "flex", gap: 6 }}>
-              <label style={{ flex: 1, fontSize: 12, fontWeight: 600 }}>
-                Giá trị từ
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              <label style={labelStyle}>
+                Từ ngày
                 <input
-                  type="number"
-                  value={minTotal}
-                  onChange={(e) => setMinTotal(e.target.value)}
+                  type="date"
+                  value={from}
+                  onChange={(e) => setFrom(e.target.value)}
                   style={inputStyle}
                 />
               </label>
-              <label style={{ flex: 1, fontSize: 12, fontWeight: 600 }}>
-                Đến
+              <label style={labelStyle}>
+                Đến ngày
                 <input
-                  type="number"
-                  value={maxTotal}
-                  onChange={(e) => setMaxTotal(e.target.value)}
+                  type="date"
+                  value={to}
+                  onChange={(e) => setTo(e.target.value)}
                   style={inputStyle}
                 />
               </label>
             </div>
-            <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+
+            <label style={labelStyle}>
+              Thị trường / Quốc gia
+              <input
+                type="text"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                placeholder="VD: Japan, USA, Việt Nam..."
+                style={inputStyle}
+              />
+            </label>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              <label style={labelStyle}>
+                Giá trị từ ($)
+                <input
+                  type="number"
+                  value={minTotal}
+                  onChange={(e) => setMinTotal(e.target.value)}
+                  placeholder="Min"
+                  style={inputStyle}
+                />
+              </label>
+              <label style={labelStyle}>
+                Đến ($)
+                <input
+                  type="number"
+                  value={maxTotal}
+                  onChange={(e) => setMaxTotal(e.target.value)}
+                  placeholder="Max"
+                  style={inputStyle}
+                />
+              </label>
+            </div>
+
+            <div style={{ display: "flex", gap: 8, marginTop: 6, paddingTop: 10, borderTop: "1px solid rgb(var(--theme-elevation-150))" }}>
               <a
                 href={buildUrl()}
                 onClick={() => setOpen(false)}
                 style={{
                   flex: 1,
                   textAlign: "center",
-                  background: "#059669",
-                  color: "#fff",
-                  padding: "8px",
+                  background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+                  color: "#ffffff",
+                  padding: "8px 12px",
                   borderRadius: 6,
-                  fontSize: 13,
+                  fontSize: 12,
                   fontWeight: 600,
                   textDecoration: "none",
+                  boxShadow: "0 2px 6px rgba(37, 99, 235, 0.3)",
                 }}
               >
-                Tải file
+                Tải Xuống File Excel
               </a>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 style={{
-                  background: "#f3f4f6",
-                  color: "#111",
-                  border: 0,
+                  background: "rgb(var(--theme-elevation-100))",
+                  color: "rgb(var(--theme-elevation-800))",
+                  border: "1px solid rgb(var(--theme-elevation-150))",
                   padding: "8px 14px",
                   borderRadius: 6,
-                  fontSize: 13,
+                  fontSize: 12,
+                  fontWeight: 600,
                   cursor: "pointer",
                 }}
               >
-                Huỷ
+                Đóng
               </button>
             </div>
           </div>
@@ -152,13 +181,23 @@ export default function OrdersExportButton() {
   );
 }
 
+const labelStyle: React.CSSProperties = {
+  fontSize: "11px",
+  fontWeight: 600,
+  textTransform: "uppercase",
+  color: "rgb(var(--theme-elevation-500))",
+};
+
 const inputStyle: React.CSSProperties = {
   display: "block",
   width: "100%",
   marginTop: 4,
-  padding: "6px 8px",
-  fontSize: 13,
-  border: "1px solid #d1d5db",
+  padding: "6px 10px",
+  fontSize: "12.5px",
+  border: "1px solid rgb(var(--theme-elevation-200))",
   borderRadius: 6,
-  fontWeight: 400,
+  background: "rgb(var(--theme-elevation-0))",
+  color: "rgb(var(--theme-elevation-900))",
+  outline: "none",
+  fontFamily: "inherit",
 };

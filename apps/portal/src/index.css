@@ -1,0 +1,372 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Enterprise ERP Design Tokens ─────────────────────── */
+:root {
+  --bg-main: #090d16;
+  --bg-sidebar: #0d131f;
+  --bg-header: #0f1624;
+  --bg-card: #131b2b;
+  --bg-card-hover: #182236;
+  --bg-card-subtle: #0f1626;
+  --bg-elevated: #1a253b;
+  
+  --border-color: #1e2c42;
+  --border-light: #2a3d5b;
+  --border-subtle: #172233;
+  --border-focus: #3b82f6;
+
+  --text-main: #f8fafc;
+  --text-body: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-light: #3b82f6;
+  --primary-subtle: rgba(37, 99, 235, 0.12);
+  --primary-border: rgba(59, 130, 246, 0.3);
+
+  --success: #10b981;
+  --success-subtle: rgba(16, 185, 129, 0.12);
+  --success-border: rgba(16, 185, 129, 0.25);
+
+  --warning: #f59e0b;
+  --warning-subtle: rgba(245, 158, 11, 0.12);
+  --warning-border: rgba(245, 158, 11, 0.25);
+
+  --danger: #ef4444;
+  --danger-subtle: rgba(239, 68, 68, 0.12);
+  --danger-border: rgba(239, 68, 68, 0.25);
+
+  --purple: #8b5cf6;
+  --purple-subtle: rgba(139, 92, 246, 0.12);
+  --purple-border: rgba(139, 92, 246, 0.25);
+
+  --cyan: #06b6d4;
+  --cyan-subtle: rgba(6, 182, 212, 0.12);
+  --cyan-border: rgba(6, 182, 212, 0.25);
+}
+
+/* ── Base ──────────────────────────────────────────── */
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tabular figures for numbers */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #24344d transparent;
+}
+*::-webkit-scrollbar { width: 6px; height: 6px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: #24344d; border-radius: 4px; }
+*::-webkit-scrollbar-thumb:hover { background: #334768; }
+
+/* ── ERP Cards & Containers ─────────────────────────── */
+.erp-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.02);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.erp-card:hover {
+  border-color: var(--border-light);
+}
+
+.glass-card {
+  /* Backward-compatible alias mapped to ERP Card */
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+/* ── ERP Stat KPI Cards ─────────────────────────────── */
+.stat-card {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.5);
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.stat-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-light);
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.6);
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 10px 10px 0 0;
+}
+.stat-card.blue::before { background: #3b82f6; }
+.stat-card.green::before { background: #10b981; }
+.stat-card.yellow::before { background: #f59e0b; }
+.stat-card.red::before { background: #ef4444; }
+.stat-card.purple::before { background: #8b5cf6; }
+.stat-card.cyan::before { background: #06b6d4; }
+
+/* ── ERP Sidebar Navigation ─────────────────────────── */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: all 0.15s ease;
+  position: relative;
+}
+.sidebar-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.04);
+}
+.sidebar-link.active {
+  color: #ffffff;
+  background: var(--primary-subtle);
+  border: 1px solid var(--primary-border);
+  font-weight: 600;
+}
+.sidebar-link.active::before {
+  content: '';
+  position: absolute;
+  left: -9px;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: var(--primary);
+  border-radius: 0 3px 3px 0;
+}
+
+/* ── Enterprise Data Table ─────────────────────────── */
+.data-table, .erp-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+}
+
+.data-table thead th, .erp-table thead th {
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  background: #0d1522;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.data-table tbody td, .erp-table tbody td {
+  padding: 11px 14px;
+  font-size: 13px;
+  color: var(--text-body);
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.data-table tbody tr, .erp-table tbody tr {
+  transition: background-color 0.12s ease;
+}
+
+.data-table tbody tr:hover, .erp-table tbody tr:hover {
+  background-color: rgba(37, 99, 235, 0.04);
+}
+
+.data-table tbody tr:last-child td, .erp-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Status Badges & Chips ─────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.badge.blue {
+  background: var(--primary-subtle);
+  color: #60a5fa;
+  border-color: var(--primary-border);
+}
+.badge.green {
+  background: var(--success-subtle);
+  color: #34d399;
+  border-color: var(--success-border);
+}
+.badge.yellow {
+  background: var(--warning-subtle);
+  color: #fbbf24;
+  border-color: var(--warning-border);
+}
+.badge.red {
+  background: var(--danger-subtle);
+  color: #f87171;
+  border-color: var(--danger-border);
+}
+.badge.purple {
+  background: var(--purple-subtle);
+  color: #c084fc;
+  border-color: var(--purple-border);
+}
+.badge.cyan {
+  background: var(--cyan-subtle);
+  color: #22d3ee;
+  border-color: var(--cyan-border);
+}
+.badge.gray {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border-color: var(--border-color);
+}
+
+/* ── ERP Buttons ───────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: 1px solid transparent;
+  outline: none;
+  line-height: 1.25;
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #3b82f6;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+}
+.btn-primary:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #60a5fa;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-ghost, .btn-secondary {
+  background: #131b2b;
+  color: var(--text-body);
+  border: 1px solid var(--border-color);
+}
+.btn-ghost:hover:not(:disabled), .btn-secondary:hover:not(:disabled) {
+  background: #1a253b;
+  border-color: var(--border-light);
+  color: #ffffff;
+}
+
+.btn-success {
+  background: #059669;
+  color: #ffffff;
+  border-color: #10b981;
+}
+.btn-success:hover:not(:disabled) {
+  background: #047857;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #ef4444;
+}
+.btn-danger:hover:not(:disabled) {
+  background: #b91c1c;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+/* ── ERP Form Inputs ───────────────────────────────── */
+.input, .erp-input {
+  width: 100%;
+  padding: 8px 12px;
+  background: #0d1420;
+  border: 1px solid var(--border-color);
+  border-radius: 7px;
+  color: var(--text-main);
+  font-size: 13px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  outline: none;
+}
+.input:focus, .erp-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  background: #101928;
+}
+.input::placeholder, .erp-input::placeholder {
+  color: var(--text-dim);
+}
+
+select.input, select.erp-input {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+}
+select.input option, select.erp-input option {
+  background: #0d1420;
+  color: #f1f5f9;
+  padding: 8px 12px;
+}
+
+/* ── Star rating ───────────────────────────────────── */
+.stars { color: #f59e0b; letter-spacing: 2px; font-size: 14px; }
+
+/* ── Pulse animation ───────────────────────────────── */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(37, 99, 235, 0); }
+}
+.pulse-glow { animation: pulse-glow 2s infinite; }
+
+/* ── Utilities ─────────────────────────────────────── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+

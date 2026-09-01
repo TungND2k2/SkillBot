@@ -1,153 +1,365 @@
 /* ─────────────────────────────────────────────────────────────
-   SkillBot — Payload admin theme override
-
-   Palette: emerald (Petite Étoile brand)
-   Font:    Inter (system fallback)
-   Tweaks:  softer shadows, rounder corners, clearer hierarchy
+   SkillBot Enterprise ERP Design System — Payload CMS 3.x
+   Deep Industrial Slate/Navy Theme for Garment & Apparel ERP
    ───────────────────────────────────────────────────────────── */
 
-@layer payload-default {
-  :root {
-    /* Brand emerald — Payload dùng "success" cho primary action (nút Save, link active) */
-    --theme-success-50:  238 246 240;
-    --theme-success-100: 215 234 220;
-    --theme-success-150: 187 219 197;
-    --theme-success-250: 132 191 152;
-    --theme-success-350: 74 156 109;
-    --theme-success-450: 22 122 79;
-    --theme-success-500: 16 185 129;
-    --theme-success-650: 6 78 59;
-    --theme-success-750: 4 47 36;
-    --theme-success-850: 2 24 19;
-    --theme-success-950: 0 12 9;
+/* ── 1. Root & Theme Variable Overrides (Force High Specificity) ── */
+:root,
+html,
+html[data-theme="dark"],
+html[data-theme="light"],
+body {
+  --theme-bg: #090d16;
+  --theme-input-bg: #0f172a;
+  --theme-elevation-0: #090d16;
+  --theme-elevation-50: #0f172a;
+  --theme-elevation-100: #161f30;
+  --theme-elevation-150: #1e293b;
+  --theme-elevation-200: #2a3b52;
+  --theme-elevation-250: #3b506e;
+  --theme-elevation-300: #64748b;
+  --theme-elevation-400: #94a3b8;
+  --theme-elevation-500: #cbd5e1;
+  --theme-elevation-600: #e2e8f0;
+  --theme-elevation-700: #f1f5f9;
+  --theme-elevation-800: #f8fafc;
+  --theme-elevation-900: #ffffff;
+  --theme-elevation-1000: #ffffff;
 
-    /* Tăng radius nhẹ — input/button mềm mắt hơn */
-    --style-radius-s: 6px;
-    --style-radius-m: 10px;
-    --style-radius-l: 14px;
+  --theme-text: #f1f5f9;
+  --theme-text-muted: #94a3b8;
+
+  /* ERP Electric Blue & Emerald Action Tokens */
+  --theme-success-50: 238 244 255;
+  --theme-success-100: 219 234 254;
+  --theme-success-200: 191 219 254;
+  --theme-success-400: 96 165 250;
+  --theme-success-500: 37 99 235;
+  --theme-success-600: 29 78 216;
+
+  --style-radius-s: 6px;
+  --style-radius-m: 8px;
+  --style-radius-l: 12px;
+
+  background-color: #090d16 !important;
+  color: #f1f5f9 !important;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── 2. App Structure & Canvas ── */
+body,
+#app,
+.template-default,
+.template-default__wrap,
+.template-default__content,
+.collection-list,
+.collection-edit,
+.dashboard {
+  background-color: #090d16 !important;
+  color: #f1f5f9 !important;
+}
+
+/* ── 3. Top Header Bar ── */
+.app-header {
+  background-color: #0d1422 !important;
+  border-bottom: 1px solid #1e293b !important;
+  padding: 10px 20px !important;
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(12px) !important;
+  z-index: 50 !important;
+
+  .app-header__controls {
+    gap: 12px !important;
   }
 }
 
-/* Font stack — Inter ưu tiên, fallback system */
-body {
-  font-family:
-    "Inter",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    "Roboto",
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ── 4. Sidebar Navigation (Enterprise Navy) ── */
+.nav,
+.nav__wrap,
+.nav__scroll {
+  background-color: #090d16 !important;
+  border-right: 1px solid #1e293b !important;
 }
 
-/* ── Tăng kích thước font cơ bản cho dễ đọc ────────────────── */
-.field-label,
-.field-description,
-label {
-  font-size: 13.5px;
-  letter-spacing: -0.005em;
-}
-
-/* ── Sidebar: nhóm collection rõ ràng hơn ─────────────────── */
 .nav__wrap {
-  padding-block: 4px;
+  padding: 12px 8px !important;
 }
 
 .nav-group__label {
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 11px;
-  font-weight: 700;
-  opacity: 0.55;
-  margin-block: 12px 6px;
-  padding-inline: 12px;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  margin: 16px 0 6px 0 !important;
+  padding: 0 10px !important;
 }
 
 .nav__link {
-  border-radius: 8px;
-  margin-inline: 6px;
-  padding-block: 9px;
-  font-weight: 500;
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
+  border-radius: 8px !important;
+  margin: 2px 4px !important;
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #cbd5e1 !important;
+  border: 1px solid transparent !important;
+  transition: all 0.15s ease-in-out !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
 
   &:hover {
-    background: rgb(var(--theme-elevation-100));
+    background: #161f30 !important;
+    border-color: #1e293b !important;
+    color: #ffffff !important;
+    transform: translateX(2px);
   }
 }
 
-.nav__link--active {
-  background: rgb(var(--theme-success-50));
-  color: rgb(var(--theme-success-500));
-  font-weight: 600;
+.nav__link--active,
+.nav__link[aria-current="page"] {
+  background: rgba(37, 99, 235, 0.15) !important;
+  color: #60a5fa !important;
+  border: 1px solid rgba(59, 130, 246, 0.35) !important;
+  font-weight: 600 !important;
+  position: relative !important;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 6px;
+    bottom: 6px;
+    width: 3.5px;
+    background: #3b82f6;
+    border-radius: 0 4px 4px 0;
+    box-shadow: 0 0 8px #3b82f6;
+  }
 }
 
-/* ── Table list: hàng cao hơn, hover rõ ──────────────────── */
+/* ── 5. Collection List & Data Grid Container ── */
+.collection-list {
+  padding: 24px 32px !important;
+  max-width: 1600px !important;
+  margin: 0 auto !important;
+}
+
+.collection-list__header {
+  margin-bottom: 20px !important;
+  padding-bottom: 16px !important;
+  border-bottom: 1px solid #1e293b !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+
+  h1 {
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+    color: #ffffff !important;
+    margin: 0 !important;
+  }
+}
+
+/* List Controls (Search, Filters, Column selector) */
+.list-controls,
+.search-filter {
+  margin-bottom: 16px !important;
+}
+
+.search-filter__input,
+.list-controls input {
+  background: #0f172a !important;
+  border: 1px solid #1e293b !important;
+  border-radius: 8px !important;
+  color: #f1f5f9 !important;
+  font-size: 13px !important;
+  padding: 8px 14px 8px 36px !important;
+  transition: all 0.15s ease !important;
+
+  &:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+    outline: none !important;
+  }
+}
+
+.column-selector__toggle,
+.where-builder__add-filter,
+.list-controls .btn {
+  background: #0f172a !important;
+  border: 1px solid #1e293b !important;
+  border-radius: 8px !important;
+  color: #94a3b8 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+
+  &:hover {
+    background: #161f30 !important;
+    color: #ffffff !important;
+    border-color: #2a3b52 !important;
+  }
+}
+
+/* ── 6. High-Density Enterprise Table / Data Grid ── */
+.table,
+.table__wrap,
+.collection-list__wrap {
+  background: #0f172a !important;
+  border: 1px solid #1e293b !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 8px 30px -5px rgba(0, 0, 0, 0.4) !important;
+}
+
 .table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  width: 100% !important;
+
   thead th {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-weight: 700;
-    opacity: 0.65;
+    background: #161f30 !important;
+    border-bottom: 1px solid #1e293b !important;
+    color: #94a3b8 !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    padding: 12px 14px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10 !important;
   }
+
   tbody tr {
-    transition: background-color 0.12s ease;
+    background-color: #0f172a !important;
+    border-bottom: 1px solid #162234 !important;
+    transition: background-color 0.12s ease !important;
+
+    &:nth-child(even) {
+      background-color: #0d1526 !important;
+    }
+
     &:hover {
-      background: rgb(var(--theme-elevation-50));
+      background-color: rgba(37, 99, 235, 0.08) !important;
     }
   }
+
   tbody td {
-    padding-block: 14px;
-  }
-}
+    padding: 12px 14px !important;
+    font-size: 13px !important;
+    color: #cbd5e1 !important;
+    border-bottom: 1px solid #162234 !important;
+    vertical-align: middle !important;
 
-/* ── List Orders: compact để fit nhiều cột trong 1 màn ───── */
-.collection-list--orders {
-  .table {
-    font-size: 12.5px;
-    table-layout: auto;
+    a {
+      color: #38bdf8 !important;
+      font-weight: 600 !important;
+      text-decoration: none !important;
 
-    thead th,
-    tbody td {
-      padding-inline: 6px;
-      white-space: nowrap;
-    }
-    thead th {
-      font-size: 10.5px;
-    }
-    tbody td {
-      padding-block: 9px;
-    }
-    /* Sort arrows nhỏ hơn để bớt chiếm chỗ */
-    thead .sort-column__buttons,
-    thead .sort-column__asc,
-    thead .sort-column__desc {
-      transform: scale(0.75);
-      transform-origin: left center;
-    }
-    /* Cột số: hẹp + căn giữa */
-    tbody td.cell-totalAmount,
-    tbody td.cell-deposit,
-    tbody td.cell-owedAmount,
-    tbody td.cell-totalQuantity,
-    thead th.cell-totalAmount,
-    thead th.cell-deposit,
-    thead th.cell-owedAmount,
-    thead th.cell-totalQuantity {
-      text-align: center;
-      width: 70px;
-      max-width: 70px;
-      min-width: 60px;
+      &:hover {
+        text-decoration: underline !important;
+        color: #60a5fa !important;
+      }
     }
   }
 }
 
-/* ── Input field: rounder, subtle border ─────────────────── */
+/* Monospace alignment for numbers & figures */
+.font-mono,
+.cell-orderCode,
+.cell-orderDate,
+.cell-totalAmount,
+.cell-deposit,
+.cell-owedAmount,
+.cell-totalQuantity,
+.cell-expectedDeliveryDate,
+.cell-code,
+.cell-phone {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+.cell-totalAmount {
+  color: #38bdf8 !important;
+  font-weight: 700 !important;
+}
+
+.cell-owedAmount {
+  color: #fbbf24 !important;
+  font-weight: 700 !important;
+}
+
+/* ── 7. Primary & Secondary Buttons ── */
+.btn,
+.btn--style-primary,
+.btn--style-secondary,
+.collection-list__header .btn,
+a.btn {
+  border-radius: 8px !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+  padding: 8px 16px !important;
+  transition: all 0.15s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+}
+
+.btn--style-primary,
+a[href*="/create"],
+.collection-list__header .btn {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  border: 1px solid #3b82f6 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.35) !important;
+
+  &:hover {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.5) !important;
+    transform: translateY(-1px);
+    color: #ffffff !important;
+  }
+}
+
+.btn--style-secondary {
+  background: #0f172a !important;
+  border: 1px solid #1e293b !important;
+  color: #cbd5e1 !important;
+
+  &:hover {
+    background: #161f30 !important;
+    border-color: #2a3b52 !important;
+    color: #ffffff !important;
+  }
+}
+
+/* ── 8. Form View & Document Edit (ERP Detail View) ── */
+.collection-edit,
+.document-fields,
+.form {
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+}
+
+.doc-header {
+  border-bottom: 1px solid #1e293b !important;
+  padding-bottom: 16px !important;
+  margin-bottom: 24px !important;
+
+  h1,
+  .doc-header__title {
+    font-size: 20px !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+  }
+}
+
+/* Form inputs & controls */
 .field-type input[type="text"],
 .field-type input[type="email"],
 .field-type input[type="password"],
@@ -155,135 +367,151 @@ label {
 .field-type input[type="date"],
 .field-type textarea,
 .react-select__control {
-  border-radius: 8px;
-  border-color: rgb(var(--theme-elevation-150));
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  border-radius: 8px !important;
+  border: 1px solid #1e293b !important;
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  font-size: 13px !important;
+  padding: 8px 12px !important;
+  transition: all 0.15s ease !important;
 
   &:focus,
   &:focus-within {
-    border-color: rgb(var(--theme-success-500));
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+    background: #111c30 !important;
+    outline: none !important;
   }
 }
 
-/* ── Button: gradient nhẹ cho primary (Save/Create) ──────── */
-.btn--style-primary {
-  background: linear-gradient(135deg, rgb(16, 185, 129) 0%, rgb(5, 150, 105) 100%);
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.25);
-  transition: transform 0.1s ease, box-shadow 0.15s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
-  }
-  &:active {
-    transform: translateY(0);
-  }
+.field-label,
+label {
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  color: #94a3b8 !important;
+  margin-bottom: 6px !important;
 }
 
-.btn--style-secondary {
-  border-radius: 8px;
-  border-color: rgb(var(--theme-elevation-200));
-  font-weight: 500;
+.field-description {
+  font-size: 11.5px !important;
+  color: #64748b !important;
+  margin-top: 4px !important;
 }
 
-/* ── Group / Collapsible: card mềm ───────────────────────── */
-.field-type.group .group__content,
-.collapsible__content {
-  border: 1px solid rgb(var(--theme-elevation-100));
-  border-radius: 12px;
-  background: rgb(var(--theme-elevation-0));
-  padding: 18px;
-}
-
-.collapsible__toggle-wrap {
-  border-radius: 10px;
-  font-weight: 600;
-}
-
-/* ── Tabs: pill style ────────────────────────────────────── */
+/* Tabs & Groups */
 .tabs-field__tabs {
-  gap: 4px;
-  padding: 4px;
-  background: rgb(var(--theme-elevation-50));
-  border-radius: 12px;
+  gap: 6px !important;
+  padding: 4px !important;
+  background: #0d1422 !important;
+  border: 1px solid #1e293b !important;
+  border-radius: 10px !important;
 }
 
 .tabs-field__tab-button {
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-weight: 500;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  border-radius: 7px !important;
+  padding: 8px 16px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #94a3b8 !important;
 
   &:hover {
-    background: rgb(var(--theme-elevation-100));
+    background: #161f30 !important;
+    color: #ffffff !important;
   }
 }
 
 .tabs-field__tab-button--active {
-  background: rgb(var(--theme-elevation-0));
-  color: rgb(var(--theme-success-500));
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  background: #1e293b !important;
+  color: #38bdf8 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* ── Document header: gọn hơn ────────────────────────────── */
-.doc-header h1,
-.doc-header__title {
-  letter-spacing: -0.02em;
-  font-weight: 700;
+.field-type.group .group__content,
+.collapsible__content {
+  border: 1px solid #1e293b !important;
+  border-left: 3px solid #3b82f6 !important;
+  border-radius: 12px !important;
+  background: #0f172a !important;
+  padding: 20px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
 }
 
-/* ── Card view (collection landing): bo mạnh, hover lift ── */
-.collection-cards__card {
-  border-radius: 14px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+.collapsible__toggle-wrap {
+  background: #0f172a !important;
+  border: 1px solid #1e293b !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  color: #f1f5f9 !important;
+}
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+/* ── 9. Pagination Bar ── */
+.paginator,
+.collection-list__pagination {
+  padding: 12px 16px !important;
+  border-top: 1px solid #1e293b !important;
+  background: #0d1422 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  font-size: 12px !important;
+  color: #94a3b8 !important;
+
+  .btn {
+    background: #161f30 !important;
+    border: 1px solid #1e293b !important;
+    color: #cbd5e1 !important;
+    padding: 4px 10px !important;
+    font-size: 11.5px !important;
+
+    &:hover {
+      background: #1e293b !important;
+      color: #ffffff !important;
+    }
   }
 }
 
-/* ── Status pill (workflow status, role badge) ──────────── */
+/* ── 10. Status Badges & Pills ── */
 .pill {
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  border-radius: 999px;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 3px 10px !important;
+  border-radius: 999px !important;
+  border: 1px solid transparent !important;
+  letter-spacing: 0.02em !important;
 }
 
-/* ── Date picker: less cramped ───────────────────────────── */
-.date-time-picker__input-wrapper {
-  border-radius: 8px;
-}
-
-/* ── Login page: center card more polished ──────────────── */
+/* ── 11. Login Screen (Enterprise Gateway) ── */
 .template-default__wrap--login,
 .login__form-wrap {
+  background: radial-gradient(circle at 50% 30%, #172554 0%, #090d16 80%) !important;
+
   .form {
-    border: 1px solid rgb(var(--theme-elevation-100));
-    border-radius: 16px;
-    box-shadow: 0 12px 40px rgba(16, 185, 129, 0.08);
-    padding: 28px 24px;
+    border: 1px solid #1e293b !important;
+    border-radius: 16px !important;
+    background: #0f172a !important;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7) !important;
+    padding: 36px 32px !important;
   }
 }
 
-/* ── Scrollbar mềm ──────────────────────────────────────── */
+/* ── 12. Custom Scrollbar ── */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
+
+::-webkit-scrollbar-track {
+  background: #090d16;
+}
+
 ::-webkit-scrollbar-thumb {
-  background: rgb(var(--theme-elevation-200));
+  background: #1e293b;
   border-radius: 999px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
+  border: 2px solid #090d16;
 
   &:hover {
-    background: rgb(var(--theme-elevation-300));
-    background-clip: padding-box;
+    background: #2a3b52;
   }
 }

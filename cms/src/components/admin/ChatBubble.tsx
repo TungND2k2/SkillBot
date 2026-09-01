@@ -390,9 +390,9 @@ const INLINE_CSS = `
   border: none;
   cursor: pointer;
   z-index: 2147483647;
-  background: linear-gradient(135deg, rgb(16,185,129) 0%, rgb(5,150,105) 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   color: white;
-  box-shadow: 0 8px 24px rgba(16,185,129,0.40);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.40);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -400,7 +400,7 @@ const INLINE_CSS = `
 }
 .sb-chat-fab:hover {
   transform: translateY(-2px) scale(1.04);
-  box-shadow: 0 12px 32px rgba(16,185,129,0.55);
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.55);
 }
 .sb-chat-fab:active { transform: scale(0.96); }
 
@@ -433,7 +433,7 @@ const INLINE_CSS = `
 
 .sb-chat-header {
   padding: 12px 14px;
-  background: linear-gradient(135deg, rgb(16,185,129) 0%, rgb(5,150,105) 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -481,9 +481,9 @@ const INLINE_CSS = `
   border: 1px solid rgba(255,255,255,0.3);
 }
 .sb-chat-avatar--ai {
-  background: linear-gradient(135deg, rgb(16,185,129) 0%, rgb(5,150,105) 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   color: white;
-  box-shadow: 0 1px 3px rgba(16,185,129,0.35);
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.35);
 }
 
 .sb-chat-messages {
@@ -515,7 +515,7 @@ const INLINE_CSS = `
   box-shadow: 0 1px 2px rgba(0,0,0,0.04);
 }
 .sb-chat-bubble--user {
-  background: linear-gradient(135deg, rgb(16,185,129) 0%, rgb(5,150,105) 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   color: white;
   border-bottom-right-radius: 4px;
 }
@@ -562,7 +562,7 @@ const INLINE_CSS = `
   text-align: left;
   font-style: normal;
   font-weight: 700;
-  color: rgb(16, 185, 129);
+  color: #2563eb;
 }
 .sb-chat-typing-dots::after {
   content: "";
@@ -576,7 +576,7 @@ const INLINE_CSS = `
   100% { content: ""; }
 }
 .sb-chat-activity-bullet {
-  color: rgb(16, 185, 129);
+  color: #2563eb;
   font-weight: 700;
   margin-right: 4px;
 }
@@ -585,8 +585,8 @@ const INLINE_CSS = `
   animation: sb-chat-pulse 1.6s ease-in-out infinite;
 }
 @keyframes sb-chat-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55); }
-  50%      { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.55); }
+  50%      { box-shadow: 0 0 0 8px rgba(37, 99, 235, 0); }
 }
 
 .sb-chat-empty {

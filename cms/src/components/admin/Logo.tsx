@@ -1,4 +1,6 @@
-/** Full logo + tagline — hiển thị trên trang Login. */
+import React from "react";
+
+/** Full logo + enterprise factory tagline — hiển thị trên trang Login và Navbar. */
 export const Logo = () => (
   <div
     style={{
@@ -11,38 +13,55 @@ export const Logo = () => (
   >
     <div
       style={{
-        width: 56,
-        height: 56,
-        borderRadius: 16,
-        background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+        width: 54,
+        height: 54,
+        borderRadius: 14,
+        background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        boxShadow: "0 10px 30px rgba(16, 185, 129, 0.35)",
+        boxShadow: "0 10px 25px rgba(37, 99, 235, 0.35)",
+        border: "1px solid rgba(255, 255, 255, 0.2)",
       }}
     >
       <svg
         width="28"
         height="28"
-        viewBox="0 0 32 32"
+        viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M10.5 11.5L13 16L10.5 20.5M16.5 11.5H21.5M16.5 20.5H21.5"
-          stroke="white"
-          strokeWidth="2.2"
+          d="M3 21h18M3 7v14M21 7v14M6 11h3M15 11h3M6 15h3M15 15h3M3 7l9-4 9 4"
+          stroke="#ffffff"
+          strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
       </svg>
     </div>
     <div style={{ textAlign: "center" }}>
-      <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-0.02em" }}>
-        SkillBot
+      <div
+        style={{
+          fontSize: 21,
+          fontWeight: 800,
+          letterSpacing: "-0.03em",
+          color: "rgb(var(--theme-elevation-900))",
+        }}
+      >
+        SKILLBOT <span style={{ color: "#3b82f6", fontWeight: 600 }}>ERP</span>
       </div>
-      <div style={{ fontSize: 13, opacity: 0.6, marginTop: 4 }}>
-        Trợ lý AI quản lý sản xuất hàng may thêu
+      <div
+        style={{
+          fontSize: 12,
+          color: "rgb(var(--theme-elevation-400))",
+          marginTop: 2,
+          letterSpacing: "0.02em",
+          textTransform: "uppercase",
+          fontWeight: 600,
+        }}
+      >
+        Hệ Thống Quản Trị Sản Xuất May Thêu
       </div>
     </div>
   </div>

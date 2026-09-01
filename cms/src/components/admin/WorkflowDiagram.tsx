@@ -80,7 +80,7 @@ export const WorkflowDiagram: React.FC = () => {
   }
 
   if (error) return <Hint variant="error">{error}</Hint>;
-  if (stages === null) return <Hint>Đang tải sơ đồ...</Hint>;
+  if (stages === null) return <Hint>Đang tải sơ đồ quy trình...</Hint>;
 
   if (stages.length === 0) {
     return (
@@ -88,7 +88,7 @@ export const WorkflowDiagram: React.FC = () => {
         Quy trình này chưa có bước nào.{" "}
         <Link
           href={`/admin/collections/workflow-stages/create?workflow=${id}`}
-          style={{ textDecoration: "underline", fontWeight: 500 }}
+          style={{ textDecoration: "underline", fontWeight: 600, color: "#3b82f6" }}
         >
           + Tạo bước đầu tiên
         </Link>
@@ -106,17 +106,20 @@ export const WorkflowDiagram: React.FC = () => {
           marginBottom: 12,
         }}
       >
-        <div style={{ fontSize: 14, fontWeight: 600 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.03em" }}>
           Sơ đồ quy trình ({stages.length} bước)
         </div>
         <Link
           href={`/admin/collections/workflow-stages/create?workflow=${id}`}
           style={{
             fontSize: 12,
-            padding: "6px 12px",
-            border: "1px solid var(--theme-elevation-150)",
+            padding: "5px 12px",
+            border: "1px solid rgb(var(--theme-elevation-200))",
             borderRadius: 6,
             textDecoration: "none",
+            background: "rgb(var(--theme-elevation-50))",
+            fontWeight: 600,
+            color: "#3b82f6",
           }}
         >
           + Thêm bước
@@ -126,7 +129,7 @@ export const WorkflowDiagram: React.FC = () => {
       <div
         style={{
           display: "flex",
-          gap: 8,
+          gap: 10,
           overflowX: "auto",
           paddingBottom: 12,
           paddingTop: 4,
@@ -161,11 +164,11 @@ const StageCard: React.FC<{ stage: Stage }> = ({ stage }) => {
         minWidth: 200,
         maxWidth: 220,
         padding: 12,
-        border: "1px solid var(--theme-elevation-150)",
+        border: "1px solid rgb(var(--theme-elevation-150))",
         borderRadius: 10,
-        background: "var(--theme-elevation-50)",
+        background: "rgb(var(--theme-elevation-50))",
         opacity: dimmed ? 0.5 : 1,
-        boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.04)",
       }}
     >
       <div
@@ -178,10 +181,10 @@ const StageCard: React.FC<{ stage: Stage }> = ({ stage }) => {
       >
         <div
           style={{
-            width: 28,
-            height: 28,
-            borderRadius: 8,
-            background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+            width: 26,
+            height: 26,
+            borderRadius: 6,
+            background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
             color: "white",
             fontSize: 12,
             fontWeight: 700,
@@ -196,8 +199,8 @@ const StageCard: React.FC<{ stage: Stage }> = ({ stage }) => {
         <div
           style={{
             fontSize: 11,
-            fontWeight: 600,
-            opacity: 0.6,
+            fontWeight: 700,
+            color: "#3b82f6",
             letterSpacing: "0.04em",
             textTransform: "uppercase",
           }}
@@ -205,14 +208,14 @@ const StageCard: React.FC<{ stage: Stage }> = ({ stage }) => {
           {stage.code}
         </div>
       </div>
-      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, lineHeight: 1.3 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6, lineHeight: 1.3 }}>
         {stage.name}
       </div>
-      <div style={{ fontSize: 11, opacity: 0.75, lineHeight: 1.6 }}>
+      <div style={{ fontSize: 11, color: "rgb(var(--theme-elevation-400))", lineHeight: 1.6 }}>
         <div>⏱ {durationLabel(stage)}</div>
         <div>{roleLabel}</div>
         {reminderCount > 0 && (
-          <div style={{ marginTop: 6, display: "flex", gap: 3 }}>
+          <div style={{ marginTop: 6, display: "flex", gap: 3, alignItems: "center" }}>
             {stage.reminders?.map((r, i) => (
               <span
                 key={i}
@@ -226,7 +229,7 @@ const StageCard: React.FC<{ stage: Stage }> = ({ stage }) => {
                 }}
               />
             ))}
-            <span style={{ marginLeft: 4, fontSize: 10 }}>
+            <span style={{ marginLeft: 4, fontSize: 10, fontWeight: 600 }}>
               {reminderCount} nhắc
             </span>
           </div>
@@ -242,12 +245,12 @@ const Arrow: React.FC = () => (
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      width: 24,
-      color: "var(--theme-elevation-300)",
+      width: 20,
+      color: "rgb(var(--theme-elevation-300))",
       flexShrink: 0,
     }}
   >
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
       <path
         d="M3 8h10m0 0L9 4m4 4L9 12"
         stroke="currentColor"
@@ -264,20 +267,20 @@ const Hint: React.FC<{
   variant?: "error" | "empty" | "default";
 }> = ({ children, variant = "default" }) => {
   const palette: Record<string, { bg: string; border: string; color?: string }> = {
-    default: { bg: "var(--theme-elevation-50)", border: "var(--theme-elevation-150)" },
-    empty: { bg: "var(--theme-elevation-50)", border: "var(--theme-elevation-200)" },
-    error: { bg: "#fef2f2", border: "#fecaca", color: "#991b1b" },
+    default: { bg: "rgb(var(--theme-elevation-50))", border: "rgb(var(--theme-elevation-150))" },
+    empty: { bg: "rgb(var(--theme-elevation-50))", border: "rgb(var(--theme-elevation-200))" },
+    error: { bg: "rgba(239, 68, 68, 0.1)", border: "rgba(239, 68, 68, 0.3)", color: "#ef4444" },
   };
   const p = palette[variant];
   return (
     <div
       style={{
-        padding: 16,
+        padding: 14,
         border: `1px dashed ${p.border}`,
         borderRadius: 8,
         background: p.bg,
         color: p.color,
-        fontSize: 13,
+        fontSize: 12.5,
         lineHeight: 1.5,
       }}
     >
