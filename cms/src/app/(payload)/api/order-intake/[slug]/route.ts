@@ -120,7 +120,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ slug: string }
         })
       : null;
 
-    // Tìm khách theo tên (không phân biệt hoa/thường); không có thì tạo mới.
+    // Tìm khách theo tên (không phân biệt hoa/thường); không có thì tạo mới
+    // kèm SĐT/email/social nếu người điền có cung cấp.
     const existingCustomer = await payload.find({
       collection: "customers",
       where: { name: { equals: customerName } },
@@ -131,7 +132,13 @@ export async function POST(req: Request, ctx: { params: Promise<{ slug: string }
       existingCustomer.docs[0] ??
       (await payload.create({
         collection: "customers",
-        data: { name: customerName, country },
+        data: {
+          name: customerName,
+          country,
+          phone: str(form, "customerPhone") || undefined,
+          email: str(form, "customerEmail") || undefined,
+          social: str(form, "customerSocial") || undefined,
+        },
         overrideAccess: true,
       }));
 

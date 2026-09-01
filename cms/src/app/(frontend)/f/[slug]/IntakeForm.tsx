@@ -257,6 +257,15 @@ export function IntakeForm({ slug }: { slug: string }) {
             <Field label="Tên khách hàng / Thương hiệu *">
               <input className="intake-input" type="text" name="customerName" required placeholder="vd: Slippery Frog Smock..." />
             </Field>
+            <Field label="SĐT khách hàng">
+              <input className="intake-input" type="text" name="customerPhone" placeholder="vd: +84 90 xxx xxxx" />
+            </Field>
+            <Field label="Email khách hàng">
+              <input className="intake-input" type="email" name="customerEmail" placeholder="vd: contact@brand.com" />
+            </Field>
+            <Field label="Link Social (FB/IG/Zalo)">
+              <input className="intake-input" type="text" name="customerSocial" placeholder="vd: instagram.com/brand" />
+            </Field>
           </div>
         </div>
 
