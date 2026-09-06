@@ -65,14 +65,14 @@ export const Suppliers: CollectionConfig = {
           type: "select",
           required: true,
           options: [
-            { label: "🧵 Vải", value: "fabric" },
-            { label: "🪡 Chỉ may / chỉ thêu (vật tư)", value: "thread" },
-            { label: "🎨 Dịch vụ thêu (xưởng thêu)", value: "embroidery_service" },
-            { label: "🖨 In vải", value: "fabric_printing" },
-            { label: "🔘 Phụ kiện (cúc, khoá, mác)", value: "accessory" },
-            { label: "🚚 Vận chuyển / Logistics", value: "logistics" },
-            { label: "📦 Bao bì", value: "packaging" },
-            { label: "🏷 Khác", value: "other" },
+            { label: "Vải chính / phụ", value: "fabric" },
+            { label: "Chỉ may / chỉ thêu", value: "thread" },
+            { label: "Dịch vụ thêu gia công", value: "embroidery_service" },
+            { label: "In vải", value: "fabric_printing" },
+            { label: "Phụ kiện (cúc, khoá, mác)", value: "accessory" },
+            { label: "Vận chuyển / Logistics", value: "logistics" },
+            { label: "Bao bì / Thùng carton", value: "packaging" },
+            { label: "Khác", value: "other" },
           ],
           admin: { width: "50%" },
         },
@@ -148,11 +148,11 @@ export const Suppliers: CollectionConfig = {
           type: "select",
           defaultValue: "3",
           options: [
-            { label: "★★★★★ Xuất sắc", value: "5" },
-            { label: "★★★★ Tốt", value: "4" },
-            { label: "★★★ Trung bình", value: "3" },
-            { label: "★★ Cần cải thiện", value: "2" },
-            { label: "★ Hạn chế dùng", value: "1" },
+            { label: "5 Sao — Xuất sắc", value: "5" },
+            { label: "4 Sao — Tốt", value: "4" },
+            { label: "3 Sao — Đạt tiêu chuẩn", value: "3" },
+            { label: "2 Sao — Cần cải thiện", value: "2" },
+            { label: "1 Sao — Hạn chế dùng", value: "1" },
           ],
           admin: { width: "50%" },
         },
@@ -169,7 +169,7 @@ export const Suppliers: CollectionConfig = {
     // ── Cấu hình theo từng loại NCC (collapsible, conditional) ──────
     {
       type: "collapsible",
-      label: "🚚 Thông tin Logistics (chỉ dành cho NCC vận chuyển)",
+      label: "Thông tin Logistics (dành cho NCC vận chuyển)",
       admin: {
         condition: (_, siblingData) => siblingData?.category === "logistics",
       },
@@ -213,7 +213,7 @@ export const Suppliers: CollectionConfig = {
     },
     {
       type: "collapsible",
-      label: "🎨 Năng lực thêu (chỉ dành cho xưởng thêu)",
+      label: "Năng lực thêu (dành cho xưởng thêu)",
       admin: {
         condition: (_, siblingData) => siblingData?.category === "embroidery_service",
       },
@@ -242,7 +242,7 @@ export const Suppliers: CollectionConfig = {
     },
     {
       type: "collapsible",
-      label: "🖨 Năng lực in vải (chỉ dành cho NCC in)",
+      label: "Năng lực in vải (dành cho NCC in)",
       admin: {
         condition: (_, siblingData) => siblingData?.category === "fabric_printing",
       },

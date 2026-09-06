@@ -82,8 +82,8 @@ export const QcLogs: CollectionConfig = {
       type: "select",
       admin: { readOnly: true, description: "Đạt nếu pass ≥ 95%" },
       options: [
-        { label: "✅ Đạt",         value: "pass" },
-        { label: "❌ Trả NCC sửa", value: "fail" },
+        { label: "Đạt chuẩn", value: "pass" },
+        { label: "Không đạt (Trả NCC sửa)", value: "fail" },
       ],
     },
     {

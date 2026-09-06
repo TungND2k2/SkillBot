@@ -56,8 +56,34 @@ export default function MediaPdfPreview() {
             gap: 12,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 24 }}>{isGoogleSheet ? '📊' : isGoogleDrive ? '📁' : '🔗'}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 8,
+                background: isGoogleSheet ? 'rgba(16, 185, 129, 0.15)' : isGoogleDrive ? 'rgba(56, 189, 248, 0.15)' : 'rgba(168, 85, 247, 0.15)',
+                color: isGoogleSheet ? '#10b981' : isGoogleDrive ? '#38bdf8' : '#a855f7',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              }}
+            >
+              {isGoogleSheet ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              ) : isGoogleDrive ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+              )}
+            </div>
             <div>
               <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#ffffff' }}>
                 {isGoogleSheet ? 'Bảng tính Google Sheets' : isGoogleDrive ? 'Tài liệu Google Drive' : 'Liên kết tài liệu trực tuyến'}
@@ -87,7 +113,7 @@ export default function MediaPdfPreview() {
                 cursor: 'pointer',
               }}
             >
-              {copied ? '✓ Đã sao chép' : '📋 Copy Link'}
+              {copied ? 'Đã sao chép' : 'Sao chép liên kết'}
             </button>
 
             <a
@@ -109,7 +135,10 @@ export default function MediaPdfPreview() {
                 boxShadow: '0 2px 10px rgba(37, 99, 235, 0.4)',
               }}
             >
-              <span>↗ Mở Link Trong Tab Mới</span>
+              <span>Mở Tab Mới</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
             </a>
           </div>
         </div>
@@ -137,7 +166,12 @@ export default function MediaPdfPreview() {
   if (doc.mimeType === 'application/pdf' && doc.url) {
     return (
       <div style={{ marginTop: 24, marginBottom: 24 }}>
-        <h4 style={{ margin: '0 0 8px 0', color: '#f8fafc' }}>📄 Xem trước PDF</h4>
+        <h4 style={{ margin: '0 0 8px 0', color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Xem trước PDF
+        </h4>
         <iframe
           title={`Preview ${doc.filename ?? 'PDF'}`}
           src={doc.url}

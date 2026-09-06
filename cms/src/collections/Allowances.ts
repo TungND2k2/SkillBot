@@ -82,10 +82,10 @@ export const Allowances: CollectionConfig = {
       type: "select",
       defaultValue: "draft",
       options: [
-        { label: "📝 Nháp",       value: "draft" },
-        { label: "⏳ Chờ duyệt",  value: "pending" },
-        { label: "✅ Đã duyệt",   value: "approved" },
-        { label: "❌ Từ chối",    value: "rejected" },
+        { label: "Bản nháp", value: "draft" },
+        { label: "Chờ phê duyệt", value: "pending" },
+        { label: "Đã phê duyệt", value: "approved" },
+        { label: "Từ chối duyệt", value: "rejected" },
       ],
     },
     {

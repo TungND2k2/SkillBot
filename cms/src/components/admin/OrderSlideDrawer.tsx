@@ -104,8 +104,8 @@ export const OrderSlideDrawer: React.FC<OrderSlideDrawerProps> = ({ order, onClo
         style={{
           position: "fixed",
           inset: 0,
-          background: "rgba(0, 0, 0, 0.6)",
-          backdropFilter: "blur(4px)",
+          background: "rgba(0, 0, 0, 0.7)",
+          backdropFilter: "blur(6px)",
           zIndex: 9998,
           transition: "opacity 0.2s ease",
         }}
@@ -118,16 +118,16 @@ export const OrderSlideDrawer: React.FC<OrderSlideDrawerProps> = ({ order, onClo
           top: 0,
           right: 0,
           bottom: 0,
-          width: "460px",
+          width: "480px",
           maxWidth: "92vw",
-          background: "#0f172a",
-          borderLeft: "1px solid #1e293b",
-          boxShadow: "-10px 0 40px rgba(0, 0, 0, 0.6)",
+          background: "#080d1a",
+          borderLeft: "1px solid rgba(255, 255, 255, 0.08)",
+          boxShadow: "-16px 0 50px rgba(0, 0, 0, 0.7)",
           zIndex: 9999,
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
-          animation: "slideInRight 0.22s ease-out",
+          animation: "slideInRight 0.22s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
         <style>{`
@@ -140,9 +140,9 @@ export const OrderSlideDrawer: React.FC<OrderSlideDrawerProps> = ({ order, onClo
         {/* Drawer Header */}
         <div
           style={{
-            padding: "18px 20px",
-            borderBottom: "1px solid #1e293b",
-            background: "#0d1422",
+            padding: "18px 22px",
+            borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+            background: "#050811",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -150,7 +150,7 @@ export const OrderSlideDrawer: React.FC<OrderSlideDrawerProps> = ({ order, onClo
         >
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <h3 style={{ fontSize: "16px", fontWeight: 800, margin: 0, color: "#ffffff", fontFamily: "monospace" }}>
+              <h3 style={{ fontSize: "16px", fontWeight: 800, margin: 0, color: "#ffffff", fontFamily: "var(--font-mono, monospace)" }}>
                 {order.orderCode || `#${order.id?.slice(-6)}`}
               </h3>
               <span
@@ -159,63 +159,74 @@ export const OrderSlideDrawer: React.FC<OrderSlideDrawerProps> = ({ order, onClo
                   fontWeight: 700,
                   padding: "2px 8px",
                   borderRadius: "999px",
-                  background: "rgba(37, 99, 235, 0.15)",
-                  color: "#60a5fa",
-                  border: "1px solid rgba(59, 130, 246, 0.3)",
+                  background: "rgba(56, 189, 248, 0.12)",
+                  color: "#38bdf8",
+                  border: "1px solid rgba(56, 189, 248, 0.25)",
                   textTransform: "uppercase",
+                  letterSpacing: "0.04em",
                 }}
               >
                 {order.status?.toUpperCase()}
               </span>
             </div>
-            <p style={{ fontSize: "11.5px", color: "#94a3b8", margin: "3px 0 0 0" }}>
-              Mã DA: <strong>{order.brandCode || "—"}</strong> · Ngày tạo: {fmtDate(order.orderDate)}
+            <p style={{ fontSize: "12px", color: "#94a3b8", margin: "4px 0 0 0" }}>
+              Mã DA: <strong style={{ color: "#e2e8f0" }}>{order.brandCode || "—"}</strong> · Ngày tạo: {fmtDate(order.orderDate)}
             </p>
           </div>
 
           <button
             onClick={onClose}
+            aria-label="Đóng ngăn chi tiết"
             style={{
-              background: "transparent",
-              border: "1px solid #1e293b",
+              background: "rgba(255, 255, 255, 0.04)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
               color: "#94a3b8",
-              width: "30px",
-              height: "30px",
-              borderRadius: "6px",
+              width: "32px",
+              height: "32px",
+              borderRadius: "8px",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "16px",
+              transition: "all 0.15s ease",
             }}
           >
-            ✕
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
 
         {/* Drawer Content Body */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: "18px" }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: "16px" }}>
           {/* Alert Status Banner */}
           {alert.level !== "normal" && (
             <div
               style={{
-                padding: "12px 14px",
+                padding: "12px 16px",
                 borderRadius: "10px",
                 background: alert.badgeBg,
                 border: `1px solid ${alert.badgeBorder}`,
                 display: "flex",
                 alignItems: "center",
-                gap: "10px",
+                gap: "12px",
               }}
             >
-              <span style={{ fontSize: "18px" }}>
-                {alert.level === "approaching" ? "🟡" : alert.level === "stalled" ? "🟠" : "🔴"}
-              </span>
+              <div
+                style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  background: alert.color,
+                  boxShadow: `0 0 10px ${alert.color}`,
+                  flexShrink: 0,
+                }}
+              />
               <div>
-                <div style={{ fontSize: "12px", fontWeight: 800, color: alert.color, textTransform: "uppercase" }}>
+                <div style={{ fontSize: "11.5px", fontWeight: 800, color: alert.color, textTransform: "uppercase", letterSpacing: "0.04em" }}>
                   {alert.label}
                 </div>
-                <div style={{ fontSize: "11.5px", color: "#f1f5f9", marginTop: "2px" }}>
+                <div style={{ fontSize: "12px", color: "#f1f5f9", marginTop: "2px" }}>
                   {alert.message}
                 </div>
               </div>
@@ -228,39 +239,39 @@ export const OrderSlideDrawer: React.FC<OrderSlideDrawerProps> = ({ order, onClo
               display: "grid",
               gridTemplateColumns: "1fr 1fr 1fr",
               gap: "10px",
-              padding: "12px",
+              padding: "14px",
               borderRadius: "10px",
-              background: "#090d16",
-              border: "1px solid #1e293b",
+              background: "#050811",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
               textAlign: "center",
             }}
           >
             <div>
-              <div style={{ fontSize: "10.5px", color: "#94a3b8", textTransform: "uppercase", fontWeight: 600 }}>Tổng tiền</div>
-              <div style={{ fontSize: "15px", fontWeight: 800, color: "#38bdf8", marginTop: "2px", fontFamily: "monospace" }}>
+              <div style={{ fontSize: "10.5px", color: "#94a3b8", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.04em" }}>Tổng tiền</div>
+              <div style={{ fontSize: "15px", fontWeight: 800, color: "#38bdf8", marginTop: "3px", fontFamily: "var(--font-mono, monospace)" }}>
                 {fmtMoney(order.totalAmount)}
               </div>
             </div>
             <div>
-              <div style={{ fontSize: "10.5px", color: "#94a3b8", textTransform: "uppercase", fontWeight: 600 }}>Đã cọc</div>
-              <div style={{ fontSize: "15px", fontWeight: 800, color: "#10b981", marginTop: "2px", fontFamily: "monospace" }}>
+              <div style={{ fontSize: "10.5px", color: "#94a3b8", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.04em" }}>Đã cọc</div>
+              <div style={{ fontSize: "15px", fontWeight: 800, color: "#34d399", marginTop: "3px", fontFamily: "var(--font-mono, monospace)" }}>
                 {fmtMoney(order.deposit)}
               </div>
             </div>
             <div>
-              <div style={{ fontSize: "10.5px", color: "#94a3b8", textTransform: "uppercase", fontWeight: 600 }}>Còn nợ</div>
-              <div style={{ fontSize: "15px", fontWeight: 800, color: (order.owedAmount || 0) > 0 ? "#fbbf24" : "#10b981", marginTop: "2px", fontFamily: "monospace" }}>
+              <div style={{ fontSize: "10.5px", color: "#94a3b8", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.04em" }}>Còn nợ</div>
+              <div style={{ fontSize: "15px", fontWeight: 800, color: (order.owedAmount || 0) > 0 ? "#fbbf24" : "#34d399", marginTop: "3px", fontFamily: "var(--font-mono, monospace)" }}>
                 {fmtMoney(order.owedAmount)}
               </div>
             </div>
           </div>
 
           {/* Customer & Delivery Section */}
-          <div style={{ padding: "14px", borderRadius: "10px", background: "#161f30", border: "1px solid #1e293b" }}>
-            <h4 style={{ fontSize: "11.5px", fontWeight: 700, color: "#64748b", textTransform: "uppercase", margin: "0 0 10px 0" }}>
-              Thông Tin Khách Hàng & Giao Hàng
+          <div style={{ padding: "16px", borderRadius: "10px", background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)" }}>
+            <h4 style={{ fontSize: "11px", fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 12px 0" }}>
+              Khách Hàng & Giao Hàng
             </h4>
-            <div style={{ display: "grid", gap: "8px", fontSize: "12.5px" }}>
+            <div style={{ display: "grid", gap: "9px", fontSize: "12.5px" }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ color: "#94a3b8" }}>Khách hàng:</span>
                 <strong style={{ color: "#ffffff" }}>{custName}</strong>
@@ -268,7 +279,7 @@ export const OrderSlideDrawer: React.FC<OrderSlideDrawerProps> = ({ order, onClo
               {custPhone && (
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ color: "#94a3b8" }}>Điện thoại:</span>
-                  <span style={{ color: "#f8fafc", fontFamily: "monospace" }}>{custPhone}</span>
+                  <span style={{ color: "#f8fafc", fontFamily: "var(--font-mono, monospace)" }}>{custPhone}</span>
                 </div>
               )}
               {custEmail && (
@@ -293,12 +304,12 @@ export const OrderSlideDrawer: React.FC<OrderSlideDrawerProps> = ({ order, onClo
           </div>
 
           {/* 6-Step Production Stages Progress */}
-          <div style={{ padding: "14px", borderRadius: "10px", background: "#161f30", border: "1px solid #1e293b" }}>
+          <div style={{ padding: "16px", borderRadius: "10px", background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-              <h4 style={{ fontSize: "11.5px", fontWeight: 700, color: "#64748b", textTransform: "uppercase", margin: 0 }}>
+              <h4 style={{ fontSize: "11px", fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", margin: 0 }}>
                 Tiến Độ 6 Bước Sản Xuất
               </h4>
-              <span style={{ fontSize: "11px", color: "#94a3b8" }}>Chuyển tuần tự</span>
+              <span style={{ fontSize: "11px", color: "#94a3b8" }}>Tuần tự</span>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -314,19 +325,26 @@ export const OrderSlideDrawer: React.FC<OrderSlideDrawerProps> = ({ order, onClo
                       justifyContent: "space-between",
                       padding: "8px 12px",
                       borderRadius: "6px",
-                      background: isCurrent ? "rgba(37, 99, 235, 0.15)" : "#0f172a",
-                      border: isCurrent ? "1px solid #3b82f6" : "1px solid #1e293b",
+                      background: isCurrent ? "rgba(56, 189, 248, 0.08)" : "rgba(0, 0, 0, 0.2)",
+                      border: isCurrent ? "1px solid rgba(56, 189, 248, 0.3)" : "1px solid rgba(255, 255, 255, 0.05)",
                       fontSize: "12px",
                     }}
                   >
-                    <span style={{ fontWeight: isCurrent ? 700 : 500, color: isPassed ? "#10b981" : isCurrent ? "#ffffff" : "#64748b" }}>
-                      {isPassed ? "✓ " : `${idx + 1}. `} {s.label}
+                    <span style={{ fontWeight: isCurrent ? 700 : 500, color: isPassed ? "#34d399" : isCurrent ? "#ffffff" : "#64748b", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      {isPassed ? (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2.5">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      ) : (
+                        <span style={{ width: 12, display: "inline-block", textAlign: "center", fontSize: 11, color: "#64748b" }}>{idx + 1}</span>
+                      )}
+                      {s.label}
                     </span>
                     <span
                       style={{
                         fontSize: "10.5px",
                         fontWeight: 700,
-                        color: isPassed ? "#10b981" : isCurrent ? "#3b82f6" : "#64748b",
+                        color: isPassed ? "#34d399" : isCurrent ? "#38bdf8" : "#64748b",
                       }}
                     >
                       {isPassed ? "Hoàn tất" : isCurrent ? "Đang xử lý" : "Chờ"}
@@ -339,13 +357,16 @@ export const OrderSlideDrawer: React.FC<OrderSlideDrawerProps> = ({ order, onClo
 
           {/* Manager Quick Override Action */}
           {order.status && order.status !== "done" && (
-            <div style={{ padding: "14px", borderRadius: "10px", background: "rgba(37, 99, 235, 0.08)", border: "1px solid rgba(59, 130, 246, 0.3)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ padding: "14px 16px", borderRadius: "10px", background: "rgba(56, 189, 248, 0.06)", border: "1px solid rgba(56, 189, 248, 0.2)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
                 <div>
-                  <h4 style={{ fontSize: "12px", fontWeight: 700, color: "#60a5fa", margin: 0 }}>
-                    🛡 Quyền Quản Lý Xác Nhận Bước
+                  <h4 style={{ fontSize: "12px", fontWeight: 700, color: "#38bdf8", margin: 0, display: "flex", alignItems: "center", gap: 6 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                    Quyền Quản Lý Xác Nhận Bước
                   </h4>
-                  <p style={{ fontSize: "11px", color: "#94a3b8", margin: "2px 0 0 0" }}>
+                  <p style={{ fontSize: "11px", color: "#94a3b8", margin: "3px 0 0 0" }}>
                     Duyệt nhanh bước {order.status.toUpperCase()} không bắt buộc file
                   </p>
                 </div>
@@ -354,17 +375,18 @@ export const OrderSlideDrawer: React.FC<OrderSlideDrawerProps> = ({ order, onClo
                   onClick={handleManagerApproveCurrentStep}
                   disabled={managerConfirming || confirmed}
                   style={{
-                    padding: "6px 12px",
+                    padding: "7px 14px",
                     borderRadius: "6px",
-                    background: confirmed ? "#10b981" : "#2563eb",
+                    background: confirmed ? "#059669" : "#2563eb",
                     color: "#ffffff",
                     border: 0,
                     fontSize: "11.5px",
                     fontWeight: 700,
                     cursor: confirmed ? "default" : "pointer",
+                    whiteSpace: "nowrap",
                   }}
                 >
-                  {confirmed ? "✓ Đã Duyệt" : managerConfirming ? "Đang lưu..." : "Duyệt Bước Này"}
+                  {confirmed ? "Đã Duyệt" : managerConfirming ? "Đang lưu..." : "Duyệt Bước Này"}
                 </button>
               </div>
             </div>
@@ -372,11 +394,11 @@ export const OrderSlideDrawer: React.FC<OrderSlideDrawerProps> = ({ order, onClo
 
           {/* Notes */}
           {order.notes && (
-            <div style={{ padding: "14px", borderRadius: "10px", background: "#161f30", border: "1px solid #1e293b" }}>
-              <h4 style={{ fontSize: "11.5px", fontWeight: 700, color: "#64748b", textTransform: "uppercase", margin: "0 0 6px 0" }}>
+            <div style={{ padding: "14px 16px", borderRadius: "10px", background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)" }}>
+              <h4 style={{ fontSize: "11px", fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 6px 0" }}>
                 Ghi Chú Sản Xuất
               </h4>
-              <p style={{ fontSize: "12px", color: "#cbd5e1", margin: 0, whiteSpace: "pre-wrap" }}>{order.notes}</p>
+              <p style={{ fontSize: "12px", color: "#cbd5e1", margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.6 }}>{order.notes}</p>
             </div>
           )}
         </div>
@@ -385,8 +407,8 @@ export const OrderSlideDrawer: React.FC<OrderSlideDrawerProps> = ({ order, onClo
         <div
           style={{
             padding: "14px 20px",
-            borderTop: "1px solid #1e293b",
-            background: "#0d1422",
+            borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+            background: "#050811",
             display: "flex",
             gap: "10px",
           }}
@@ -398,21 +420,28 @@ export const OrderSlideDrawer: React.FC<OrderSlideDrawerProps> = ({ order, onClo
               textAlign: "center",
               background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
               color: "#ffffff",
-              padding: "9px",
+              padding: "9px 14px",
               borderRadius: "8px",
               fontSize: "12.5px",
               fontWeight: 600,
               textDecoration: "none",
-              boxShadow: "0 2px 8px rgba(37, 99, 235, 0.3)",
+              boxShadow: "0 2px 10px rgba(37, 99, 235, 0.3)",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
             }}
           >
-            Mở Toàn Bộ Chi Tiết & Chỉnh Sửa ↗
+            <span>Mở Toàn Bộ Chi Tiết & Chỉnh Sửa</span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" />
+            </svg>
           </Link>
           <button
             onClick={onClose}
             style={{
-              background: "#161f30",
-              border: "1px solid #1e293b",
+              background: "rgba(255, 255, 255, 0.05)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
               color: "#cbd5e1",
               padding: "9px 16px",
               borderRadius: "8px",

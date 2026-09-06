@@ -119,17 +119,17 @@ export const STATUS_SELECT_OPTIONS = [
     label: `${s.code.toUpperCase()} — ${s.name}`,
     value: s.code,
   })),
-  { label: "✅ Hoàn thành", value: "done" as StageCode },
-  { label: "⏸ Tạm dừng", value: "paused" as StageCode },
-  { label: "❌ Huỷ", value: "cancelled" as StageCode },
+  { label: "Hoàn thành", value: "done" as StageCode },
+  { label: "Tạm dừng", value: "paused" as StageCode },
+  { label: "Huỷ đơn", value: "cancelled" as StageCode },
 ];
 
 /**
  * Phân loại 4 Cấp Độ Cảnh Báo Sản Xuất:
- * 🟡 Sắp đến hạn: còn <= 7 ngày đến ngày trả.
- * 🔴 Đơn muộn: đã quá ngày trả (1-14 ngày).
- * 🔴 Trễ nghiêm trọng: đã quá 14 ngày so với ngày trả.
- * 🟠 Cần xử lý: đơn không có cập nhật bước nào trong hơn 7 ngày so với thời gian quy định của bước đó.
+ * - Sắp đến hạn: còn <= 7 ngày đến ngày trả.
+ * - Đơn muộn: đã quá ngày trả (1-14 ngày).
+ * - Trễ nghiêm trọng: đã quá 14 ngày so với ngày trả.
+ * - Cần xử lý: đơn không có cập nhật bước nào trong hơn 7 ngày so với thời gian quy định của bước đó.
  */
 export interface AlertStatus {
   level: "approaching" | "overdue" | "critical_overdue" | "stalled" | "normal";
@@ -162,7 +162,7 @@ export function getOrderAlertStatus(order: {
 
   const now = new Date();
 
-  // 1. Kiểm tra Cảnh báo nghẽn công đoạn (🟠 Cần xử lý)
+  // 1. Kiểm tra Cảnh báo nghẽn công đoạn (Cần xử lý)
   const currentStage = getStage(status);
   if (currentStage) {
     const stageStartIso = order.stageStartedAt || order.updatedAt;
@@ -190,7 +190,7 @@ export function getOrderAlertStatus(order: {
     const deliveryDate = new Date(order.expectedDeliveryDate);
     const diffDays = Math.ceil((deliveryDate.getTime() - now.getTime()) / 86_400_000);
 
-    // 🔴 Trễ nghiêm trọng: quá 14 ngày
+    // Cấp độ: Trễ nghiêm trọng (> 14 ngày)
     if (diffDays < -14) {
       return {
         level: "critical_overdue",
@@ -203,7 +203,7 @@ export function getOrderAlertStatus(order: {
       };
     }
 
-    // 🔴 Đơn muộn: quá 1-14 ngày
+    // Cấp độ: Đơn muộn (1-14 ngày)
     if (diffDays < 0) {
       return {
         level: "overdue",
@@ -216,7 +216,7 @@ export function getOrderAlertStatus(order: {
       };
     }
 
-    // 🟡 Sắp đến hạn: còn <= 7 ngày
+    // Cấp độ: Sắp đến hạn (<= 7 ngày)
     if (diffDays <= 7) {
       return {
         level: "approaching",

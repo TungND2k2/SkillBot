@@ -106,7 +106,7 @@ export const Orders: CollectionConfig = {
             // ── 1. Thông tin cơ bản ─────────────────────────
             {
               type: "collapsible",
-              label: "📝 Thông tin cơ bản",
+              label: "Thông tin cơ bản",
               admin: { initCollapsed: false },
               fields: [
                 {
@@ -187,7 +187,7 @@ export const Orders: CollectionConfig = {
             // ── 2. Hoá đơn + đề bài ────────────────────────
             {
               type: "collapsible",
-              label: "📎 Hoá đơn + Đề bài",
+              label: "Hoá đơn & Đề bài kỹ thuật",
               admin: { initCollapsed: false },
               fields: [
                 {
@@ -257,10 +257,10 @@ export const Orders: CollectionConfig = {
                           type: "select",
                           defaultValue: "pending",
                           options: [
-                            { label: "⏳ Chưa kiểm", value: "pending" },
-                            { label: "✅ Khớp 100%", value: "match" },
-                            { label: "⚠️ Lệch — cần Sales xác nhận", value: "warning" },
-                            { label: "❌ Sai lệch nghiêm trọng", value: "rejected" },
+                            { label: "Chưa kiểm tra", value: "pending" },
+                            { label: "Khớp 100%", value: "match" },
+                            { label: "Lệch — cần Sales xác nhận", value: "warning" },
+                            { label: "Sai lệch nghiêm trọng", value: "rejected" },
                           ],
                           admin: { width: "50%", readOnly: true },
                         },
@@ -297,7 +297,7 @@ export const Orders: CollectionConfig = {
             // ── 4. Tài chính ────────────────────────────
             {
               type: "collapsible",
-              label: "💰 Tài chính",
+              label: "Dòng tiền & Tài chính",
               admin: { initCollapsed: false },
               fields: [
                 {
@@ -355,7 +355,7 @@ export const Orders: CollectionConfig = {
             // ── 5. Giao hàng + deadline ─────────────────
             {
               type: "collapsible",
-              label: "📦 Giao hàng",
+              label: "Giao hàng & Thời hạn",
               admin: { initCollapsed: false },
               fields: [
                 {
@@ -395,7 +395,7 @@ export const Orders: CollectionConfig = {
             // ── 6. Xác nhận khách (collapsed) ──────────
             {
               type: "collapsible",
-              label: "👋 Xác nhận khách (ảnh chat)",
+              label: "Xác nhận khách hàng (Ảnh chat / văn bản)",
               admin: { initCollapsed: true },
               fields: [
                 {
@@ -418,9 +418,9 @@ export const Orders: CollectionConfig = {
                       type: "select",
                       defaultValue: "pending",
                       options: [
-                        { label: "⏳ Chưa kiểm", value: "pending" },
-                        { label: "✅ Hợp lệ", value: "valid" },
-                        { label: "❌ Không hợp lệ", value: "invalid" },
+                        { label: "Chưa kiểm tra", value: "pending" },
+                        { label: "Hợp lệ", value: "valid" },
+                        { label: "Không hợp lệ", value: "invalid" },
                       ],
                       admin: { width: "30%", readOnly: true },
                     },
@@ -432,7 +432,7 @@ export const Orders: CollectionConfig = {
             // ── 7. Ghi chú ─────────────────────────────
             {
               name: "notes",
-              label: "📝 Ghi chú",
+              label: "Ghi chú sản xuất",
               type: "textarea",
             },
           ],
@@ -666,13 +666,13 @@ export const Orders: CollectionConfig = {
                       type: "select",
                       required: true,
                       options: [
-                        { label: "🧵 Vải chính", value: "fabric_main" },
-                        { label: "🧶 Vải phụ (lót, bèo)", value: "fabric_secondary" },
-                        { label: "🔘 NPL (ren, cúc, ruy băng)", value: "accessory" },
-                        { label: "🎨 Xưởng thêu", value: "embroidery" },
-                        { label: "✂️ Xưởng may", value: "sewing" },
-                        { label: "🖨 In vải", value: "fabric_printing" },
-                        { label: "🚚 Vận chuyển", value: "logistics" },
+                        { label: "Vải chính", value: "fabric_main" },
+                        { label: "Vải phụ (lót, bèo)", value: "fabric_secondary" },
+                        { label: "Phụ liệu (ren, cúc, ruy băng)", value: "accessory" },
+                        { label: "Xưởng thêu gia công", value: "embroidery" },
+                        { label: "Xưởng may gia công", value: "sewing" },
+                        { label: "Nhà in vải", value: "fabric_printing" },
+                        { label: "Đơn vị vận chuyển", value: "logistics" },
                       ],
                       admin: { width: "30%" },
                     },
@@ -694,7 +694,7 @@ export const Orders: CollectionConfig = {
                 },
                 {
                   name: "files",
-                  label: "📎 File / Ảnh",
+                  label: "Tệp đính kèm / Hồ sơ ảnh",
                   type: "array",
                   admin: {
                     description:
@@ -710,15 +710,15 @@ export const Orders: CollectionConfig = {
                           type: "select",
                           required: true,
                           options: [
-                            { label: "🧵 Ảnh vải đã nhận", value: "fabric_received" },
-                            { label: "🎴 Mẫu vải swatch", value: "fabric_swatch" },
-                            { label: "🎨 Ảnh thêu cập nhật", value: "embroidery_progress" },
-                            { label: "🎨 Mẫu thêu duyệt", value: "embroidery_sample" },
-                            { label: "✂️ Ảnh may cập nhật", value: "sewing_progress" },
-                            { label: "✂️ Mẫu may duyệt", value: "sewing_sample" },
-                            { label: "✅ QC ảnh kiểm tra", value: "qc_photo" },
-                            { label: "🚚 Bằng chứng giao", value: "delivery_proof" },
-                            { label: "📄 Tài liệu khác", value: "other" },
+                            { label: "Ảnh vải đã nhận", value: "fabric_received" },
+                            { label: "Mẫu vải swatch", value: "fabric_swatch" },
+                            { label: "Ảnh thêu tiến độ", value: "embroidery_progress" },
+                            { label: "Mẫu thêu duyệt", value: "embroidery_sample" },
+                            { label: "Ảnh may tiến độ", value: "sewing_progress" },
+                            { label: "Mẫu may duyệt", value: "sewing_sample" },
+                            { label: "Ảnh kiểm tra KCS (QC)", value: "qc_photo" },
+                            { label: "Bằng chứng giao hàng", value: "delivery_proof" },
+                            { label: "Tài liệu khác", value: "other" },
                           ],
                           admin: { width: "33%" },
                         },
@@ -782,7 +782,7 @@ export const Orders: CollectionConfig = {
     // ── Quyền Quản Lý Xác Nhận Chuyển Bước (Manager Override) ──
     {
       type: "collapsible",
-      label: "🛡 Quản Lý Xác Nhận Chuyển Bước",
+      label: "Quyền Quản Lý Xác Nhận Chuyển Bước",
       admin: {
         position: "sidebar",
         initCollapsed: true,
@@ -791,7 +791,7 @@ export const Orders: CollectionConfig = {
       fields: [
         {
           name: "managerConfirmed",
-          label: "👑 Duyệt toàn bộ (Master Override)",
+          label: "Duyệt toàn bộ (Master Override)",
           type: "checkbox",
           defaultValue: false,
         },

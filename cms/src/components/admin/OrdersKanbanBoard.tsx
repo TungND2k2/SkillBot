@@ -6,9 +6,9 @@ import { OrderSlideDrawer, OrderData } from "./OrderSlideDrawer";
 import { getOrderAlertStatus } from "../../lib/workflow-stages";
 
 const COLUMNS = [
-  { key: "b1", label: "B1: Nhận đơn (1-2d)", color: "#3b82f6" },
+  { key: "b1", label: "B1: Nhận đơn (1-2d)", color: "#38bdf8" },
   { key: "b2", label: "B2: Định mức (1-4d)", color: "#6366f1" },
-  { key: "b3", label: "B3: Mua NPL (3-7d)", color: "#8b5cf6" },
+  { key: "b3", label: "B3: Mua NPL (3-7d)", color: "#a855f7" },
   { key: "b4", label: "B4: Gửi NCC (1d)", color: "#ec4899" },
   { key: "b5", label: "B5: Thêu & May (24-35d)", color: "#f59e0b" },
   { key: "b6", label: "B6: QC & Giao (1-3d)", color: "#10b981" },
@@ -68,43 +68,60 @@ export const OrdersKanbanBoard: React.FC = () => {
           flexWrap: "wrap",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, maxWidth: "600px", flexWrap: "wrap" }}>
-          <input
-            type="text"
-            placeholder="🔍 Tìm nhanh theo mã đơn, mã DA, khách hàng..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              padding: "7px 12px",
-              borderRadius: "8px",
-              background: "#0f172a",
-              border: "1px solid #1e293b",
-              color: "#f8fafc",
-              fontSize: "12.5px",
-              outline: "none",
-              minWidth: "220px",
-            }}
-          />
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, maxWidth: "620px", flexWrap: "wrap" }}>
+          {/* Search Input with SVG icon */}
+          <div style={{ position: "relative", flex: 1, minWidth: "240px" }}>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "#64748b" }}
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Tìm nhanh theo mã đơn, mã DA, khách hàng..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "8px 12px 8px 32px",
+                borderRadius: "8px",
+                background: "#080d1a",
+                border: "1px solid rgba(255, 255, 255, 0.08)",
+                color: "#f8fafc",
+                fontSize: "12.5px",
+                outline: "none",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
 
           {/* Quick Alert Filter */}
           <select
             value={alertFilter}
             onChange={(e) => setAlertFilter(e.target.value)}
             style={{
-              padding: "7px 10px",
+              padding: "8px 12px",
               borderRadius: "8px",
-              background: "#0f172a",
-              border: "1px solid #1e293b",
+              background: "#080d1a",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
               color: "#cbd5e1",
               fontSize: "12px",
               outline: "none",
+              cursor: "pointer",
             }}
           >
-            <option value="all">⚡ Tất cả cảnh báo ({orders.length})</option>
-            <option value="approaching">🟡 Sắp đến hạn (≤ 7 ngày)</option>
-            <option value="overdue">🔴 Đơn muộn (1–14 ngày)</option>
-            <option value="critical_overdue">🔴 Trễ nghiêm trọng (&gt; 14 ngày)</option>
-            <option value="stalled">🟠 Cần xử lý (Kẹt bước)</option>
+            <option value="all">Tất cả cảnh báo ({orders.length})</option>
+            <option value="approaching">Sắp đến hạn (≤ 7 ngày)</option>
+            <option value="overdue">Đơn muộn (1–14 ngày)</option>
+            <option value="critical_overdue">Trễ nghiêm trọng (&gt; 14 ngày)</option>
+            <option value="stalled">Cần xử lý (Kẹt bước)</option>
           </select>
         </div>
 
@@ -112,19 +129,23 @@ export const OrdersKanbanBoard: React.FC = () => {
           <button
             onClick={fetchOrders}
             style={{
-              background: "#0f172a",
-              border: "1px solid #1e293b",
+              background: "#080d1a",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
               color: "#94a3b8",
-              padding: "6px 12px",
-              borderRadius: "6px",
+              padding: "7px 14px",
+              borderRadius: "8px",
               fontSize: "12px",
+              fontWeight: 600,
               cursor: "pointer",
               display: "inline-flex",
               alignItems: "center",
-              gap: "4px",
+              gap: "6px",
             }}
           >
-            🔄 Làm mới ({filteredOrders.length} đơn)
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Làm mới ({filteredOrders.length})
           </button>
           <Link
             href="/admin/collections/orders/create"
@@ -132,15 +153,22 @@ export const OrdersKanbanBoard: React.FC = () => {
               background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
               color: "#ffffff",
               border: "1px solid #3b82f6",
-              padding: "6px 14px",
-              borderRadius: "6px",
+              padding: "7px 16px",
+              borderRadius: "8px",
               fontSize: "12px",
               fontWeight: 600,
               textDecoration: "none",
-              boxShadow: "0 2px 8px rgba(37, 99, 235, 0.3)",
+              boxShadow: "0 2px 10px rgba(37, 99, 235, 0.3)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
             }}
           >
-            ➕ Tạo Đơn
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Tạo Đơn
           </Link>
         </div>
       </div>
@@ -152,9 +180,9 @@ export const OrdersKanbanBoard: React.FC = () => {
             padding: "48px",
             textAlign: "center",
             color: "#94a3b8",
-            background: "#0f172a",
+            background: "#080d1a",
             borderRadius: "12px",
-            border: "1px solid #1e293b",
+            border: "1px solid rgba(255, 255, 255, 0.08)",
             fontSize: "13px",
           }}
         >
@@ -176,8 +204,8 @@ export const OrdersKanbanBoard: React.FC = () => {
               <div
                 key={col.key}
                 style={{
-                  background: "#090d16",
-                  border: "1px solid #1e293b",
+                  background: "#050811",
+                  border: "1px solid rgba(255, 255, 255, 0.08)",
                   borderRadius: "10px",
                   display: "flex",
                   flexDirection: "column",
@@ -189,9 +217,9 @@ export const OrdersKanbanBoard: React.FC = () => {
                 <div
                   style={{
                     padding: "12px 14px",
-                    background: "#0d1422",
-                    borderBottom: "1px solid #1e293b",
-                    borderTop: `3px solid ${col.color}`,
+                    background: "#080d1a",
+                    borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                    borderTop: `2px solid ${col.color}`,
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
@@ -204,8 +232,8 @@ export const OrdersKanbanBoard: React.FC = () => {
                       fontWeight: 800,
                       padding: "2px 7px",
                       borderRadius: "999px",
-                      background: "rgba(255, 255, 255, 0.08)",
-                      color: "#ffffff",
+                      background: "rgba(255, 255, 255, 0.06)",
+                      color: "#cbd5e1",
                     }}
                   >
                     {colOrders.length}
@@ -230,7 +258,7 @@ export const OrdersKanbanBoard: React.FC = () => {
                         padding: "32px 10px",
                         color: "#475569",
                         fontSize: "11.5px",
-                        border: "1px dashed #1e293b",
+                        border: "1px dashed rgba(255, 255, 255, 0.06)",
                         borderRadius: "8px",
                       }}
                     >
@@ -248,11 +276,11 @@ export const OrdersKanbanBoard: React.FC = () => {
                           style={{
                             padding: "12px",
                             borderRadius: "8px",
-                            background: "#0f172a",
-                            border: `1px solid ${alert.level !== "normal" ? alert.badgeBorder : "#1e293b"}`,
+                            background: "#090e1d",
+                            border: `1px solid ${alert.level !== "normal" ? alert.badgeBorder : "rgba(255, 255, 255, 0.08)"}`,
                             cursor: "pointer",
                             transition: "all 0.15s ease",
-                            boxShadow: "0 2px 6px rgba(0, 0, 0, 0.25)",
+                            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
                             position: "relative",
                           }}
                           onMouseEnter={(e) => {
@@ -260,7 +288,7 @@ export const OrdersKanbanBoard: React.FC = () => {
                             e.currentTarget.style.transform = "translateY(-2px)";
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = alert.level !== "normal" ? alert.badgeBorder : "#1e293b";
+                            e.currentTarget.style.borderColor = alert.level !== "normal" ? alert.badgeBorder : "rgba(255, 255, 255, 0.08)";
                             e.currentTarget.style.transform = "translateY(0)";
                           }}
                         >
@@ -270,10 +298,10 @@ export const OrdersKanbanBoard: React.FC = () => {
                               style={{
                                 display: "inline-flex",
                                 alignItems: "center",
-                                gap: "4px",
+                                gap: "6px",
                                 fontSize: "10px",
                                 fontWeight: 700,
-                                padding: "2px 6px",
+                                padding: "2px 7px",
                                 borderRadius: "4px",
                                 background: alert.badgeBg,
                                 color: alert.color,
@@ -281,16 +309,17 @@ export const OrdersKanbanBoard: React.FC = () => {
                                 marginBottom: "8px",
                               }}
                             >
+                              <span style={{ width: 6, height: 6, borderRadius: "50%", background: alert.color, boxShadow: `0 0 4px ${alert.color}` }} />
                               {alert.label}: {alert.message}
                             </div>
                           )}
 
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                            <span style={{ fontSize: "13px", fontWeight: 800, color: "#38bdf8", fontFamily: "monospace" }}>
+                            <span style={{ fontSize: "13px", fontWeight: 800, color: "#38bdf8", fontFamily: "var(--font-mono, monospace)" }}>
                               {order.orderCode || `#${order.id?.slice(-6)}`}
                             </span>
                             {order.brandCode && (
-                              <span style={{ fontSize: "10px", padding: "1px 6px", borderRadius: "4px", background: "#1e293b", color: "#cbd5e1", fontWeight: 600 }}>
+                              <span style={{ fontSize: "10px", padding: "1px 6px", borderRadius: "4px", background: "rgba(255, 255, 255, 0.06)", color: "#cbd5e1", fontWeight: 600 }}>
                                 {order.brandCode}
                               </span>
                             )}
@@ -302,13 +331,13 @@ export const OrdersKanbanBoard: React.FC = () => {
 
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px", color: "#94a3b8", marginBottom: "6px" }}>
                             <span>SL: <strong style={{ color: "#ffffff" }}>{order.totalQuantity?.toLocaleString() || 0}</strong></span>
-                            <span style={{ color: "#38bdf8", fontWeight: 700, fontFamily: "monospace" }}>{fmtMoney(order.totalAmount)}</span>
+                            <span style={{ color: "#38bdf8", fontWeight: 700, fontFamily: "var(--font-mono, monospace)" }}>{fmtMoney(order.totalAmount)}</span>
                           </div>
 
                           <div
                             style={{
                               paddingTop: "6px",
-                              borderTop: "1px solid #162234",
+                              borderTop: "1px solid rgba(255, 255, 255, 0.06)",
                               display: "flex",
                               justifyContent: "space-between",
                               alignItems: "center",
@@ -318,7 +347,12 @@ export const OrdersKanbanBoard: React.FC = () => {
                             <span style={{ color: alert.color, fontWeight: alert.level !== "normal" ? 700 : 500 }}>
                               Hạn: {fmtDate(order.expectedDeliveryDate)}
                             </span>
-                            <span style={{ color: "#3b82f6", fontWeight: 600 }}>Chi tiết ↗</span>
+                            <span style={{ color: "#38bdf8", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 3 }}>
+                              Chi tiết
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                              </svg>
+                            </span>
                           </div>
                         </div>
                       );

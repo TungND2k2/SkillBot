@@ -34,7 +34,6 @@ export default function MediaLinkImporter({ path = 'externalUrl', readOnly }: Me
       return {
         type: 'google_sheet',
         label: 'Google Sheets (Bảng tính)',
-        icon: '📊',
         color: '#10b981',
         bg: 'rgba(16, 185, 129, 0.12)',
         borderColor: 'rgba(16, 185, 129, 0.3)',
@@ -45,7 +44,6 @@ export default function MediaLinkImporter({ path = 'externalUrl', readOnly }: Me
       return {
         type: 'google_drive',
         label: 'Google Drive (Thư mục / Tệp)',
-        icon: '📁',
         color: '#38bdf8',
         bg: 'rgba(56, 189, 248, 0.12)',
         borderColor: 'rgba(56, 189, 248, 0.3)',
@@ -56,7 +54,6 @@ export default function MediaLinkImporter({ path = 'externalUrl', readOnly }: Me
       return {
         type: 'design',
         label: 'Thiết kế Online (Figma / Canva)',
-        icon: '🎨',
         color: '#ec4899',
         bg: 'rgba(236, 72, 153, 0.12)',
         borderColor: 'rgba(236, 72, 153, 0.3)',
@@ -66,7 +63,6 @@ export default function MediaLinkImporter({ path = 'externalUrl', readOnly }: Me
     return {
       type: 'web',
       label: 'Liên kết ngoài (Web URL)',
-      icon: '🔗',
       color: '#a855f7',
       bg: 'rgba(168, 85, 247, 0.12)',
       borderColor: 'rgba(168, 85, 247, 0.3)',
@@ -93,13 +89,13 @@ export default function MediaLinkImporter({ path = 'externalUrl', readOnly }: Me
   <rect width="100%" height="100%" fill="url(#bg)" rx="16"/>
   <rect x="2" y="2" width="796" height="446" fill="none" stroke="${serviceInfo.color}" stroke-opacity="0.35" stroke-width="2" rx="14"/>
   <circle cx="80" cy="80" r="36" fill="${serviceInfo.color}" fill-opacity="0.2"/>
-  <text x="80" y="92" font-size="34" text-anchor="middle" fill="#ffffff">${serviceInfo.icon}</text>
+  <path d="M70 68h20m-20 8h20m-20 8h14m-18 16h28a4 4 0 004-4V60a4 4 0 00-4-4H66a4 4 0 00-4 4v36a4 4 0 004 4z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" fill="none"/>
   <text x="135" y="75" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="22" font-weight="bold" fill="#ffffff">${safeTitle}</text>
   <text x="135" y="100" font-family="-apple-system, monospace" font-size="14" fill="${serviceInfo.color}">${serviceInfo.label}</text>
   <rect x="50" y="140" width="700" height="60" rx="8" fill="#0b0f19" stroke="rgba(255,255,255,0.08)"/>
   <text x="70" y="176" font-family="monospace" font-size="13" fill="#38bdf8">${displayUrl}</text>
   <rect x="50" y="230" width="220" height="46" rx="8" fill="#2563eb"/>
-  <text x="160" y="259" font-family="-apple-system, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="#ffffff">↗ MỞ LIÊN KẾT GỐC</text>
+  <text x="160" y="259" font-family="-apple-system, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="#ffffff">MỞ LIÊN KẾT GỐC</text>
   <text x="50" y="410" font-family="-apple-system, sans-serif" font-size="12" fill="#64748b">SkillBot ERP • Hệ thống quản lý may thêu xuất khẩu</text>
 </svg>`;
 
@@ -132,7 +128,11 @@ export default function MediaLinkImporter({ path = 'externalUrl', readOnly }: Me
         } else if (service.type === 'google_drive') {
           altField.setValue('Google Drive - Tài liệu');
         } else {
-          altField.setValue(`Tài liệu - ${new URL(targetUrl).hostname}`);
+          try {
+            altField.setValue(`Tài liệu - ${new URL(targetUrl).hostname}`);
+          } catch {
+            altField.setValue('Tài liệu trực tuyến');
+          }
         }
       }
 
@@ -141,41 +141,52 @@ export default function MediaLinkImporter({ path = 'externalUrl', readOnly }: Me
         kindField.setValue(service.suggestedKind);
       }
 
-      // Tạo companion file gắn vào Payload upload field
-      const companionFile = generateCompanionFile(targetUrl, service);
+      // Sinh companion SVG file cho Payload
+      const companion = generateCompanionFile(targetUrl, service);
       if (fileField.setValue) {
-        fileField.setValue(companionFile);
+        fileField.setValue(companion);
       }
 
-      setSuccessMsg(`Đã nhận diện ${service.label}! File đính kèm đã sẵn sàng. Bạn có thể nhấn 'Lưu'.`);
+      setSuccessMsg(`Đã nhận diện: ${service.label}. File đại diện đã sẵn sàng để lưu!`);
       setTimeout(() => setSuccessMsg(null), 5000);
-    } catch (e) {
-      console.error('Lỗi khi nạp link:', e);
+    } catch (err) {
+      console.error(err);
+      alert('Có lỗi khi xử lý đường dẫn.');
     } finally {
       setLoading(false);
     }
-  }, [inputUrl, setValue, altField, kindField, fileField]);
-
-  // Hook lắng nghe sự kiện change trên native remote URL box
-  useEffect(() => {
-    const handleNativeInput = (e: Event) => {
-      const target = e.target as HTMLInputElement;
-      if (target && target.classList.contains('file-field__remote-file')) {
-        const val = target.value.trim();
-        if (val.startsWith('http://') || val.startsWith('https://')) {
-          setInputUrl(val);
-          handleApplyUrl(val);
-        }
-      }
-    };
-
-    document.addEventListener('change', handleNativeInput, true);
-    return () => {
-      document.removeEventListener('change', handleNativeInput, true);
-    };
-  }, [handleApplyUrl]);
+  }, [inputUrl, altField, kindField, fileField, setValue]);
 
   const currentService = value ? detectService(value) : null;
+
+  const renderServiceIcon = (type: string, color: string) => {
+    if (type === 'google_sheet') {
+      return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      );
+    }
+    if (type === 'google_drive') {
+      return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+        </svg>
+      );
+    }
+    if (type === 'design') {
+      return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+        </svg>
+      );
+    }
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+      </svg>
+    );
+  };
 
   return (
     <div
@@ -189,10 +200,25 @@ export default function MediaLinkImporter({ path = 'externalUrl', readOnly }: Me
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 18 }}>🔗</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 6,
+              background: 'rgba(56, 189, 248, 0.12)',
+              color: '#38bdf8',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
+          </div>
           <span style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc', letterSpacing: '-0.01em' }}>
-            Dán liên kết trực tuyến (Google Sheets, Drive, Figma, v.v.)
+            Dán liên kết trực tuyến (Google Sheets, Drive, Figma, Canva, Web)
           </span>
         </div>
         <span
@@ -262,16 +288,16 @@ export default function MediaLinkImporter({ path = 'externalUrl', readOnly }: Me
             boxShadow: '0 2px 10px rgba(37, 99, 235, 0.35)',
           }}
         >
-          {loading ? 'Đang nạp...' : '✨ Nạp Link Này'}
+          {loading ? 'Đang nạp...' : 'Nạp Link Này'}
         </button>
       </div>
 
       {/* Quick Type Chips */}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 14 }}>
         {[
-          { label: '📊 Google Sheets', url: 'https://docs.google.com/spreadsheets/' },
-          { label: '📁 Google Drive', url: 'https://drive.google.com/drive/' },
-          { label: '🎨 Figma / Canva', url: 'https://www.figma.com/' },
+          { label: 'Google Sheets', url: 'https://docs.google.com/spreadsheets/' },
+          { label: 'Google Drive', url: 'https://drive.google.com/drive/' },
+          { label: 'Figma / Canva', url: 'https://www.figma.com/' },
         ].map((item, idx) => (
           <button
             key={idx}
@@ -312,7 +338,9 @@ export default function MediaLinkImporter({ path = 'externalUrl', readOnly }: Me
             gap: 8,
           }}
         >
-          <span>✅</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
           <span>{successMsg}</span>
         </div>
       )}
@@ -332,7 +360,9 @@ export default function MediaLinkImporter({ path = 'externalUrl', readOnly }: Me
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, overflow: 'hidden' }}>
-            <span style={{ fontSize: 22 }}>{currentService.icon}</span>
+            <div style={{ flexShrink: 0 }}>
+              {renderServiceIcon(currentService.type, currentService.color)}
+            </div>
             <div style={{ overflow: 'hidden' }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: currentService.color }}>
                 {currentService.label}
@@ -372,7 +402,7 @@ export default function MediaLinkImporter({ path = 'externalUrl', readOnly }: Me
                 cursor: 'pointer',
               }}
             >
-              {copied ? '✓ Đã sao chép' : '📋 Copy Link'}
+              {copied ? 'Đã sao chép' : 'Sao chép link'}
             </button>
 
             <a
@@ -393,7 +423,10 @@ export default function MediaLinkImporter({ path = 'externalUrl', readOnly }: Me
                 boxShadow: `0 2px 8px ${currentService.color}40`,
               }}
             >
-              <span>↗ Mở Link Gốc</span>
+              <span>Mở Link Gốc</span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
             </a>
           </div>
         </div>

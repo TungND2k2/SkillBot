@@ -25,14 +25,14 @@ interface Stage {
 }
 
 const ROLE_LABEL: Record<string, string> = {
-  admin: "👑 Admin",
-  manager: "📋 Manager",
-  planner: "🔧 Planner",
-  salesperson: "💼 Sales",
-  qc: "✅ QC",
-  storage: "📦 Storage",
-  accountant: "💰 Kế toán",
-  supplier: "🏭 NCC",
+  admin: "Admin",
+  manager: "Manager",
+  planner: "Planner",
+  salesperson: "Sales",
+  qc: "QC",
+  storage: "Storage",
+  accountant: "Kế toán",
+  supplier: "NCC",
 };
 
 const KIND_DOT: Record<string, string> = {
@@ -212,7 +212,7 @@ const StageCard: React.FC<{ stage: Stage }> = ({ stage }) => {
         {stage.name}
       </div>
       <div style={{ fontSize: 11, color: "rgb(var(--theme-elevation-400))", lineHeight: 1.6 }}>
-        <div>⏱ {durationLabel(stage)}</div>
+        <div>Thời hạn: {durationLabel(stage)}</div>
         <div>{roleLabel}</div>
         {reminderCount > 0 && (
           <div style={{ marginTop: 6, display: "flex", gap: 3, alignItems: "center" }}>

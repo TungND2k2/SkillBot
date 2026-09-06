@@ -10,23 +10,19 @@ const ensureFileForExternalUrl: CollectionBeforeValidateHook = async ({ data, re
   if (data?.externalUrl && !req.file && (!data.filename || operation === 'create')) {
     const url = String(data.externalUrl).trim();
     let service = "Liên kết ngoài";
-    let icon = "🔗";
     let color = "#3b82f6";
     let slug = "link";
 
     if (url.includes("docs.google.com/spreadsheets")) {
       service = "Google Sheets Document";
-      icon = "📊";
       color = "#10b981";
       slug = "google-sheet";
     } else if (url.includes("drive.google.com")) {
       service = "Google Drive Folder/File";
-      icon = "📁";
       color = "#38bdf8";
       slug = "google-drive";
     } else if (url.includes("figma.com") || url.includes("canva.com")) {
       service = "Thiết kế Online (Figma/Canva)";
-      icon = "🎨";
       color = "#ec4899";
       slug = "design";
     }
@@ -47,13 +43,13 @@ const ensureFileForExternalUrl: CollectionBeforeValidateHook = async ({ data, re
   <rect width="100%" height="100%" fill="url(#bg)" rx="16"/>
   <rect x="2" y="2" width="796" height="446" fill="none" stroke="${color}" stroke-opacity="0.35" stroke-width="2" rx="14"/>
   <circle cx="80" cy="80" r="36" fill="${color}" fill-opacity="0.2"/>
-  <text x="80" y="92" font-size="34" text-anchor="middle" fill="#ffffff">${icon}</text>
+  <path d="M70 68h20m-20 8h20m-20 8h14m-18 16h28a4 4 0 004-4V60a4 4 0 00-4-4H66a4 4 0 00-4 4v36a4 4 0 004 4z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" fill="none"/>
   <text x="135" y="75" font-family="-apple-system, sans-serif" font-size="22" font-weight="bold" fill="#ffffff">${safeTitle}</text>
   <text x="135" y="100" font-family="-apple-system, monospace" font-size="14" fill="${color}">${service}</text>
   <rect x="50" y="140" width="700" height="60" rx="8" fill="#0b0f19" stroke="rgba(255,255,255,0.08)"/>
   <text x="70" y="176" font-family="monospace" font-size="13" fill="#38bdf8">${displayUrl}</text>
   <rect x="50" y="230" width="220" height="46" rx="8" fill="#2563eb"/>
-  <text x="160" y="259" font-family="-apple-system, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="#ffffff">↗ MỞ LIÊN KẾT GỐC</text>
+  <text x="160" y="259" font-family="-apple-system, sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="#ffffff">MỞ LIÊN KẾT GỐC</text>
   <text x="50" y="410" font-family="-apple-system, sans-serif" font-size="12" fill="#64748b">SkillBot ERP • Hệ thống quản lý sản xuất may thêu</text>
 </svg>`;
 
@@ -122,7 +118,7 @@ export const Media: CollectionConfig = {
     ownerField,
     {
       name: "externalUrl",
-      label: "🔗 Đường dẫn liên kết ngoài (Google Sheet / Drive / Canva / Web)",
+      label: "Đường dẫn liên kết ngoài (Google Sheets / Drive / Canva / Web)",
       type: "text",
       admin: {
         components: {
@@ -151,24 +147,24 @@ export const Media: CollectionConfig = {
     },
     {
       name: "kind",
-      label: "Loại tài liệu (AI suy luận)",
+      label: "Loại tài liệu",
       type: "select",
       admin: {
         description: "AI tự đoán khi nhận file — giúp lọc nhanh trong admin.",
       },
       options: [
-        { label: "💰 Hoá đơn", value: "invoice" },
-        { label: "📋 Đề bài", value: "brief" },
-        { label: "🎨 Ảnh thiết kế / sketch", value: "design" },
-        { label: "🎴 Mẫu vải swatch", value: "fabric_swatch" },
-        { label: "🧵 Ảnh thêu cập nhật", value: "embroidery_progress" },
-        { label: "✂️ Ảnh may cập nhật", value: "sewing_progress" },
-        { label: "✅ QC ảnh kiểm tra", value: "qc_photo" },
-        { label: "🚚 Bằng chứng giao", value: "delivery_proof" },
-        { label: "👋 Ảnh khách xác nhận", value: "customer_confirmation" },
-        { label: "📜 Hợp đồng", value: "contract" },
-        { label: "📄 Tài liệu đối tác / NCC", value: "partner_doc" },
-        { label: "📝 Khác", value: "other" },
+        { label: "Hoá đơn", value: "invoice" },
+        { label: "Đề bài sản xuất", value: "brief" },
+        { label: "Ảnh thiết kế / Sketch", value: "design" },
+        { label: "Mẫu vải Swatch", value: "fabric_swatch" },
+        { label: "Ảnh thêu tiến độ", value: "embroidery_progress" },
+        { label: "Ảnh may tiến độ", value: "sewing_progress" },
+        { label: "Ảnh kiểm tra KCS (QC)", value: "qc_photo" },
+        { label: "Bằng chứng giao hàng", value: "delivery_proof" },
+        { label: "Ảnh khách hàng xác nhận", value: "customer_confirmation" },
+        { label: "Hợp đồng", value: "contract" },
+        { label: "Tài liệu đối tác / NCC", value: "partner_doc" },
+        { label: "Khác", value: "other" },
       ],
     },
     {

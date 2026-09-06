@@ -56,10 +56,10 @@ export const Inventory: CollectionConfig = {
       defaultValue: "ok",
       admin: { readOnly: true, description: "Tự động tính từ tồn vs min" },
       options: [
-        { label: "✅ Đủ",         value: "ok" },
-        { label: "⚠️ Sắp hết",    value: "low" },
-        { label: "🚨 Cảnh báo",   value: "critical" },
-        { label: "❌ Hết hàng",   value: "empty" },
+        { label: "Đầy đủ tồn kho", value: "ok" },
+        { label: "Sắp hết hàng", value: "low" },
+        { label: "Cảnh báo thiếu hụt", value: "critical" },
+        { label: "Đã hết hàng", value: "empty" },
       ],
     },
     {

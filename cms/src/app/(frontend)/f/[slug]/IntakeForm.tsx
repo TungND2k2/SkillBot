@@ -93,11 +93,13 @@ export function IntakeForm({ slug }: { slug: string }) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              margin: "0 auto 16px",
-              fontSize: "26px",
+              color: "#f87171",
             }}
           >
-            🔒
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0110 0v4" />
+            </svg>
           </div>
           <h2 style={{ fontSize: "18px", fontWeight: 800, color: "#ffffff", marginBottom: "8px" }}>
             Liên Kết Đã Hết Hạn
@@ -125,11 +127,12 @@ export function IntakeForm({ slug }: { slug: string }) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              margin: "0 auto 20px",
-              fontSize: "28px",
+              color: "#34d399",
             }}
           >
-            ✓
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
           </div>
           <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#ffffff", marginBottom: "6px" }}>
             Tạo Đơn Hàng Thành Công!
@@ -167,11 +170,16 @@ export function IntakeForm({ slug }: { slug: string }) {
               borderRadius: "8px",
               background: "rgba(37, 99, 235, 0.1)",
               border: "1px solid rgba(59, 130, 246, 0.2)",
-              fontSize: "12px",
-              color: "#93c5fd",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
             }}
           >
-            🤖 Bot Telegram đã gửi thông báo và đường dẫn đối soát cho quản lý xưởng.
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Hệ thống đã tự động gửi thông báo và đường dẫn đối soát cho quản lý xưởng.
           </div>
         </div>
       </Shell>
@@ -222,7 +230,11 @@ export function IntakeForm({ slug }: { slug: string }) {
               gap: "6px",
             }}
           >
-            <span>⏳ SLA Quy định:</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#facc15" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <span>SLA Quy định:</span>
             <strong style={{ color: "#facc15" }}>1–2 ngày</strong>
           </div>
         </div>
@@ -351,7 +363,11 @@ export function IntakeForm({ slug }: { slug: string }) {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px", marginBottom: "14px" }}>
             {/* Invoice Upload */}
             <div className="file-dropzone">
-              <div style={{ fontSize: "24px", marginBottom: "6px" }}>📄</div>
+              <div style={{ marginBottom: "6px", color: "#38bdf8" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
               <span style={{ fontSize: "12px", fontWeight: 700, color: "#f8fafc" }}>Hóa đơn đối soát (PDF/ảnh) *</span>
               <span style={{ fontSize: "11px", color: "#94a3b8", margin: "2px 0 8px 0" }}>
                 {invoiceName || "Kéo thả hoặc bấm để chọn tệp"}
@@ -368,7 +384,11 @@ export function IntakeForm({ slug }: { slug: string }) {
 
             {/* Brief Upload */}
             <div className="file-dropzone">
-              <div style={{ fontSize: "24px", marginBottom: "6px" }}>🎨</div>
+              <div style={{ marginBottom: "6px", color: "#a855f7" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                </svg>
+              </div>
               <span style={{ fontSize: "12px", fontWeight: 700, color: "#f8fafc" }}>Đề bài thiết kế Brief *</span>
               <span style={{ fontSize: "11px", color: "#94a3b8", margin: "2px 0 8px 0" }}>
                 {briefName || "Kéo thả hoặc bấm để chọn tệp"}
@@ -385,7 +405,12 @@ export function IntakeForm({ slug }: { slug: string }) {
 
             {/* Customer Confirmation Photo */}
             <div className="file-dropzone">
-              <div style={{ fontSize: "24px", marginBottom: "6px" }}>📸</div>
+              <div style={{ marginBottom: "6px", color: "#10b981" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
+              </div>
               <span style={{ fontSize: "12px", fontWeight: 700, color: "#f8fafc" }}>Ảnh khách xác nhận (Tuỳ chọn)</span>
               <span style={{ fontSize: "11px", color: "#94a3b8", margin: "2px 0 8px 0" }}>
                 {confirmName || "Bằng chứng chat/xác nhận mẫu"}
@@ -431,9 +456,17 @@ export function IntakeForm({ slug }: { slug: string }) {
               color: "#f87171",
               fontSize: "13px",
               fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
             }}
           >
-            ⚠️ {error}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span>{error}</span>
           </div>
         )}
 
@@ -454,9 +487,13 @@ export function IntakeForm({ slug }: { slug: string }) {
             opacity: submitting ? 0.7 : 1,
             transition: "all 0.15s ease",
             letterSpacing: "0.02em",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
           }}
         >
-          {submitting ? "Đang Khởi Tạo Đơn Hàng & Tải Hồ Sơ..." : "🚀 Hoàn Tất & Khởi Tạo Đơn Hàng (B1)"}
+          {submitting ? "Đang Khởi Tạo Đơn Hàng & Tải Hồ Sơ..." : "Hoàn Tất & Khởi Tạo Đơn Hàng (B1)"}
         </button>
       </form>
     </Shell>
