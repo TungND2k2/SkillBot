@@ -280,9 +280,16 @@ nav {
   background: #080d1a !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 12px !important;
-  overflow: hidden !important;
   box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.6) !important;
   position: relative !important;
+}
+
+/* overflow:hidden trên wrap chặn luôn scroll ngang khi bảng nhiều cột hơn
+   viewport — cho kéo ngang thay vì cắt cụt dữ liệu. */
+.table__wrap,
+.collection-list__table-wrap {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
 }
 
 .table {

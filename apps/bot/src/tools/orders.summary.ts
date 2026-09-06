@@ -106,9 +106,9 @@ Dùng khi user hỏi "đơn X đang sao rồi", "PE5 còn lại mấy ngày", v.
 
       if (order.totalAmount !== undefined) {
         lines.push(
-          `Tài chính: tổng ${order.totalAmount.toLocaleString("vi-VN")}đ, ` +
-            `cọc ${(order.deposit ?? 0).toLocaleString("vi-VN")}đ, ` +
-            `nợ ${(order.owedAmount ?? 0).toLocaleString("vi-VN")}đ`,
+          `Tài chính: tổng $${order.totalAmount.toLocaleString("en-US")}, ` +
+            `cọc $${(order.deposit ?? 0).toLocaleString("en-US")}, ` +
+            `nợ $${(order.owedAmount ?? 0).toLocaleString("en-US")}`,
         );
       }
 
