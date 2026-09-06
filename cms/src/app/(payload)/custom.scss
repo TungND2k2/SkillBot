@@ -439,29 +439,61 @@ a[href*="/create"],
   }
 }
 
-/* Form inputs & controls */
-.field-type input[type="text"],
-.field-type input[type="email"],
-.field-type input[type="password"],
-.field-type input[type="number"],
-.field-type input[type="date"],
-.field-type textarea,
-.react-select__control {
+/* ── 9. Universal Form Inputs & Controls (High Specificity & Autofill Shield) ── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="search"],
+input[type="url"],
+textarea,
+select,
+.input__input,
+.text-field input,
+.field-type input,
+.drawer input,
+.modal input,
+.dialog input,
+.form input,
+.render-fields input {
   border-radius: 8px !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  background: #0b0f19 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background-color: #0b0f19 !important;
   color: #f8fafc !important;
   font-size: 13px !important;
-  padding: 9px 12px !important;
-  transition: all 0.15s ease !important;
+  padding: 9px 14px !important;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) inset !important;
+  -webkit-text-fill-color: #f8fafc !important;
 
   &:focus,
   &:focus-within {
     border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
-    background: #0f172a !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25), 0 1px 3px rgba(0, 0, 0, 0.4) inset !important;
+    background-color: #0f172a !important;
     outline: none !important;
   }
+
+  &::placeholder {
+    color: #475569 !important;
+    -webkit-text-fill-color: #475569 !important;
+  }
+}
+
+/* Triệt tiêu hoàn toàn lỗi browser autofill biến ô nhập thành màu trắng/vàng */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #0b0f19 inset !important;
+  -webkit-text-fill-color: #f8fafc !important;
+  caret-color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  transition: background-color 5000s ease-in-out 0s !important;
 }
 
 .field-label,
@@ -579,3 +611,249 @@ label {
     background: #334155;
   }
 }
+
+/* ── 13. Drawers, Modals & Dialogs (Next-Gen Glassmorphism) ── */
+.drawer,
+.drawer__content,
+.modal,
+.modal__wrap,
+.modal__content,
+.dialog,
+[role="dialog"] {
+  background-color: #050811 !important;
+  color: #f8fafc !important;
+}
+
+.drawer__content,
+.modal__content {
+  border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: -12px 0 50px rgba(0, 0, 0, 0.85) !important;
+}
+
+.drawer__header,
+.modal__header {
+  background: rgba(8, 13, 26, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 16px 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  z-index: 20 !important;
+
+  h1, h2, h3, h4,
+  .drawer__header-title,
+  .modal__header-title {
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    letter-spacing: -0.02em !important;
+    margin: 0 !important;
+  }
+
+  /* Ẩn hoặc làm mờ [Chưa có tiêu đề] thô */
+  span:contains("[Chưa có tiêu đề]"),
+  h2:contains("[Chưa có tiêu đề]") {
+    color: #94a3b8 !important;
+    font-weight: 600 !important;
+  }
+}
+
+.drawer__close,
+.modal__close-btn,
+button.modal__close {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 999px !important;
+  color: #94a3b8 !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.15s ease !important;
+  cursor: pointer !important;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    transform: scale(1.06);
+  }
+}
+
+/* ── 14. File Upload Field & Dropzone Luxury Redesign ── */
+.file-field {
+  margin-bottom: 24px !important;
+}
+
+.file-field__upload {
+  margin-bottom: 16px !important;
+}
+
+.file-field__dropzoneContent {
+  background: #080d1a !important;
+  border: 1.5px dashed rgba(255, 255, 255, 0.16) !important;
+  border-radius: 12px !important;
+  padding: 32px 24px !important;
+  text-align: center !important;
+  transition: all 0.18s ease-in-out !important;
+
+  &:hover {
+    border-color: #3b82f6 !important;
+    background: rgba(59, 130, 246, 0.04) !important;
+  }
+}
+
+.file-field__dropzoneButtons {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  flex-wrap: wrap !important;
+  margin-bottom: 8px !important;
+
+  .btn {
+    border-radius: 999px !important;
+    padding: 7px 18px !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+  }
+}
+
+.file-field__orText,
+.file-field__dragAndDropText {
+  color: #64748b !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+.file-field__remote-file-wrap {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-top: 12px !important;
+  margin-bottom: 12px !important;
+  background: #080d1a !important;
+  padding: 8px 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 10px !important;
+
+  .file-field__remote-file,
+  input.file-field__remote-file {
+    flex: 1 !important;
+    background: #0b0f19 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 8px !important;
+    color: #f8fafc !important;
+    font-size: 13px !important;
+    padding: 9px 12px !important;
+  }
+
+  .file-field__add-file,
+  button.file-field__add-file {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    border: 1px solid #3b82f6 !important;
+    border-radius: 8px !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 12.5px !important;
+    padding: 9px 16px !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    transition: all 0.15s ease !important;
+
+    &:hover {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+      box-shadow: 0 2px 10px rgba(37, 99, 235, 0.4) !important;
+    }
+  }
+}
+
+/* ── 15. React-Select Dropdown Menus (Crisp Dark Obsidian) ── */
+.react-select__control {
+  background: #0b0f19 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+  color: #f8fafc !important;
+  min-height: 38px !important;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.22) !important;
+  }
+}
+
+.react-select__menu {
+  background: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85) !important;
+  overflow: hidden !important;
+  z-index: 1000 !important;
+}
+
+.react-select__option {
+  background: transparent !important;
+  color: #cbd5e1 !important;
+  font-size: 13px !important;
+  padding: 10px 14px !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+
+  &:hover,
+  &--is-focused {
+    background: rgba(59, 130, 246, 0.16) !important;
+    color: #ffffff !important;
+  }
+
+  &--is-selected {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+  }
+}
+
+.react-select__single-value {
+  color: #f8fafc !important;
+  font-weight: 600 !important;
+}
+
+.react-select__indicator {
+  color: #64748b !important;
+
+  &:hover {
+    color: #94a3b8 !important;
+  }
+}
+
+/* ── 16. Toast Notifications (Sonner Toast - Floating & Non-overlapping) ── */
+[data-sonner-toaster] {
+  bottom: 88px !important;
+  right: 28px !important;
+  z-index: 9999 !important;
+}
+
+[data-sonner-toast] {
+  background: rgba(11, 15, 25, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(20px) !important;
+  border-radius: 12px !important;
+  color: #f8fafc !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75) !important;
+  padding: 14px 18px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+
+  &[data-type="error"] {
+    border-left: 4px solid #ef4444 !important;
+    background: linear-gradient(145deg, #1f0a0a 0%, #0b0f19 100%) !important;
+    color: #fca5a5 !important;
+  }
+
+  &[data-type="success"] {
+    border-left: 4px solid #10b981 !important;
+    background: linear-gradient(145deg, #0a1f13 0%, #0b0f19 100%) !important;
+    color: #6ee7b7 !important;
+  }
+}
+
