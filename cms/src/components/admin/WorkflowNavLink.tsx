@@ -32,18 +32,24 @@ export default function WorkflowNavLink() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: "14px" }}>🗂</span>
-          <span>Sơ Đồ Quy Trình B1→B6</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="3" y="3" width="6" height="6" rx="1" />
+            <rect x="15" y="3" width="6" height="6" rx="1" />
+            <rect x="9" y="15" width="6" height="6" rx="1" />
+            <path d="M6 9v3a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V9M12 13v2" />
+          </svg>
+          <span>Quy Trình Sản Xuất (B1→B6)</span>
         </div>
         <span
           style={{
             fontSize: "10px",
-            fontWeight: 800,
+            fontWeight: 700,
             padding: "2px 6px",
             borderRadius: "4px",
-            background: "rgba(37, 99, 235, 0.2)",
-            color: "#60a5fa",
-            border: "1px solid rgba(59, 130, 246, 0.3)",
+            background: "rgba(56, 189, 248, 0.12)",
+            color: "#38bdf8",
+            border: "1px solid rgba(56, 189, 248, 0.25)",
+            letterSpacing: "0.04em",
           }}
         >
           SLA

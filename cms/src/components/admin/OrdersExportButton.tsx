@@ -24,27 +24,29 @@ export default function OrdersExportButton() {
   };
 
   return (
-    <div style={{ display: "inline-block", position: "relative", marginBottom: 12 }}>
+    <div style={{ display: "inline-block", position: "relative" }}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         style={{
-          background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
-          color: "#ffffff",
-          border: "1px solid #3b82f6",
-          padding: "7px 14px",
-          borderRadius: 8,
-          fontSize: 12.5,
+          background: "rgba(255, 255, 255, 0.04)",
+          color: "#e2e8f0",
+          border: "1px solid rgba(255, 255, 255, 0.08)",
+          padding: "5px 12px",
+          borderRadius: 6,
+          fontSize: 12,
           fontWeight: 600,
           cursor: "pointer",
           display: "inline-flex",
           alignItems: "center",
           gap: 6,
-          boxShadow: "0 2px 8px rgba(37, 99, 235, 0.25)",
+          transition: "all 0.15s ease",
         }}
       >
-        <span>📊</span>
-        <span>Xuất Excel Đơn Hàng</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+        </svg>
+        <span>Xuất Excel</span>
       </button>
 
       {open && (
@@ -52,15 +54,15 @@ export default function OrdersExportButton() {
           style={{
             position: "absolute",
             top: "100%",
-            left: 0,
+            right: 0,
             marginTop: 6,
-            background: "rgb(var(--theme-elevation-50))",
-            color: "rgb(var(--theme-elevation-900))",
-            border: "1px solid rgb(var(--theme-elevation-200))",
-            borderRadius: 12,
-            padding: 18,
-            width: 340,
-            boxShadow: "0 14px 35px -5px rgba(0, 0, 0, 0.35)",
+            background: "#0d111a",
+            color: "#f8fafc",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            borderRadius: 10,
+            padding: 16,
+            width: 320,
+            boxShadow: "0 16px 40px rgba(0, 0, 0, 0.75)",
             zIndex: 100,
           }}
         >

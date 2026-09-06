@@ -71,8 +71,6 @@ export const OrdersListToolbar: React.FC = () => {
     };
 
     load();
-    // Tự refetch định kỳ — tránh ribbon hiện số liệu cũ khi user sửa đơn
-    // ở tab/trang khác rồi quay lại mà không F5.
     const interval = setInterval(load, 30_000);
     return () => {
       cancel = true;
@@ -82,155 +80,221 @@ export const OrdersListToolbar: React.FC = () => {
 
   const fmtMoney = (n: number) => `$${n.toLocaleString()}`;
 
+  const alertCards = [
+    {
+      title: "Sắp Đến Hạn",
+      sub: "≤ 7 ngày trả hàng",
+      count: stats.approachingCount,
+      color: "#eab308",
+      glow: "rgba(234, 179, 8, 0.2)",
+      hint: "Ưu tiên KCS & Đóng gói",
+    },
+    {
+      title: "Đơn Muộn",
+      sub: "Quá 1 – 14 ngày",
+      count: stats.overdueCount,
+      color: "#f87171",
+      glow: "rgba(248, 113, 113, 0.2)",
+      hint: "Thúc đẩy tiến độ khẩn",
+    },
+    {
+      title: "Trễ Nghiêm Trọng",
+      sub: "Quá > 14 ngày",
+      count: stats.criticalOverdueCount,
+      color: "#ef4444",
+      glow: "rgba(239, 68, 68, 0.25)",
+      hint: "Báo cáo Ban giám đốc",
+    },
+    {
+      title: "Kẹt Bước / Cần Xử Lý",
+      sub: "Quá 7 ngày không cập nhật",
+      count: stats.stalledCount,
+      color: "#fb923c",
+      glow: "rgba(251, 146, 60, 0.2)",
+      hint: "Kiểm tra tổ sản xuất",
+    },
+  ];
+
   return (
-    <div style={{ marginBottom: "16px", display: "flex", flexDirection: "column", gap: "14px" }}>
-      {/* 4 Alert Cards Ribbon */}
+    <div style={{ marginBottom: "18px", display: "flex", flexDirection: "column", gap: "12px" }}>
+      {/* 4 Executive KPI Stat Cards */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-          gap: "12px",
+          gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+          gap: "10px",
         }}
       >
-        <div
-          style={{
-            padding: "12px 16px",
-            borderRadius: "10px",
-            background: "#0f172a",
-            border: "1px solid #1e293b",
-            borderLeft: "3.5px solid #eab308",
-          }}
-        >
-          <div style={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase" }}>
-            🟡 Sắp Đến Hạn (≤ 7 ngày)
-          </div>
-          <div style={{ fontSize: "18px", fontWeight: 800, color: "#facc15", marginTop: "2px", fontFamily: "monospace" }}>
-            {stats.approachingCount} Đơn
-          </div>
-          <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
-            Cần ưu tiên KCS & đóng gói
-          </div>
-        </div>
+        {alertCards.map((card, idx) => (
+          <div
+            key={idx}
+            style={{
+              padding: "12px 14px",
+              borderRadius: "10px",
+              background: "linear-gradient(180deg, rgba(17, 24, 39, 0.7) 0%, rgba(11, 15, 25, 0.8) 100%)",
+              border: "1px solid rgba(255, 255, 255, 0.06)",
+              backdropFilter: "blur(12px)",
+              position: "relative",
+              overflow: "hidden",
+              transition: "all 0.15s ease",
+            }}
+          >
+            {/* Top accent hairline */}
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: "14px",
+                right: "14px",
+                height: "1.5px",
+                background: `linear-gradient(90deg, transparent 0%, ${card.color} 50%, transparent 100%)`,
+                opacity: 0.6,
+              }}
+            />
 
-        <div
-          style={{
-            padding: "12px 16px",
-            borderRadius: "10px",
-            background: "#0f172a",
-            border: "1px solid #1e293b",
-            borderLeft: "3.5px solid #f87171",
-          }}
-        >
-          <div style={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase" }}>
-            🔴 Đơn Muộn (1–14 ngày)
-          </div>
-          <div style={{ fontSize: "18px", fontWeight: 800, color: "#f87171", marginTop: "2px", fontFamily: "monospace" }}>
-            {stats.overdueCount} Đơn
-          </div>
-          <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
-            Thúc tiến độ khẩn cấp
-          </div>
-        </div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <span
+                  style={{
+                    width: "6px",
+                    height: "6px",
+                    borderRadius: "999px",
+                    background: card.color,
+                    boxShadow: `0 0 6px ${card.glow}`,
+                  }}
+                />
+                <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.02em", color: "#94a3b8" }}>
+                  {card.title}
+                </span>
+              </div>
+              <span style={{ fontSize: "10px", color: "#475569" }}>{card.sub}</span>
+            </div>
 
-        <div
-          style={{
-            padding: "12px 16px",
-            borderRadius: "10px",
-            background: "#0f172a",
-            border: "1px solid #1e293b",
-            borderLeft: "3.5px solid #ef4444",
-          }}
-        >
-          <div style={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase" }}>
-            🔴 Trễ Nghiêm Trọng (&gt; 14 ngày)
-          </div>
-          <div style={{ fontSize: "18px", fontWeight: 800, color: "#ef4444", marginTop: "2px", fontFamily: "monospace" }}>
-            {stats.criticalOverdueCount} Đơn
-          </div>
-          <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
-            Báo cáo giám đốc xử lý
-          </div>
-        </div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "6px" }}>
+              <span
+                style={{
+                  fontSize: "20px",
+                  fontWeight: 700,
+                  color: card.count > 0 ? card.color : "#f8fafc",
+                  fontVariantNumeric: "tabular-nums",
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                {card.count}
+              </span>
+              <span style={{ fontSize: "12px", color: "#64748b", fontWeight: 500 }}>đơn</span>
+            </div>
 
-        <div
-          style={{
-            padding: "12px 16px",
-            borderRadius: "10px",
-            background: "#0f172a",
-            border: "1px solid #1e293b",
-            borderLeft: "3.5px solid #f97316",
-          }}
-        >
-          <div style={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase" }}>
-            🟠 Cần Xử Lý (Kẹt bước)
+            <div style={{ fontSize: "11px", color: "#475569", marginTop: "4px" }}>
+              {card.hint}
+            </div>
           </div>
-          <div style={{ fontSize: "18px", fontWeight: 800, color: "#fb923c", marginTop: "2px", fontFamily: "monospace" }}>
-            {stats.stalledCount} Đơn
-          </div>
-          <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
-            Quá 7 ngày SLA không cập nhật
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* View Switcher & Action Toolbar */}
+      {/* View Switcher & Action Toolbar (Linear Style) */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           flexWrap: "wrap",
-          gap: "12px",
-          padding: "10px 14px",
+          gap: "10px",
+          padding: "8px 12px",
           borderRadius: "10px",
-          background: "#0f172a",
-          border: "1px solid #1e293b",
+          background: "rgba(11, 15, 25, 0.7)",
+          border: "1px solid rgba(255, 255, 255, 0.06)",
+          backdropFilter: "blur(12px)",
         }}
       >
-        {/* View Mode Toggle (Directus Pattern) */}
-        <div style={{ display: "flex", alignItems: "center", gap: "4px", background: "#090d16", padding: "3px", borderRadius: "8px", border: "1px solid #1e293b" }}>
+        {/* View Mode Segmented Control */}
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            padding: "2px",
+            borderRadius: "8px",
+            background: "rgba(255, 255, 255, 0.03)",
+            border: "1px solid rgba(255, 255, 255, 0.06)",
+          }}
+        >
           <button
             type="button"
             onClick={() => setViewMode("table")}
             style={{
-              padding: "6px 14px",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "5px 12px",
               borderRadius: "6px",
               border: 0,
               fontSize: "12px",
               fontWeight: 600,
               cursor: "pointer",
-              background: viewMode === "table" ? "#2563eb" : "transparent",
+              background: viewMode === "table" ? "rgba(255, 255, 255, 0.1)" : "transparent",
               color: viewMode === "table" ? "#ffffff" : "#94a3b8",
               transition: "all 0.15s ease",
             }}
           >
-            📋 Bảng Sổ Cái (Table)
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <path d="M3 9h18M3 15h18M9 3v18" />
+            </svg>
+            <span>Bảng Số Cái</span>
           </button>
+
           <button
             type="button"
             onClick={() => setViewMode("kanban")}
             style={{
-              padding: "6px 14px",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "5px 12px",
               borderRadius: "6px",
               border: 0,
               fontSize: "12px",
               fontWeight: 600,
               cursor: "pointer",
-              background: viewMode === "kanban" ? "#2563eb" : "transparent",
+              background: viewMode === "kanban" ? "rgba(255, 255, 255, 0.1)" : "transparent",
               color: viewMode === "kanban" ? "#ffffff" : "#94a3b8",
               transition: "all 0.15s ease",
             }}
           >
-            🗂 Luồng Kanban 6 Bước (Board)
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="5" height="18" rx="1" />
+              <rect x="10" y="3" width="5" height="12" rx="1" />
+              <rect x="17" y="3" width="5" height="16" rx="1" />
+            </svg>
+            <span>Luồng Kanban 6 Bước</span>
           </button>
         </div>
 
-        {/* Action Controls */}
+        {/* Financial KPI & Export Actions */}
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{ fontSize: "12px", color: "#94a3b8" }}>
-            Doanh số: <strong style={{ color: "#38bdf8", fontFamily: "monospace" }}>{fmtMoney(stats.totalRevenue)}</strong> ·
-            Công nợ: <strong style={{ color: "#fbbf24", fontFamily: "monospace" }}>{fmtMoney(stats.totalOwed)}</strong>
-          </span>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              fontSize: "12px",
+              padding: "4px 10px",
+              borderRadius: "6px",
+              background: "rgba(255, 255, 255, 0.02)",
+              border: "1px solid rgba(255, 255, 255, 0.06)",
+            }}
+          >
+            <span style={{ color: "#64748b" }}>Doanh số</span>
+            <span style={{ color: "#38bdf8", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
+              {fmtMoney(stats.totalRevenue)}
+            </span>
+            <span style={{ color: "#334155" }}>•</span>
+            <span style={{ color: "#64748b" }}>Công nợ</span>
+            <span style={{ color: "#fbbf24", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
+              {fmtMoney(stats.totalOwed)}
+            </span>
+          </div>
+
           <OrdersExportButton />
         </div>
       </div>

@@ -108,93 +108,77 @@ main {
   }
 }
 
-/* ── 4. Sidebar Navigation (Sleek Obsidian Navy with Custom Icons) ── */
+/* ── 4. Sidebar Navigation (Sleek Linear/Raycast Design - Zero Emojis) ── */
 .nav,
 .nav__wrap,
 .nav__scroll,
 nav {
-  background-color: #050811 !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.07) !important;
+  background-color: #060911 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
   width: 250px !important;
 }
 
 .nav__wrap {
-  padding: 14px 8px !important;
+  padding: 12px 10px !important;
 }
 
 .nav-group__label {
   text-transform: uppercase !important;
-  letter-spacing: 0.12em !important;
+  letter-spacing: 0.08em !important;
   font-size: 10px !important;
-  font-weight: 800 !important;
+  font-weight: 700 !important;
   color: #475569 !important;
   margin: 20px 8px 6px 8px !important;
   padding: 0 4px !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
   padding-bottom: 4px !important;
 }
 
 .nav__link,
 .nav a {
-  border-radius: 8px !important;
-  margin: 2px 0 !important;
-  padding: 8px 12px !important;
+  border-radius: 6px !important;
+  margin: 1px 0 !important;
+  padding: 7px 12px !important;
   font-size: 13px !important;
   font-weight: 500 !important;
   color: #94a3b8 !important;
   border: 1px solid transparent !important;
-  transition: all 0.15s ease-in-out !important;
+  transition: all 0.12s ease-in-out !important;
   display: flex !important;
   align-items: center !important;
-  gap: 10px !important;
+  gap: 8px !important;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05) !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
-    color: #ffffff !important;
-    transform: translateX(2px);
+    background: rgba(255, 255, 255, 0.035) !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+    color: #f8fafc !important;
   }
 }
 
 .nav__link--active,
 .nav__link[aria-current="page"] {
-  background: linear-gradient(90deg, rgba(37, 99, 235, 0.2) 0%, rgba(37, 99, 235, 0.02) 100%) !important;
+  background: rgba(56, 189, 248, 0.08) !important;
   color: #38bdf8 !important;
-  border: 1px solid rgba(56, 189, 248, 0.3) !important;
-  font-weight: 700 !important;
+  border: 1px solid rgba(56, 189, 248, 0.22) !important;
+  font-weight: 600 !important;
   position: relative !important;
 
   &::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 6px;
-    bottom: 6px;
-    width: 3.5px;
-    background: #38bdf8;
-    border-radius: 0 4px 4px 0;
-    box-shadow: 0 0 12px #38bdf8;
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 6px !important;
+    bottom: 6px !important;
+    width: 3px !important;
+    background: #38bdf8 !important;
+    border-radius: 0 3px 3px 0 !important;
+    box-shadow: 0 0 10px #38bdf8 !important;
   }
 }
 
-/* ── Auto-Inject Collection Emoji Icons on Sidebar ── */
-.nav a[href*="/collections/users"]::before { content: "👤"; font-size: 13px; margin-right: 2px; }
-.nav a[href*="/collections/media"]::before { content: "📁"; font-size: 13px; margin-right: 2px; }
-.nav a[href*="/collections/telegram"]::before { content: "🤖"; font-size: 13px; margin-right: 2px; }
-.nav a[href*="/collections/customers"]::before { content: "🤝"; font-size: 13px; margin-right: 2px; }
-.nav a[href*="/collections/suppliers"]::before { content: "🏭"; font-size: 13px; margin-right: 2px; }
-.nav a[href*="/collections/orders"]::before { content: "📦"; font-size: 13px; margin-right: 2px; }
-.nav a[href*="/collections/fabrics"]::before { content: "🧵"; font-size: 13px; margin-right: 2px; }
-.nav a[href*="/collections/inventory"]::before { content: "📊"; font-size: 13px; margin-right: 2px; }
-.nav a[href*="/collections/allowances"]::before { content: "📐"; font-size: 13px; margin-right: 2px; }
-.nav a[href*="/collections/qc-logs"]::before { content: "🔍"; font-size: 13px; margin-right: 2px; }
-.nav a[href*="/collections/feedbacks"]::before { content: "💬"; font-size: 13px; margin-right: 2px; }
-.nav a[href*="/collections/reminders"]::before { content: "⏰"; font-size: 13px; margin-right: 2px; }
-.nav a[href*="/collections/order-intake"]::before { content: "🔗"; font-size: 13px; margin-right: 2px; }
-
 /* ── 5. Main Collection View Layout (Open, Airy, Non-boxed) ── */
 .collection-list {
-  padding: 24px 36px !important;
+  padding: 24px 32px !important;
   max-width: 1600px !important;
   margin: 0 auto !important;
 }
@@ -208,18 +192,39 @@ nav {
 
 .collection-list__header {
   margin-bottom: 20px !important;
-  padding-bottom: 16px !important;
+  padding-bottom: 14px !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
 
   h1 {
-    font-size: 24px !important;
-    font-weight: 900 !important;
-    letter-spacing: -0.03em !important;
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
     color: #ffffff !important;
     margin: 0 !important;
+  }
+
+  /* Nút Tạo mới thanh lịch, chuẩn hoá tiếng Việt */
+  a.btn,
+  a[href$="/create"],
+  .btn {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    border-radius: 7px !important;
+    padding: 7px 16px !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 10px rgba(37, 99, 235, 0.3) !important;
+    transition: all 0.15s ease !important;
+
+    &:hover {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.5) !important;
+      transform: translateY(-1px);
+    }
   }
 }
 
@@ -227,29 +232,28 @@ nav {
 .list-controls,
 .search-filter,
 .collection-list__controls {
-  margin-bottom: 18px !important;
+  margin-bottom: 16px !important;
   display: flex !important;
   align-items: center !important;
-  gap: 10px !important;
+  gap: 8px !important;
   flex-wrap: wrap !important;
 }
 
 .search-filter__input,
 .list-controls input,
 .search-filter input {
-  background: #0b0f19 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 7px !important;
   color: #f8fafc !important;
-  font-size: 13px !important;
-  padding: 9px 14px 9px 36px !important;
+  font-size: 12.5px !important;
+  padding: 8px 12px 8px 34px !important;
   transition: all 0.15s ease !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
 
   &:focus {
     border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
-    background: #0f172a !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
     outline: none !important;
   }
 }
@@ -258,34 +262,32 @@ nav {
 .where-builder__add-filter,
 .list-controls .btn,
 .search-filter .btn {
-  background: #0b0f19 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 7px !important;
   color: #94a3b8 !important;
   font-size: 12px !important;
-  font-weight: 600 !important;
-  padding: 8px 14px !important;
+  font-weight: 500 !important;
+  padding: 7px 12px !important;
 
   &:hover {
-    background: #121b2b !important;
+    background: rgba(255, 255, 255, 0.06) !important;
     color: #ffffff !important;
-    border-color: rgba(255, 255, 255, 0.18) !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
   }
 }
 
-/* ── 7. High-Density Luxury Data Grid ── */
+/* ── 7. Luxury High-Density Data Grid (Clean Slate / No Monospace Dates) ── */
 .table,
 .table__wrap,
 .collection-list__table-wrap {
-  background: #080d1a !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.6) !important;
+  background: #090d16 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important;
   position: relative !important;
 }
 
-/* overflow:hidden trên wrap chặn luôn scroll ngang khi bảng nhiều cột hơn
-   viewport — cho kéo ngang thay vì cắt cụt dữ liệu. */
 .table__wrap,
 .collection-list__table-wrap {
   overflow-x: auto !important;
@@ -298,91 +300,95 @@ nav {
   width: 100% !important;
 
   thead th {
-    background: #0f172a !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: #0c101c !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
     color: #64748b !important;
     font-size: 11px !important;
-    font-weight: 800 !important;
+    font-weight: 600 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.08em !important;
-    padding: 13px 16px !important;
+    letter-spacing: 0.06em !important;
+    padding: 11px 16px !important;
     position: sticky !important;
     top: 0 !important;
     z-index: 10 !important;
   }
 
   tbody tr {
-    background-color: #080d1a !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+    background-color: #090d16 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
     transition: background-color 0.12s ease !important;
 
-    &:nth-child(even) {
-      background-color: #060913 !important;
-    }
-
     &:hover {
-      background-color: rgba(37, 99, 235, 0.08) !important;
+      background-color: rgba(255, 255, 255, 0.02) !important;
     }
   }
 
   tbody td {
-    padding: 13px 16px !important;
+    padding: 12px 16px !important;
     font-size: 13px !important;
     color: #cbd5e1 !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
     vertical-align: middle !important;
 
     a {
-      color: #38bdf8 !important;
+      color: #f1f5f9 !important;
       font-weight: 600 !important;
       text-decoration: none !important;
 
       &:hover {
+        color: #38bdf8 !important;
         text-decoration: underline !important;
-        color: #60a5fa !important;
       }
     }
   }
 }
 
-/* Monospace alignment for numbers & figures */
-.font-mono,
-.cell-orderCode,
-.cell-orderDate,
-.cell-totalAmount,
-.cell-deposit,
-.cell-owedAmount,
-.cell-totalQuantity,
-.cell-expectedDeliveryDate,
-.cell-code,
-.cell-phone {
-  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+/* Số liệu & Cột ngày thanh nhã, không dùng font monospace gãy khúc */
+.cell-orderDate {
+  color: #94a3b8 !important;
   font-variant-numeric: tabular-nums !important;
+  font-weight: 500 !important;
+}
+
+.cell-orderCode {
+  color: #ffffff !important;
+  font-weight: 600 !important;
 }
 
 .cell-totalAmount {
-  color: #38bdf8 !important;
-  font-weight: 800 !important;
+  color: #f8fafc !important;
+  font-weight: 700 !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+.cell-deposit {
+  color: #94a3b8 !important;
+  font-variant-numeric: tabular-nums !important;
 }
 
 .cell-owedAmount {
   color: #fbbf24 !important;
-  font-weight: 800 !important;
+  font-weight: 700 !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+.cell-totalQuantity {
+  color: #cbd5e1 !important;
+  font-variant-numeric: tabular-nums !important;
 }
 
 /* ── 8. Primary & Secondary Buttons ── */
 .btn,
 .btn--style-primary,
 .btn--style-secondary,
-.collection-list__header .btn,
 a.btn,
 button.btn {
-  border-radius: 8px !important;
-  font-size: 12.5px !important;
-  font-weight: 700 !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
   letter-spacing: 0.01em !important;
-  padding: 8px 16px !important;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  padding: 6px 14px !important;
+  transition: all 0.12s ease !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 6px !important;
@@ -390,33 +396,18 @@ button.btn {
   cursor: pointer !important;
 }
 
-.btn--style-primary,
-a[href*="/create"],
-.collection-list__header .btn {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-  border: 1px solid #3b82f6 !important;
-  color: #ffffff !important;
-  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.4) !important;
-
-  &:hover {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
-    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.6) !important;
-    transform: translateY(-1px);
-    color: #ffffff !important;
-  }
-}
-
 .btn--style-secondary {
-  background: #0b0f19 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   color: #cbd5e1 !important;
 
   &:hover {
-    background: #121b2b !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
     color: #ffffff !important;
   }
 }
+
 
 /* ── 9. Form View & Document Edit ── */
 .collection-edit,

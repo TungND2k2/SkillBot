@@ -382,25 +382,27 @@ export default ChatBubble;
 const INLINE_CSS = `
 .sb-chat-fab {
   position: fixed;
-  right: 24px;
-  bottom: 24px;
-  width: 56px;
-  height: 56px;
+  right: 18px;
+  bottom: 18px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
   z-index: 2147483647;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  color: white;
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.40);
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: #38bdf8;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: transform .18s ease, box-shadow .18s ease;
 }
 .sb-chat-fab:hover {
-  transform: translateY(-2px) scale(1.04);
-  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.55);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
+  color: #ffffff;
+  border-color: rgba(56, 189, 248, 0.4);
 }
 .sb-chat-fab:active { transform: scale(0.96); }
 
