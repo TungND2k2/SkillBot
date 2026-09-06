@@ -20,9 +20,13 @@ export const OrdersListToolbar: React.FC = () => {
 
   useEffect(() => {
     let cancel = false;
-    (async () => {
+
+    const load = async () => {
       try {
-        const res = await fetch("/api/orders?limit=500&depth=0", { credentials: "include" });
+        const res = await fetch("/api/orders?limit=500&depth=0", {
+          credentials: "include",
+          cache: "no-store",
+        });
         if (!res.ok) return;
         const data = await res.json();
         const docs = data.docs || [];
@@ -64,9 +68,15 @@ export const OrdersListToolbar: React.FC = () => {
       } catch (err) {
         console.error(err);
       }
-    })();
+    };
+
+    load();
+    // Tự refetch định kỳ — tránh ribbon hiện số liệu cũ khi user sửa đơn
+    // ở tab/trang khác rồi quay lại mà không F5.
+    const interval = setInterval(load, 30_000);
     return () => {
       cancel = true;
+      clearInterval(interval);
     };
   }, []);
 

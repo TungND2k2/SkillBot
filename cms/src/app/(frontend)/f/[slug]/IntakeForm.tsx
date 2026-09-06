@@ -550,6 +550,10 @@ function Shell({ children, wide }: { children: React.ReactNode; wide?: boolean }
           outline: none;
           transition: all 0.15s ease;
           box-sizing: border-box;
+          /* Trang nền tối nhưng browser mặc định vẽ popup date/select theo
+             color-scheme "light" → chữ tháng/năm bị mất tương phản hoặc
+             không hiện. Khai báo dark để calendar popup vẽ đúng theme. */
+          color-scheme: dark;
         }
         .intake-input:focus {
           border-color: #3b82f6;

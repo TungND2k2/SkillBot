@@ -32,9 +32,21 @@ export const Media: CollectionConfig = {
   upload: {
     // Cho phép ảnh + PDF (hóa đơn / đề bài / ảnh xác nhận)
     mimeTypes: ["image/*", "application/pdf"],
+    // Cho phép tạo bản ghi Media chỉ với link ngoài (Google Sheet, Drive...),
+    // không bắt buộc phải upload file nhị phân thật.
+    filesRequiredOnCreate: false,
   },
   fields: [
     ownerField,
+    {
+      name: "externalUrl",
+      label: "Link ngoài (khi không có file thật)",
+      type: "text",
+      admin: {
+        description:
+          "Dùng khi tài liệu là link ngoài (Google Sheet, Drive, Figma...) thay vì file upload trực tiếp. Để trống nếu đã upload file.",
+      },
+    },
     {
       // UI field thuần — render iframe khi file là PDF (read-only preview).
       name: "pdfPreview",
