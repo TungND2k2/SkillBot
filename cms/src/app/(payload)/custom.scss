@@ -56,6 +56,9 @@ body,
 .template-default__wrap,
 .template-default__content,
 .template-default__body,
+.template-minimal,
+.template-minimal__wrap,
+.login,
 .collection-list,
 .collection-edit,
 .dashboard,
@@ -847,4 +850,319 @@ button.modal__close {
     color: #6ee7b7 !important;
   }
 }
+
+/* ── 17. Executive Login & Auth Views (Minimal Template) ── */
+.template-minimal,
+.login {
+  background-color: #030712 !important;
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(37, 99, 235, 0.22), transparent 70%),
+    radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.1), transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(139, 92, 246, 0.08), transparent 45%) !important;
+  min-height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 32px 16px !important;
+  position: relative !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
+
+  /* Ambient Grid Accent */
+  &::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px) !important;
+    background-size: 36px 36px !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+
+  .template-minimal__wrap {
+    position: relative !important;
+    z-index: 1 !important;
+    width: 100% !important;
+    max-width: 440px !important;
+    background: rgba(11, 15, 25, 0.92) !important;
+    backdrop-filter: blur(28px) !important;
+    -webkit-backdrop-filter: blur(28px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 16px !important;
+    padding: 36px 32px !important;
+    box-shadow: 
+      0 24px 64px -12px rgba(0, 0, 0, 0.85),
+      0 0 45px rgba(37, 99, 235, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+
+    @media (max-width: 480px) {
+      padding: 24px 18px !important;
+      border-radius: 14px !important;
+      max-width: 100% !important;
+    }
+  }
+
+  .login__brand {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    margin-bottom: 24px !important;
+    width: 100% !important;
+  }
+
+  form,
+  .login__form,
+  .form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    width: 100% !important;
+
+    .login__form__inputWrap {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 16px !important;
+      width: 100% !important;
+    }
+
+    .field-type {
+      margin-bottom: 0 !important;
+      width: 100% !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 6px !important;
+
+      label,
+      .field-label {
+        font-size: 11.5px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        color: #94a3b8 !important;
+        margin-bottom: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+
+        .required {
+          color: #ef4444 !important;
+        }
+      }
+
+      .field-type__wrap {
+        width: 100% !important;
+        position: relative !important;
+      }
+
+      input {
+        height: 46px !important;
+        background: #060a14 !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 8px !important;
+        color: #f8fafc !important;
+        padding: 10px 14px !important;
+        font-size: 14px !important;
+        transition: all 0.15s ease !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+
+        &:focus {
+          border-color: #38bdf8 !important;
+          box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18) !important;
+          outline: none !important;
+          background: #090e1c !important;
+        }
+
+        &:-webkit-autofill,
+        &:-webkit-autofill:hover,
+        &:-webkit-autofill:focus {
+          -webkit-text-fill-color: #f8fafc !important;
+          -webkit-box-shadow: 0 0 0px 1000px #060a14 inset !important;
+          border-color: #38bdf8 !important;
+        }
+      }
+    }
+
+    a,
+    .form__link,
+    .login__form a {
+      font-size: 12px !important;
+      color: #38bdf8 !important;
+      text-decoration: none !important;
+      text-align: right !important;
+      display: block !important;
+      margin-top: -4px !important;
+      margin-bottom: 4px !important;
+      font-weight: 500 !important;
+      transition: color 0.15s ease !important;
+
+      &:hover {
+        color: #7dd3fc !important;
+        text-decoration: underline !important;
+      }
+    }
+
+    .form-submit {
+      width: 100% !important;
+      margin: 4px 0 0 0 !important;
+
+      .btn,
+      .btn--style-primary,
+      button[type="submit"] {
+        height: 46px !important;
+        width: 100% !important;
+        border-radius: 8px !important;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+        color: #ffffff !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.02em !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        box-shadow: 0 4px 18px rgba(37, 99, 235, 0.45) !important;
+        cursor: pointer !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.15s ease !important;
+
+        &:hover {
+          background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+          box-shadow: 0 6px 24px rgba(37, 99, 235, 0.6) !important;
+          transform: translateY(-1px) !important;
+        }
+
+        &:active {
+          transform: translateY(0) scale(0.99) !important;
+        }
+      }
+    }
+  }
+}
+
+/* ── 18. Comprehensive Mobile & Responsive Engineering ── */
+html,
+body {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 1024px) {
+  .app-header {
+    padding: 8px 16px !important;
+  }
+
+  .template-default__content,
+  .dashboard,
+  .collection-list {
+    padding: 16px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Tables horizontal scroll container */
+  .table,
+  .collection-list__wrap,
+  .collection-list__table {
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Compact collection headers */
+  .collection-list__header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+
+    h1 {
+      font-size: 20px !important;
+    }
+
+    .collection-list__controls {
+      width: 100% !important;
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+    }
+  }
+
+  /* Form view on mobile */
+  .collection-edit,
+  .document-fields {
+    padding: 12px !important;
+
+    .render-fields {
+      gap: 12px !important;
+    }
+
+    .field-type {
+      width: 100% !important;
+      min-width: 100% !important;
+    }
+  }
+
+  /* Sidebar drawer on mobile */
+  .doc-sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-left: none !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    margin-top: 24px !important;
+    padding-top: 20px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 13px !important;
+  }
+
+  /* Prevent iOS Safari auto-zoom on focus by enforcing min 16px font */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  .template-minimal {
+    padding: 24px 12px !important;
+    align-items: flex-start !important;
+    padding-top: 36px !important;
+  }
+
+  .template-minimal__wrap {
+    padding: 24px 16px !important;
+    border-radius: 14px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8) !important;
+  }
+
+  .app-header {
+    height: 50px !important;
+    padding: 6px 12px !important;
+  }
+
+  /* Mobile bottom toast */
+  [data-sonner-toaster] {
+    bottom: 20px !important;
+    right: 12px !important;
+    left: 12px !important;
+    width: auto !important;
+  }
+}
+
+
 

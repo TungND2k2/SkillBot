@@ -7,26 +7,32 @@ export const Logo = () => (
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      gap: 14,
-      marginBottom: 20,
+      gap: 12,
+      marginBottom: 24,
+      width: "100%",
+      maxWidth: "100%",
+      textAlign: "center",
+      boxSizing: "border-box",
     }}
   >
+    {/* Glowing Logo Icon */}
     <div
       style={{
-        width: 60,
-        height: 60,
-        borderRadius: 16,
-        background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+        width: 54,
+        height: 54,
+        borderRadius: 14,
+        background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        boxShadow: "0 12px 30px rgba(37, 99, 235, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.4)",
-        border: "1px solid rgba(255, 255, 255, 0.25)",
+        boxShadow: "0 10px 25px -4px rgba(37, 99, 235, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4)",
+        border: "1px solid rgba(255, 255, 255, 0.2)",
+        position: "relative",
       }}
     >
       <svg
-        width="32"
-        height="32"
+        width="28"
+        height="28"
         viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -40,29 +46,53 @@ export const Logo = () => (
         />
       </svg>
     </div>
-    <div style={{ textAlign: "center" }}>
+
+    {/* Brand Title & Tagline */}
+    <div style={{ maxWidth: "100%", padding: "0 8px", boxSizing: "border-box" }}>
       <div
         style={{
-          fontSize: 22,
+          fontSize: 21,
           fontWeight: 900,
           letterSpacing: "-0.03em",
           color: "#ffffff",
-          fontFamily: "Inter, sans-serif",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 6,
+          flexWrap: "wrap",
         }}
       >
-        SKILLBOT <span style={{ color: "#38bdf8", fontWeight: 700 }}>ERP</span>
+        <span>SKILLBOT</span>
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 800,
+            padding: "2px 8px",
+            borderRadius: 6,
+            background: "rgba(56, 189, 248, 0.15)",
+            color: "#38bdf8",
+            border: "1px solid rgba(56, 189, 248, 0.3)",
+            letterSpacing: "0.04em",
+          }}
+        >
+          ERP
+        </span>
       </div>
       <div
         style={{
           fontSize: 11,
           color: "#94a3b8",
-          marginTop: 4,
-          letterSpacing: "0.08em",
+          marginTop: 6,
+          letterSpacing: "0.06em",
           textTransform: "uppercase",
-          fontWeight: 700,
+          fontWeight: 600,
+          lineHeight: 1.4,
+          maxWidth: "280px",
+          margin: "6px auto 0",
         }}
       >
-        Hệ Thống Quản Trị Sản Xuất May Thêu Xuất Khẩu
+        Quản Trị Sản Xuất May Thêu Xuất Khẩu
       </div>
     </div>
   </div>

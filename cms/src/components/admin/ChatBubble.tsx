@@ -412,26 +412,40 @@ const INLINE_CSS = `
 
 .sb-chat-panel {
   position: fixed;
-  right: 24px;
-  bottom: 92px;
-  width: 400px;
-  height: 620px;
-  max-height: calc(100vh - 116px);
-  background-color: #ffffff;
-  color: #1f2937;
-  border: 1px solid #e5e7eb;
+  right: 16px;
+  bottom: 84px;
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  height: 580px;
+  max-height: calc(100vh - 100px);
+  background-color: #0b0f19;
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.22);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(37, 99, 235, 0.15);
   display: flex;
   flex-direction: column;
   z-index: 2147483646;
   overflow: hidden;
-  font-size: 14px;
+  font-size: 13.5px;
   line-height: 1.55;
   animation: sb-chat-fadein .18s ease;
   isolation: isolate;
 }
-/* Force light theme — user yêu cầu nền trắng kể cả OS dark mode */
+
+@media (max-width: 480px) {
+  .sb-chat-panel {
+    right: 8px !important;
+    left: 8px !important;
+    bottom: 74px !important;
+    width: auto !important;
+    max-width: calc(100vw - 16px) !important;
+    height: calc(100vh - 86px) !important;
+    max-height: calc(100vh - 86px) !important;
+    border-radius: 14px !important;
+  }
+}
+
 @keyframes sb-chat-fadein {
   from { opacity: 0; transform: translateY(8px) scale(0.98); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
@@ -499,7 +513,7 @@ const INLINE_CSS = `
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background-color: #f9fafb;
+  background-color: #060911;
 }
 
 .sb-chat-row {
@@ -511,14 +525,14 @@ const INLINE_CSS = `
 .sb-chat-row--assistant { justify-content: flex-start; }
 
 .sb-chat-bubble {
-  max-width: 78%;
+  max-width: 82%;
   padding: 9px 13px;
   border-radius: 14px;
   white-space: pre-wrap;
   word-break: break-word;
-  font-size: 13.5px;
+  font-size: 13px;
   line-height: 1.55;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 .sb-chat-bubble--user {
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
@@ -526,17 +540,17 @@ const INLINE_CSS = `
   border-bottom-right-radius: 4px;
 }
 .sb-chat-bubble--assistant {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
+  background-color: #0e1526;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom-left-radius: 4px;
-  color: #1f2937;
+  color: #f1f5f9;
 }
 .sb-chat-bubble--activity {
-  background-color: #f3f4f6;
-  border: 1px dashed #d1d5db;
+  background-color: #080d1a;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
   border-bottom-left-radius: 4px;
   font-size: 12px;
-  color: #4b5563;
+  color: #94a3b8;
 }
 
 .sb-chat-activity-list {
@@ -639,31 +653,31 @@ const INLINE_CSS = `
   display: flex;
   gap: 8px;
   padding: 10px 12px;
-  border-top: 1px solid #e5e7eb;
-  background-color: #ffffff;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: #0b0f19;
 }
 .sb-chat-input input {
   flex: 1;
   padding: 9px 14px;
   border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  background-color: #f9fafb;
-  color: #1f2937;
-  font-size: 13.5px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: #060911;
+  color: #f8fafc;
+  font-size: 13px;
   outline: none;
   transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
 }
 .sb-chat-input input:focus {
-  border-color: rgb(16,185,129);
-  background-color: #ffffff;
-  box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+  border-color: #38bdf8;
+  background-color: #080e1c;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
 }
 .sb-chat-input button {
   width: 38px;
   height: 38px;
   border-radius: 10px;
   border: none;
-  background: linear-gradient(135deg, rgb(16,185,129) 0%, rgb(5,150,105) 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   color: white;
   cursor: pointer;
   display: flex;
@@ -671,11 +685,11 @@ const INLINE_CSS = `
   justify-content: center;
   flex-shrink: 0;
   transition: transform .12s ease, box-shadow .15s ease, opacity .15s ease;
-  box-shadow: 0 2px 6px rgba(16,185,129,0.30);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
 }
 .sb-chat-input button:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16,185,129,0.45);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.55);
 }
 .sb-chat-input button:disabled {
   opacity: 0.4;

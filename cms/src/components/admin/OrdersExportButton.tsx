@@ -60,8 +60,9 @@ export default function OrdersExportButton() {
             color: "#f8fafc",
             border: "1px solid rgba(255, 255, 255, 0.1)",
             borderRadius: 10,
-            padding: 16,
             width: 320,
+            maxWidth: "calc(100vw - 24px)",
+            boxSizing: "border-box",
             boxShadow: "0 16px 40px rgba(0, 0, 0, 0.75)",
             zIndex: 100,
           }}

@@ -113,6 +113,7 @@ export const OrderSlideDrawer: React.FC<OrderSlideDrawerProps> = ({ order, onClo
 
       {/* Slide Drawer */}
       <div
+        className="sb-slide-drawer"
         style={{
           position: "fixed",
           top: 0,
@@ -134,6 +135,12 @@ export const OrderSlideDrawer: React.FC<OrderSlideDrawerProps> = ({ order, onClo
           @keyframes slideInRight {
             from { transform: translateX(100%); }
             to { transform: translateX(0); }
+          }
+          @media (max-width: 520px) {
+            .sb-slide-drawer {
+              width: 100vw !important;
+              max-width: 100vw !important;
+            }
           }
         `}</style>
 

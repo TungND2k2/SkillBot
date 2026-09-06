@@ -117,14 +117,45 @@ export const OrdersListToolbar: React.FC = () => {
 
   return (
     <div style={{ marginBottom: "18px", display: "flex", flexDirection: "column", gap: "12px" }}>
+      <style>{`
+        .sb-orders-toolbar-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          gap: 10px;
+        }
+        @media (max-width: 640px) {
+          .sb-orders-toolbar-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 8px !important;
+          }
+          .sb-orders-view-switcher {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 8px !important;
+          }
+          .sb-orders-view-segmented {
+            width: 100% !important;
+            display: flex !important;
+          }
+          .sb-orders-view-segmented button {
+            flex: 1 !important;
+            justify-content: center !important;
+          }
+          .sb-orders-financial-wrap {
+            width: 100% !important;
+            justify-content: space-between !important;
+            flex-wrap: wrap !important;
+          }
+        }
+        @media (max-width: 400px) {
+          .sb-orders-toolbar-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
+
       {/* 4 Executive KPI Stat Cards */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-          gap: "10px",
-        }}
-      >
+      <div className="sb-orders-toolbar-grid">
         {alertCards.map((card, idx) => (
           <div
             key={idx}
@@ -194,6 +225,7 @@ export const OrdersListToolbar: React.FC = () => {
 
       {/* View Switcher & Action Toolbar (Linear Style) */}
       <div
+        className="sb-orders-view-switcher"
         style={{
           display: "flex",
           justifyContent: "space-between",
@@ -209,6 +241,7 @@ export const OrdersListToolbar: React.FC = () => {
       >
         {/* View Mode Segmented Control */}
         <div
+          className="sb-orders-view-segmented"
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -271,7 +304,7 @@ export const OrdersListToolbar: React.FC = () => {
         </div>
 
         {/* Financial KPI & Export Actions */}
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div className="sb-orders-financial-wrap" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <div
             style={{
               display: "inline-flex",

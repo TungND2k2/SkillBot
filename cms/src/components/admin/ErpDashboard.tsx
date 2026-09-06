@@ -113,6 +113,7 @@ export const ErpDashboard: React.FC = () => {
 
   return (
     <div
+      className="sb-erp-dashboard-wrap"
       style={{
         margin: "0 0 24px 0",
         padding: "20px 24px",
@@ -122,6 +123,38 @@ export const ErpDashboard: React.FC = () => {
         boxShadow: "0 16px 36px rgba(0, 0, 0, 0.5)",
       }}
     >
+      <style>{`
+        .sb-erp-dashboard-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+          gap: 10px;
+          margin-bottom: 16px;
+        }
+        @media (max-width: 680px) {
+          .sb-erp-dashboard-wrap {
+            padding: 14px 12px !important;
+            margin-bottom: 16px !important;
+          }
+          .sb-erp-dashboard-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 8px !important;
+          }
+          .sb-erp-header-actions {
+            width: 100% !important;
+            flex-direction: column !important;
+          }
+          .sb-erp-header-actions a {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+        }
+        @media (max-width: 440px) {
+          .sb-erp-dashboard-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
+
       {/* Header Banner */}
       <div
         style={{
@@ -160,7 +193,7 @@ export const ErpDashboard: React.FC = () => {
           </p>
         </div>
 
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div className="sb-erp-header-actions" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           <Link
             href="/admin/collections/orders"
             style={{
@@ -212,14 +245,7 @@ export const ErpDashboard: React.FC = () => {
       </div>
 
       {/* 4 Executive Alert Cards */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-          gap: "10px",
-          marginBottom: "16px",
-        }}
-      >
+      <div className="sb-erp-dashboard-grid">
         {alertCards.map((card, idx) => (
           <div
             key={idx}
