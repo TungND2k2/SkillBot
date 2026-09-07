@@ -1,1168 +1,242 @@
-/* ─────────────────────────────────────────────────────────────
-   SkillBot Enterprise ERP Design System — Next-Gen Dark Theme
-   Masterpiece UI/UX for Apparel & Garment Manufacturing
-   ───────────────────────────────────────────────────────────── */
+/* SkillBot ERP — calm, high-density enterprise theme for Payload Admin. */
+:root {
+  --sb-navy-950: #091426;
+  --sb-blue-700: #175cd3;
+  --sb-blue-600: #2570e8;
+  --sb-blue-100: #dbeafe;
+  --sb-slate-700: #344054;
+  --sb-slate-500: #667085;
+  --sb-danger: #d92d20;
+  --sb-success: #067647;
+  --sb-radius-sm: 6px;
+  --sb-radius-md: 10px;
+  --sb-radius-lg: 16px;
+  --sb-shadow-sm: 0 1px 2px rgba(16, 24, 40, .05);
+  --sb-shadow-md: 0 8px 24px rgba(16, 24, 40, .08);
+  --theme-bg: #f7f9fc;
+  --theme-input-bg: #fff;
+  --theme-text: #182230;
+  --theme-text-muted: #667085;
+  --theme-border-color: #e4e7ec;
+  --style-radius-s: 6px;
+  --style-radius-m: 10px;
+  --style-radius-l: 16px;
+  --gutter-h: 32px;
+}
 
-/* ── 1. Root & Theme Variable Overrides (Force High Specificity) ── */
-:root,
-html,
-html[data-theme="dark"],
-html[data-theme="light"],
-body {
-  --theme-bg: #030712 !important;
-  --theme-input-bg: #0b0f19 !important;
-  --theme-elevation-0: #030712 !important;
-  --theme-elevation-50: #080d1a !important;
-  --theme-elevation-100: #0f172a !important;
-  --theme-elevation-150: #1e293b !important;
-  --theme-elevation-200: #334155 !important;
-  --theme-elevation-250: #475569 !important;
-  --theme-elevation-300: #64748b !important;
-  --theme-elevation-400: #94a3b8 !important;
-  --theme-elevation-500: #cbd5e1 !important;
-  --theme-elevation-600: #e2e8f0 !important;
-  --theme-elevation-700: #f1f5f9 !important;
-  --theme-elevation-800: #f8fafc !important;
-  --theme-elevation-900: #ffffff !important;
-  --theme-elevation-1000: #ffffff !important;
+html[data-theme="light"] {
+  --theme-elevation-0: #fff;
+  --theme-elevation-50: #f7f9fc;
+  --theme-elevation-100: #f2f4f7;
+  --theme-elevation-150: #e4e7ec;
+  --theme-elevation-200: #d0d5dd;
+  --theme-elevation-300: #98a2b3;
+  --theme-elevation-400: #667085;
+  --theme-elevation-500: #475467;
+  --theme-elevation-600: #344054;
+  --theme-elevation-700: #182230;
+  --theme-elevation-800: #101828;
+  --theme-elevation-900: #091426;
+  --theme-elevation-1000: #000b1d;
+}
 
-  --theme-text: #f8fafc !important;
-  --theme-text-muted: #94a3b8 !important;
-  --theme-border-color: rgba(255, 255, 255, 0.08) !important;
+html[data-theme="dark"] {
+  --theme-bg: #0b1423;
+  --theme-input-bg: #101d30;
+  --theme-text: #f1f5f9;
+  --theme-text-muted: #94a3b8;
+  --theme-border-color: #25344a;
+  --theme-elevation-0: #101d30;
+  --theme-elevation-50: #132238;
+  --theme-elevation-100: #192a42;
+  --theme-elevation-150: #25344a;
+  --theme-elevation-200: #334155;
+  --theme-elevation-300: #475569;
+  --theme-elevation-400: #64748b;
+  --theme-elevation-500: #94a3b8;
+  --theme-elevation-600: #cbd5e1;
+  --theme-elevation-700: #e2e8f0;
+  --theme-elevation-800: #f1f5f9;
+  --theme-elevation-900: #f8fafc;
+  --theme-elevation-1000: #fff;
+}
 
-  /* ERP Action Tokens */
-  --theme-success-50: #eff6ff !important;
-  --theme-success-100: #dbeafe !important;
-  --theme-success-200: #bfdbfe !important;
-  --theme-success-400: #60a5fa !important;
-  --theme-success-500: #2563eb !important;
-  --theme-success-600: #1d4ed8 !important;
-
-  --style-radius-s: 6px !important;
-  --style-radius-m: 8px !important;
-  --style-radius-l: 12px !important;
-
-  background-color: #030712 !important;
-  color: #f8fafc !important;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif !important;
+html, body {
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--theme-text);
+  background: var(--theme-bg);
   -webkit-font-smoothing: antialiased;
-  letter-spacing: -0.01em;
 }
+body { letter-spacing: -.006em; }
+::selection { color: #fff; background: var(--sb-blue-600); }
+:focus-visible { outline: 3px solid rgba(37, 112, 232, .25); outline-offset: 2px; }
 
-/* ── 2. Canvas & App Layout ── */
-body,
-#app,
-.template-default,
-.template-default__wrap,
-.template-default__content,
-.template-default__body,
-.template-minimal,
-.template-minimal__wrap,
-.login,
-.collection-list,
-.collection-edit,
-.dashboard,
-.render-fields,
-main {
-  background-color: #030712 !important;
-  color: #f8fafc !important;
+/* Branding */
+.skillbot-nav-brand, .skillbot-login-brand { display: flex; align-items: center; }
+.skillbot-nav-brand { gap: 10px; color: var(--theme-text); }
+.skillbot-nav-brand__mark, .skillbot-login-brand__mark {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  color: #fff;
+  background: var(--sb-blue-700);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .16);
 }
+.skillbot-nav-brand__mark { width: 32px; height: 32px; border-radius: 8px; }
+.skillbot-login-brand__mark { width: 52px; height: 52px; border-radius: 13px; }
+.skillbot-nav-brand svg { width: 19px; height: 19px; }
+.skillbot-login-brand svg { width: 30px; height: 30px; }
+.skillbot-nav-brand svg, .skillbot-login-brand svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
+.skillbot-nav-brand__name { font-size: 15px; font-weight: 750; letter-spacing: -.02em; white-space: nowrap; }
+.skillbot-nav-brand__name b { color: #75a7ff; font-size: 11px; letter-spacing: .04em; }
+.skillbot-login-brand { flex-direction: column; gap: 14px; text-align: center; }
+.skillbot-login-brand__name { color: var(--sb-navy-950); font-size: 25px; font-weight: 760; letter-spacing: -.035em; }
+.skillbot-login-brand__name span { color: var(--sb-blue-700); font-size: 13px; letter-spacing: .08em; }
+.skillbot-login-brand p { margin: 4px 0 0; color: var(--sb-slate-500); font-size: 13px; }
+html[data-theme="dark"] .skillbot-login-brand__name { color: #f8fafc; }
 
-/* ── 3. Top Header Bar (Ultra-Clean Glassmorphism Navbar) ── */
+/* Authentication */
+.template-minimal {
+  position: relative;
+  min-height: 100vh;
+  padding: 32px;
+  overflow: hidden;
+  background: #eef3f9;
+}
+.template-minimal::before {
+  position: fixed;
+  inset: 0 50% 0 0;
+  content: "";
+  background-color: var(--sb-navy-950);
+  background-image: linear-gradient(135deg, rgba(37,112,232,.15), transparent 55%), radial-gradient(circle at 15% 85%, rgba(37,112,232,.3), transparent 34%);
+}
+.template-minimal::after {
+  position: fixed;
+  top: 50%;
+  left: 25%;
+  z-index: 0;
+  width: min(34vw, 450px);
+  color: #fff;
+  content: "Vận hành tinh gọn. Dữ liệu rõ ràng. Quyết định nhanh hơn.";
+  font-size: clamp(28px, 3vw, 46px);
+  font-weight: 650;
+  line-height: 1.18;
+  letter-spacing: -.04em;
+  transform: translate(-50%, -50%);
+}
+.template-minimal__wrap {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 440px);
+  margin-left: calc(75% - 220px);
+  padding: 40px;
+  border: 1px solid rgba(208,213,221,.75);
+  border-radius: var(--sb-radius-lg);
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 24px 64px rgba(16,24,40,.12);
+}
+.login__brand { margin-bottom: 30px; }
+.login form, .login__form { display: flex; flex-direction: column; gap: 18px; }
+.login .field-type { margin: 0; }
+.login .field-label { margin-bottom: 7px; color: var(--sb-slate-700); font-size: 13px; font-weight: 600; }
+.login input { min-height: 46px; }
+.login .form-submit { width: 100%; margin: 4px 0 0; }
+.login .form-submit .btn { width: 100%; min-height: 46px; justify-content: center; }
+.login a { color: var(--sb-blue-700); font-size: 13px; font-weight: 600; }
+.login .form__error { border-radius: var(--sb-radius-md); }
+html[data-theme="dark"] .template-minimal { background: #0b1423; }
+html[data-theme="dark"] .template-minimal__wrap { border-color: #25344a; background: #101d30; }
+html[data-theme="dark"] .login .field-label { color: #cbd5e1; }
+
+/* Shell */
 .app-header {
-  background: rgba(8, 13, 26, 0.85) !important;
-  backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
-  padding: 10px 24px !important;
-  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.6) !important;
-  z-index: 50 !important;
-  height: 56px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-
-  .app-header__step-nav,
-  .step-nav {
-    display: flex !important;
-    align-items: center !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
-
-    a {
-      color: #38bdf8 !important;
-      text-decoration: none !important;
-
-      &:hover {
-        text-decoration: underline !important;
-      }
-    }
-
-    span,
-    .step-nav__separator {
-      color: #475569 !important;
-      margin: 0 8px !important;
-    }
-  }
-
-  .app-header__controls {
-    gap: 12px !important;
-    display: flex !important;
-    align-items: center !important;
-  }
+  min-height: 64px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--theme-elevation-150);
+  background: color-mix(in srgb, var(--theme-elevation-0) 94%, transparent);
+  box-shadow: var(--sb-shadow-sm);
+  backdrop-filter: blur(12px);
 }
+.nav { border-right: 1px solid #20334f; background: var(--sb-navy-950); }
+.nav__wrap { padding: 14px 12px 24px; }
+.nav .skillbot-nav-brand { color: #fff; }
+.nav-group__label { margin: 24px 10px 8px; color: #7f94b2; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.nav__link { min-height: 38px; margin: 2px 0; padding: 8px 11px; border: 1px solid transparent; border-radius: 7px; color: #c1cde0; font-size: 13px; font-weight: 500; transition: 120ms ease; }
+.nav__link:hover { border-color: rgba(255,255,255,.06); color: #fff; background: rgba(255,255,255,.06); }
+.nav__link--active, .nav__link[aria-current="page"] { border-color: rgba(96,165,250,.2); color: #fff; background: rgba(37,112,232,.24); }
+.template-default__content, .dashboard, .collection-list { background: var(--theme-bg); }
+.collection-list, .collection-edit { max-width: 1640px; margin-inline: auto; }
+.collection-list { padding-top: 28px; }
+.collection-list__header, .doc-header { margin-bottom: 22px; }
+.collection-list__header h1, .doc-header h1 { color: var(--theme-text); font-size: clamp(22px, 2vw, 28px); font-weight: 700; letter-spacing: -.035em; }
 
-/* ── 4. Sidebar Navigation (Sleek Linear/Raycast Design - Zero Emojis) ── */
-.nav,
-.nav__wrap,
-.nav__scroll,
-nav {
-  background-color: #060911 !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
-  width: 250px !important;
+/* Controls */
+.btn, button.btn, a.btn { min-height: 38px; padding: 8px 14px; border-radius: var(--sb-radius-sm); font-size: 13px; font-weight: 600; box-shadow: none; transition: 120ms ease; }
+.btn--style-primary, .form-submit .btn { border-color: var(--sb-blue-700); color: #fff; background: var(--sb-blue-700); }
+.btn--style-primary:hover, .form-submit .btn:hover { border-color: #134ea9; background: #134ea9; transform: translateY(-1px); }
+.btn--style-secondary { border-color: var(--theme-elevation-200); color: var(--theme-text); background: var(--theme-elevation-0); }
+.btn--style-secondary:hover { border-color: var(--theme-elevation-300); background: var(--theme-elevation-50); }
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="date"], input[type="search"], input[type="url"], textarea, select, .input__input {
+  min-height: 40px;
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--sb-radius-sm);
+  color: var(--theme-text);
+  background: var(--theme-input-bg);
+  box-shadow: var(--sb-shadow-sm);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
 }
-
-.nav__wrap {
-  padding: 12px 10px !important;
-}
-
-.nav-group__label {
-  text-transform: uppercase !important;
-  letter-spacing: 0.08em !important;
-  font-size: 10px !important;
-  font-weight: 700 !important;
-  color: #475569 !important;
-  margin: 20px 8px 6px 8px !important;
-  padding: 0 4px !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
-  padding-bottom: 4px !important;
-}
-
-.nav__link,
-.nav a {
-  border-radius: 6px !important;
-  margin: 1px 0 !important;
-  padding: 7px 12px !important;
-  font-size: 13px !important;
-  font-weight: 500 !important;
-  color: #94a3b8 !important;
-  border: 1px solid transparent !important;
-  transition: all 0.12s ease-in-out !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.035) !important;
-    border-color: rgba(255, 255, 255, 0.06) !important;
-    color: #f8fafc !important;
-  }
-}
-
-.nav__link--active,
-.nav__link[aria-current="page"] {
-  background: rgba(56, 189, 248, 0.08) !important;
-  color: #38bdf8 !important;
-  border: 1px solid rgba(56, 189, 248, 0.22) !important;
-  font-weight: 600 !important;
-  position: relative !important;
-
-  &::before {
-    content: "" !important;
-    position: absolute !important;
-    left: 0 !important;
-    top: 6px !important;
-    bottom: 6px !important;
-    width: 3px !important;
-    background: #38bdf8 !important;
-    border-radius: 0 3px 3px 0 !important;
-    box-shadow: 0 0 10px #38bdf8 !important;
-  }
-}
-
-/* ── 5. Main Collection View Layout (Open, Airy, Non-boxed) ── */
-.collection-list {
-  padding: 24px 32px !important;
-  max-width: 1600px !important;
-  margin: 0 auto !important;
-}
-
-.collection-list__wrap {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-}
-
-.collection-list__header {
-  margin-bottom: 20px !important;
-  padding-bottom: 14px !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-
-  h1 {
-    font-size: 22px !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.02em !important;
-    color: #ffffff !important;
-    margin: 0 !important;
-  }
-
-  /* Nút Tạo mới thanh lịch, chuẩn hoá tiếng Việt */
-  a.btn,
-  a[href$="/create"],
-  .btn {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    color: #ffffff !important;
-    border-radius: 7px !important;
-    padding: 7px 16px !important;
-    font-size: 12.5px !important;
-    font-weight: 600 !important;
-    box-shadow: 0 2px 10px rgba(37, 99, 235, 0.3) !important;
-    transition: all 0.15s ease !important;
-
-    &:hover {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
-      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.5) !important;
-      transform: translateY(-1px);
-    }
-  }
-}
-
-/* ── 6. Search Bar & Toolbar Controls ── */
-.list-controls,
-.search-filter,
-.collection-list__controls {
-  margin-bottom: 16px !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  flex-wrap: wrap !important;
-}
-
-.search-filter__input,
-.list-controls input,
-.search-filter input {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 7px !important;
-  color: #f8fafc !important;
-  font-size: 12.5px !important;
-  padding: 8px 12px 8px 34px !important;
-  transition: all 0.15s ease !important;
-
-  &:focus {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-    outline: none !important;
-  }
-}
-
-.column-selector__toggle,
-.where-builder__add-filter,
-.list-controls .btn,
-.search-filter .btn {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 7px !important;
-  color: #94a3b8 !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  padding: 7px 12px !important;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.06) !important;
-    color: #ffffff !important;
-    border-color: rgba(255, 255, 255, 0.14) !important;
-  }
-}
-
-/* ── 7. Luxury High-Density Data Grid (Clean Slate / No Monospace Dates) ── */
-.table,
-.table__wrap,
-.collection-list__table-wrap {
-  background: #090d16 !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  border-radius: 10px !important;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important;
-  position: relative !important;
-}
-
-.table__wrap,
-.collection-list__table-wrap {
-  overflow-x: auto !important;
-  overflow-y: hidden !important;
-}
-
-.table {
-  border-collapse: separate !important;
-  border-spacing: 0 !important;
-  width: 100% !important;
-
-  thead th {
-    background: #0c101c !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-    color: #64748b !important;
-    font-size: 11px !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.06em !important;
-    padding: 11px 16px !important;
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 10 !important;
-  }
-
-  tbody tr {
-    background-color: #090d16 !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
-    transition: background-color 0.12s ease !important;
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.02) !important;
-    }
-  }
-
-  tbody td {
-    padding: 12px 16px !important;
-    font-size: 13px !important;
-    color: #cbd5e1 !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
-    vertical-align: middle !important;
-
-    a {
-      color: #f1f5f9 !important;
-      font-weight: 600 !important;
-      text-decoration: none !important;
-
-      &:hover {
-        color: #38bdf8 !important;
-        text-decoration: underline !important;
-      }
-    }
-  }
-}
-
-/* Số liệu & Cột ngày thanh nhã, không dùng font monospace gãy khúc */
-.cell-orderDate {
-  color: #94a3b8 !important;
-  font-variant-numeric: tabular-nums !important;
-  font-weight: 500 !important;
-}
-
-.cell-orderCode {
-  color: #ffffff !important;
-  font-weight: 600 !important;
-}
-
-.cell-totalAmount {
-  color: #f8fafc !important;
-  font-weight: 700 !important;
-  font-variant-numeric: tabular-nums !important;
-}
-
-.cell-deposit {
-  color: #94a3b8 !important;
-  font-variant-numeric: tabular-nums !important;
-}
-
-.cell-owedAmount {
-  color: #fbbf24 !important;
-  font-weight: 700 !important;
-  font-variant-numeric: tabular-nums !important;
-}
-
-.cell-totalQuantity {
-  color: #cbd5e1 !important;
-  font-variant-numeric: tabular-nums !important;
-}
-
-/* ── 8. Primary & Secondary Buttons ── */
-.btn,
-.btn--style-primary,
-.btn--style-secondary,
-a.btn,
-button.btn {
-  border-radius: 6px !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.01em !important;
-  padding: 6px 14px !important;
-  transition: all 0.12s ease !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  text-decoration: none !important;
-  cursor: pointer !important;
-}
-
-.btn--style-secondary {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  color: #cbd5e1 !important;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border-color: rgba(255, 255, 255, 0.15) !important;
-    color: #ffffff !important;
-  }
-}
-
-
-/* ── 9. Form View & Document Edit ── */
-.collection-edit,
-.document-fields,
-.form {
-  max-width: 1400px !important;
-  margin: 0 auto !important;
-}
-
-.doc-header {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-  padding-bottom: 16px !important;
-  margin-bottom: 24px !important;
-
-  h1,
-  .doc-header__title {
-    font-size: 22px !important;
-    font-weight: 900 !important;
-    color: #ffffff !important;
-  }
-}
-
-/* ── 9. Universal Form Inputs & Controls (High Specificity & Autofill Shield) ── */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="date"],
-input[type="search"],
-input[type="url"],
-textarea,
-select,
-.input__input,
-.text-field input,
-.field-type input,
-.drawer input,
-.modal input,
-.dialog input,
-.form input,
-.render-fields input {
-  border-radius: 8px !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  background-color: #0b0f19 !important;
-  color: #f8fafc !important;
-  font-size: 13px !important;
-  padding: 9px 14px !important;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) inset !important;
-  -webkit-text-fill-color: #f8fafc !important;
-
-  &:focus,
-  &:focus-within {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25), 0 1px 3px rgba(0, 0, 0, 0.4) inset !important;
-    background-color: #0f172a !important;
-    outline: none !important;
-  }
-
-  &::placeholder {
-    color: #475569 !important;
-    -webkit-text-fill-color: #475569 !important;
-  }
-}
-
-/* Triệt tiêu hoàn toàn lỗi browser autofill biến ô nhập thành màu trắng/vàng */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active,
-textarea:-webkit-autofill,
-textarea:-webkit-autofill:hover,
-textarea:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px #0b0f19 inset !important;
-  -webkit-text-fill-color: #f8fafc !important;
-  caret-color: #f8fafc !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
-  transition: background-color 5000s ease-in-out 0s !important;
-}
-
-.field-label,
-label {
-  font-size: 11px !important;
-  font-weight: 800 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.06em !important;
-  color: #64748b !important;
-  margin-bottom: 6px !important;
-}
-
-.field-description {
-  font-size: 11.5px !important;
-  color: #475569 !important;
-  margin-top: 4px !important;
-}
-
-/* Tabs & Groups */
-.tabs-field__tabs {
-  gap: 6px !important;
-  padding: 4px !important;
-  background: #050811 !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 10px !important;
-}
-
-.tabs-field__tab-button {
-  border-radius: 7px !important;
-  padding: 8px 16px !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  color: #64748b !important;
-
-  &:hover {
-    background: #0f172a !important;
-    color: #ffffff !important;
-  }
-}
-
-.tabs-field__tab-button--active {
-  background: #1e293b !important;
-  color: #38bdf8 !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-}
-
-.field-type.group .group__content,
-.collapsible__content {
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-left: 3.5px solid #3b82f6 !important;
-  border-radius: 12px !important;
-  background: #080d1a !important;
-  padding: 20px !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
-}
-
-.collapsible__toggle-wrap {
-  background: #080d1a !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 8px !important;
-  font-weight: 700 !important;
-  color: #f1f5f9 !important;
-}
-
-/* ── 10. Pagination Bar ── */
-.paginator,
-.collection-list__pagination {
-  padding: 12px 16px !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
-  background: #050811 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  font-size: 12px !important;
-  color: #94a3b8 !important;
-
-  .btn {
-    background: #0f172a !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    color: #cbd5e1 !important;
-    padding: 5px 12px !important;
-    font-size: 11.5px !important;
-
-    &:hover {
-      background: #1e293b !important;
-      color: #ffffff !important;
-    }
-  }
-}
-
-/* ── 11. Empty State (Clean & Airy) ── */
-.collection-list__no-results,
-.no-results {
-  padding: 48px 20px !important;
-  text-align: center !important;
-  color: #64748b !important;
-  font-size: 13px !important;
-}
-
-/* ── 12. Custom Scrollbar ── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #030712;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 999px;
-
-  &:hover {
-    background: #334155;
-  }
-}
-
-/* ── 13. Drawers, Modals & Dialogs (Next-Gen Glassmorphism) ── */
-.drawer,
-.drawer__content,
-.modal,
-.modal__wrap,
-.modal__content,
-.dialog,
-[role="dialog"] {
-  background-color: #050811 !important;
-  color: #f8fafc !important;
-}
-
-.drawer__content,
-.modal__content {
-  border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: -12px 0 50px rgba(0, 0, 0, 0.85) !important;
-}
-
-.drawer__header,
-.modal__header {
-  background: rgba(8, 13, 26, 0.95) !important;
-  backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-  padding: 16px 24px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  z-index: 20 !important;
-
-  h1, h2, h3, h4,
-  .drawer__header-title,
-  .modal__header-title {
-    font-size: 17px !important;
-    font-weight: 800 !important;
-    color: #ffffff !important;
-    letter-spacing: -0.02em !important;
-    margin: 0 !important;
-  }
-
-  /* Ẩn hoặc làm mờ [Chưa có tiêu đề] thô */
-  span:contains("[Chưa có tiêu đề]"),
-  h2:contains("[Chưa có tiêu đề]") {
-    color: #94a3b8 !important;
-    font-weight: 600 !important;
-  }
-}
-
-.drawer__close,
-.modal__close-btn,
-button.modal__close {
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 999px !important;
-  color: #94a3b8 !important;
-  width: 32px !important;
-  height: 32px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: all 0.15s ease !important;
-  cursor: pointer !important;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.15) !important;
-    color: #ffffff !important;
-    border-color: rgba(255, 255, 255, 0.25) !important;
-    transform: scale(1.06);
-  }
-}
-
-/* ── 14. File Upload Field & Dropzone Luxury Redesign ── */
-.file-field {
-  margin-bottom: 24px !important;
-}
-
-.file-field__upload {
-  margin-bottom: 16px !important;
-}
-
-.file-field__dropzoneContent {
-  background: #080d1a !important;
-  border: 1.5px dashed rgba(255, 255, 255, 0.16) !important;
-  border-radius: 12px !important;
-  padding: 32px 24px !important;
-  text-align: center !important;
-  transition: all 0.18s ease-in-out !important;
-
-  &:hover {
-    border-color: #3b82f6 !important;
-    background: rgba(59, 130, 246, 0.04) !important;
-  }
-}
-
-.file-field__dropzoneButtons {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 12px !important;
-  flex-wrap: wrap !important;
-  margin-bottom: 8px !important;
-
-  .btn {
-    border-radius: 999px !important;
-    padding: 7px 18px !important;
-    font-size: 12.5px !important;
-    font-weight: 700 !important;
-  }
-}
-
-.file-field__orText,
-.file-field__dragAndDropText {
-  color: #64748b !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-}
-
-.file-field__remote-file-wrap {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  margin-top: 12px !important;
-  margin-bottom: 12px !important;
-  background: #080d1a !important;
-  padding: 8px 12px !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 10px !important;
-
-  .file-field__remote-file,
-  input.file-field__remote-file {
-    flex: 1 !important;
-    background: #0b0f19 !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    border-radius: 8px !important;
-    color: #f8fafc !important;
-    font-size: 13px !important;
-    padding: 9px 12px !important;
-  }
-
-  .file-field__add-file,
-  button.file-field__add-file {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-    border: 1px solid #3b82f6 !important;
-    border-radius: 8px !important;
-    color: #ffffff !important;
-    font-weight: 700 !important;
-    font-size: 12.5px !important;
-    padding: 9px 16px !important;
-    cursor: pointer !important;
-    white-space: nowrap !important;
-    transition: all 0.15s ease !important;
-
-    &:hover {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
-      box-shadow: 0 2px 10px rgba(37, 99, 235, 0.4) !important;
-    }
-  }
-}
-
-/* ── 15. React-Select Dropdown Menus (Crisp Dark Obsidian) ── */
-.react-select__control {
-  background: #0b0f19 !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-radius: 8px !important;
-  color: #f8fafc !important;
-  min-height: 38px !important;
-
-  &:hover {
-    border-color: rgba(255, 255, 255, 0.22) !important;
-  }
-}
-
-.react-select__menu {
-  background: #0f172a !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  border-radius: 10px !important;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85) !important;
-  overflow: hidden !important;
-  z-index: 1000 !important;
-}
-
-.react-select__option {
-  background: transparent !important;
-  color: #cbd5e1 !important;
-  font-size: 13px !important;
-  padding: 10px 14px !important;
-  cursor: pointer !important;
-  transition: all 0.12s ease !important;
-
-  &:hover,
-  &--is-focused {
-    background: rgba(59, 130, 246, 0.16) !important;
-    color: #ffffff !important;
-  }
-
-  &--is-selected {
-    background: #2563eb !important;
-    color: #ffffff !important;
-    font-weight: 700 !important;
-  }
-}
-
-.react-select__single-value {
-  color: #f8fafc !important;
-  font-weight: 600 !important;
-}
-
-.react-select__indicator {
-  color: #64748b !important;
-
-  &:hover {
-    color: #94a3b8 !important;
-  }
-}
-
-/* ── 16. Toast Notifications (Sonner Toast - Floating & Non-overlapping) ── */
-[data-sonner-toaster] {
-  bottom: 88px !important;
-  right: 28px !important;
-  z-index: 9999 !important;
-}
-
-[data-sonner-toast] {
-  background: rgba(11, 15, 25, 0.95) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  backdrop-filter: blur(20px) !important;
-  border-radius: 12px !important;
-  color: #f8fafc !important;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75) !important;
-  padding: 14px 18px !important;
-  font-size: 13px !important;
-  font-weight: 500 !important;
-
-  &[data-type="error"] {
-    border-left: 4px solid #ef4444 !important;
-    background: linear-gradient(145deg, #1f0a0a 0%, #0b0f19 100%) !important;
-    color: #fca5a5 !important;
-  }
-
-  &[data-type="success"] {
-    border-left: 4px solid #10b981 !important;
-    background: linear-gradient(145deg, #0a1f13 0%, #0b0f19 100%) !important;
-    color: #6ee7b7 !important;
-  }
-}
-
-/* ── 17. Executive Login & Auth Views (Minimal Template) ── */
-.template-minimal,
-.login {
-  background-color: #030712 !important;
-  background-image: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(37, 99, 235, 0.22), transparent 70%),
-    radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.1), transparent 45%),
-    radial-gradient(circle at 85% 80%, rgba(139, 92, 246, 0.08), transparent 45%) !important;
-  min-height: 100vh !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 32px 16px !important;
-  position: relative !important;
-  overflow-x: hidden !important;
-  box-sizing: border-box !important;
-
-  /* Ambient Grid Accent */
-  &::before {
-    content: "" !important;
-    position: absolute !important;
-    inset: 0 !important;
-    background-image: 
-      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px) !important;
-    background-size: 36px 36px !important;
-    pointer-events: none !important;
-    z-index: 0 !important;
-  }
-
-  .template-minimal__wrap {
-    position: relative !important;
-    z-index: 1 !important;
-    width: 100% !important;
-    max-width: 440px !important;
-    background: rgba(11, 15, 25, 0.92) !important;
-    backdrop-filter: blur(28px) !important;
-    -webkit-backdrop-filter: blur(28px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 16px !important;
-    padding: 36px 32px !important;
-    box-shadow: 
-      0 24px 64px -12px rgba(0, 0, 0, 0.85),
-      0 0 45px rgba(37, 99, 235, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
-    margin: 0 auto !important;
-    box-sizing: border-box !important;
-
-    @media (max-width: 480px) {
-      padding: 24px 18px !important;
-      border-radius: 14px !important;
-      max-width: 100% !important;
-    }
-  }
-
-  .login__brand {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    margin-bottom: 24px !important;
-    width: 100% !important;
-  }
-
-  form,
-  .login__form,
-  .form {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 16px !important;
-    width: 100% !important;
-
-    .login__form__inputWrap {
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 16px !important;
-      width: 100% !important;
-    }
-
-    .field-type {
-      margin-bottom: 0 !important;
-      width: 100% !important;
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 6px !important;
-
-      label,
-      .field-label {
-        font-size: 11.5px !important;
-        font-weight: 700 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.05em !important;
-        color: #94a3b8 !important;
-        margin-bottom: 0 !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 4px !important;
-
-        .required {
-          color: #ef4444 !important;
-        }
-      }
-
-      .field-type__wrap {
-        width: 100% !important;
-        position: relative !important;
-      }
-
-      input {
-        height: 46px !important;
-        background: #060a14 !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
-        border-radius: 8px !important;
-        color: #f8fafc !important;
-        padding: 10px 14px !important;
-        font-size: 14px !important;
-        transition: all 0.15s ease !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-
-        &:focus {
-          border-color: #38bdf8 !important;
-          box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18) !important;
-          outline: none !important;
-          background: #090e1c !important;
-        }
-
-        &:-webkit-autofill,
-        &:-webkit-autofill:hover,
-        &:-webkit-autofill:focus {
-          -webkit-text-fill-color: #f8fafc !important;
-          -webkit-box-shadow: 0 0 0px 1000px #060a14 inset !important;
-          border-color: #38bdf8 !important;
-        }
-      }
-    }
-
-    a,
-    .form__link,
-    .login__form a {
-      font-size: 12px !important;
-      color: #38bdf8 !important;
-      text-decoration: none !important;
-      text-align: right !important;
-      display: block !important;
-      margin-top: -4px !important;
-      margin-bottom: 4px !important;
-      font-weight: 500 !important;
-      transition: color 0.15s ease !important;
-
-      &:hover {
-        color: #7dd3fc !important;
-        text-decoration: underline !important;
-      }
-    }
-
-    .form-submit {
-      width: 100% !important;
-      margin: 4px 0 0 0 !important;
-
-      .btn,
-      .btn--style-primary,
-      button[type="submit"] {
-        height: 46px !important;
-        width: 100% !important;
-        border-radius: 8px !important;
-        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-        color: #ffffff !important;
-        font-size: 14px !important;
-        font-weight: 700 !important;
-        letter-spacing: 0.02em !important;
-        border: 1px solid rgba(255, 255, 255, 0.18) !important;
-        box-shadow: 0 4px 18px rgba(37, 99, 235, 0.45) !important;
-        cursor: pointer !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        transition: all 0.15s ease !important;
-
-        &:hover {
-          background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
-          box-shadow: 0 6px 24px rgba(37, 99, 235, 0.6) !important;
-          transform: translateY(-1px) !important;
-        }
-
-        &:active {
-          transform: translateY(0) scale(0.99) !important;
-        }
-      }
-    }
-  }
-}
-
-/* ── 18. Comprehensive Mobile & Responsive Engineering ── */
-html,
-body {
-  max-width: 100% !important;
-  overflow-x: hidden !important;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box !important;
-}
+input:focus, textarea:focus, select:focus, .input__input:focus { border-color: var(--sb-blue-600); outline: 0; box-shadow: 0 0 0 3px rgba(37,112,232,.14); }
+input::placeholder, textarea::placeholder { color: var(--theme-elevation-400); }
+input:-webkit-autofill { -webkit-text-fill-color: var(--theme-text); -webkit-box-shadow: 0 0 0 1000px var(--theme-input-bg) inset; }
+.field-label { color: var(--theme-elevation-600); font-size: 12px; font-weight: 600; }
+.field-description { color: var(--theme-elevation-400); font-size: 12px; line-height: 1.5; }
+
+/* Data and form surfaces */
+.table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.table__wrap, .collection-list__table-wrap { overflow: auto; border: 1px solid var(--theme-elevation-150); border-radius: var(--sb-radius-md); background: var(--theme-elevation-0); box-shadow: var(--sb-shadow-sm); }
+.table thead th { height: 42px; padding: 10px 14px; border-bottom: 1px solid var(--theme-elevation-150); color: var(--theme-elevation-500); background: var(--theme-elevation-50); font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.table tbody td { padding: 12px 14px; border-bottom: 1px solid var(--theme-elevation-100); color: var(--theme-elevation-700); font-size: 13px; }
+.table tbody tr { background: var(--theme-elevation-0); transition: background 100ms ease; }
+.table tbody tr:hover { background: color-mix(in srgb, var(--theme-elevation-50) 70%, var(--sb-blue-100)); }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table a { color: var(--sb-blue-700); font-weight: 600; text-decoration: none; }
+.cell-totalAmount, .cell-owedAmount, .cell-deposit, .cell-totalQuantity { font-variant-numeric: tabular-nums; }
+.cell-owedAmount { color: #b54708; font-weight: 700; }
+.tabs-field__tabs { gap: 4px; padding: 4px; border: 1px solid var(--theme-elevation-150); border-radius: 8px; background: var(--theme-elevation-50); }
+.tabs-field__tab-button { padding: 8px 13px; border-radius: 6px; color: var(--theme-elevation-500); font-size: 12px; font-weight: 600; }
+.tabs-field__tab-button--active { color: var(--sb-blue-700); background: var(--theme-elevation-0); box-shadow: var(--sb-shadow-sm); }
+.field-type.group .group__content, .collapsible__content { border: 1px solid var(--theme-elevation-150); border-radius: var(--sb-radius-md); background: var(--theme-elevation-0); }
+.drawer__content, .modal__content, [role="dialog"] { border-color: var(--theme-elevation-150); color: var(--theme-text); background: var(--theme-elevation-0); box-shadow: 0 24px 64px rgba(16,24,40,.18); }
+.file-field__dropzoneContent { padding: 28px; border: 1px dashed var(--theme-elevation-300); border-radius: var(--sb-radius-md); background: var(--theme-elevation-50); transition: 120ms ease; }
+.file-field__dropzoneContent:hover { border-color: var(--sb-blue-600); background: color-mix(in srgb, var(--theme-elevation-50) 85%, var(--sb-blue-100)); }
+.paginator { padding-block: 14px; color: var(--theme-elevation-500); font-size: 12px; }
+.collection-list__no-results, .no-results { padding: 56px 24px; color: var(--theme-elevation-500); text-align: center; }
+[data-sonner-toast] { border: 1px solid var(--theme-elevation-150); border-radius: var(--sb-radius-md); color: var(--theme-text); background: var(--theme-elevation-0); box-shadow: var(--sb-shadow-md); }
+[data-sonner-toast][data-type="success"] { border-left: 4px solid var(--sb-success); }
+[data-sonner-toast][data-type="error"] { border-left: 4px solid var(--sb-danger); }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 999px; background: var(--theme-elevation-300); background-clip: padding-box; }
 
 @media (max-width: 1024px) {
-  .app-header {
-    padding: 8px 16px !important;
-  }
-
-  .template-default__content,
-  .dashboard,
-  .collection-list {
-    padding: 16px !important;
-  }
+  :root { --gutter-h: 24px; }
+  .template-minimal::after { width: 38vw; font-size: 30px; }
 }
-
 @media (max-width: 768px) {
-  /* Tables horizontal scroll container */
-  .table,
-  .collection-list__wrap,
-  .collection-list__table {
-    display: block !important;
-    width: 100% !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-
-  /* Compact collection headers */
-  .collection-list__header {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 12px !important;
-    margin-bottom: 16px !important;
-
-    h1 {
-      font-size: 20px !important;
-    }
-
-    .collection-list__controls {
-      width: 100% !important;
-      display: flex !important;
-      flex-wrap: wrap !important;
-      gap: 8px !important;
-    }
-  }
-
-  /* Form view on mobile */
-  .collection-edit,
-  .document-fields {
-    padding: 12px !important;
-
-    .render-fields {
-      gap: 12px !important;
-    }
-
-    .field-type {
-      width: 100% !important;
-      min-width: 100% !important;
-    }
-  }
-
-  /* Sidebar drawer on mobile */
-  .doc-sidebar {
-    width: 100% !important;
-    max-width: 100% !important;
-    border-left: none !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-    margin-top: 24px !important;
-    padding-top: 20px !important;
-  }
+  :root { --gutter-h: 16px; }
+  .template-minimal { display: grid; place-items: center; padding: 20px; background: #eef3f9; }
+  .template-minimal::before { inset: 0; background-image: linear-gradient(160deg, #091426 0%, #15345f 100%); }
+  .template-minimal::after { display: none; }
+  .template-minimal__wrap { width: min(100%, 430px); margin: 0; padding: 32px 26px; }
+  .app-header { min-height: 56px; padding-inline: 16px; }
+  .collection-list { padding-top: 20px; }
+  .table tbody td, .table thead th { padding-inline: 11px; }
 }
-
-@media (max-width: 480px) {
-  body {
-    font-size: 13px !important;
-  }
-
-  /* Prevent iOS Safari auto-zoom on focus by enforcing min 16px font */
-  input,
-  select,
-  textarea {
-    font-size: 16px !important;
-  }
-
-  .template-minimal {
-    padding: 24px 12px !important;
-    align-items: flex-start !important;
-    padding-top: 36px !important;
-  }
-
-  .template-minimal__wrap {
-    padding: 24px 16px !important;
-    border-radius: 14px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8) !important;
-  }
-
-  .app-header {
-    height: 50px !important;
-    padding: 6px 12px !important;
-  }
-
-  /* Mobile bottom toast */
-  [data-sonner-toaster] {
-    bottom: 20px !important;
-    right: 12px !important;
-    left: 12px !important;
-    width: auto !important;
-  }
+@media (max-width: 420px) {
+  .template-minimal { padding: 12px; }
+  .template-minimal__wrap { padding: 28px 20px; border-radius: 14px; }
+  .skillbot-login-brand__mark { width: 46px; height: 46px; }
 }
-
-
-
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}
