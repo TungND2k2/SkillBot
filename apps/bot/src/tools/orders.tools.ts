@@ -21,7 +21,15 @@ export const orderTools = createCrudTools({
     orderDate: z.string().optional().describe("Ngày đặt YYYY-MM-DD (bỏ trống = hôm nay)"),
 
     // 3. Composite Mã DA
-    brandCode: z.string().default("PE").describe("Mã thương hiệu (PE, VN...)"),
+    brandCode: z
+      .string()
+      .regex(/^[A-Za-z0-9]{1,10}$/, "Mã DA phải là mã NGẮN (PE, VN, JP...) — KHÔNG phải tên khách hay mô tả đơn")
+      .default("PE")
+      .describe(
+        "Mã thương hiệu/dự án NGẮN, tối đa 10 ký tự chữ+số (vd: PE, VN, JP). " +
+          "TUYỆT ĐỐI KHÔNG điền tên khách hàng, số hoá đơn, hay bất kỳ mô tả dài nào vào đây — " +
+          "cứ để mặc định 'PE' nếu không chắc.",
+      ),
     country: z.string().describe("Quốc gia khách"),
     salesperson: z.string().optional().describe("ID user role salesperson"),
     salespersonCode: z.string().optional().describe("Mã sales viết tắt (vd: MAINT)"),

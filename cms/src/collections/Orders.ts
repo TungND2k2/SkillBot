@@ -55,6 +55,9 @@ export const Orders: CollectionConfig = {
   labels: { singular: "Đơn hàng", plural: "Đơn hàng" },
   admin: {
     useAsTitle: "orderCode",
+    // Search box "Tìm với Mã đơn" match luôn cả Mã DA (brandCode) — chỉ cần
+    // trùng 1 phần chuỗi (contains) là ra kết quả.
+    listSearchableFields: ["orderCode", "brandCode"],
     defaultColumns: [
       "orderDate",
       "brandCode",
@@ -143,7 +146,16 @@ export const Orders: CollectionConfig = {
                       type: "text",
                       required: true,
                       defaultValue: "PE",
-                      admin: { width: "33%", description: "Mã thương hiệu / dự án. vd: PE/VN/JP" },
+                      maxLength: 10,
+                      validate: (value: unknown) => {
+                        const v = String(value ?? "").trim();
+                        if (!v) return "Bắt buộc nhập Mã DA";
+                        if (!/^[A-Za-z0-9]{1,10}$/.test(v)) {
+                          return "Mã DA phải là mã ngắn (chữ/số, tối đa 10 ký tự — vd: PE, VN, JP), KHÔNG phải tên khách/mô tả đơn hàng";
+                        }
+                        return true;
+                      },
+                      admin: { width: "33%", description: "Mã thương hiệu / dự án ngắn. vd: PE/VN/JP — KHÔNG điền tên khách hoặc mô tả đơn." },
                     },
                   ],
                 },

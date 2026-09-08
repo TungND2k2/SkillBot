@@ -82,6 +82,14 @@ export const OrdersListToolbar: React.FC = () => {
 
   const alertCards = [
     {
+      title: "Đang Sản Xuất",
+      sub: "Tổng đơn B1 → B6",
+      count: stats.activePipeline,
+      color: "#2563eb",
+      glow: "rgba(37, 99, 235, 0.2)",
+      hint: "Toàn bộ đơn đang chạy",
+    },
+    {
       title: "Sắp Đến Hạn",
       sub: "≤ 7 ngày trả hàng",
       count: stats.approachingCount,
