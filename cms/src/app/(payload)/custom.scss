@@ -83,6 +83,9 @@ body { letter-spacing: -.006em; }
   box-shadow: 0 1px 2px rgba(16, 24, 40, .16);
 }
 .skillbot-nav-brand__mark { width: 32px; height: 32px; border-radius: 8px; }
+/* Slot logo trong header của Payload chỉ ~32px, mark phải tự co vừa. */
+.app-header .skillbot-nav-brand__mark, .graphic-icon .skillbot-nav-brand__mark { width: 30px; height: 30px; }
+.app-header .skillbot-nav-brand__mark svg, .graphic-icon .skillbot-nav-brand__mark svg { width: 18px; height: 18px; }
 .skillbot-login-brand__mark { width: 52px; height: 52px; border-radius: 13px; }
 .skillbot-nav-brand svg { width: 19px; height: 19px; }
 .skillbot-login-brand svg { width: 30px; height: 30px; }

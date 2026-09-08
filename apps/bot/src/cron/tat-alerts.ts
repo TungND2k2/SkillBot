@@ -1,7 +1,7 @@
 /**
- * Cron job — digest cảnh báo TAT hằng ngày, gửi vào các group Telegram
- * có `tatAlertTarget=true` (cấu hình trong CMS admin, collection
- * TelegramGroups).
+ * Cron job — digest cảnh báo TAT hằng ngày. Gửi DM cho mọi Telegram user
+ * đã từng chat với bot (collection TelegramUsers, trừ bot/blocked) và thêm
+ * các group có `tatAlertTarget=true` (TelegramGroups) nếu được tick.
  *
  * 4 mức (theo spec logic bot):
  *   🟡 Sắp đến hạn     — còn ≤7 ngày tới expectedDeliveryDate
@@ -50,6 +50,18 @@ function customerName(c: OrderDoc["customer"]): string {
 
 function daysBetween(a: Date, b: Date): number {
   return Math.floor((a.getTime() - b.getTime()) / 86_400_000);
+}
+
+interface TelegramUserDoc {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  telegramUserId: string;
+  username?: string;
+  displayName?: string;
+  isBot?: boolean;
+  blocked?: boolean;
+  [key: string]: unknown;
 }
 
 interface FlaggedOrder {
@@ -110,9 +122,8 @@ export async function runTatAlerts(opts: TatAlertsOptions): Promise<string> {
     }
   }
 
-  if (dueSoon.length === 0 && overdue.length === 0 && critical.length === 0 && stalled.length === 0) {
-    return "";
-  }
+  const nothingFlagged =
+    dueSoon.length === 0 && overdue.length === 0 && critical.length === 0 && stalled.length === 0;
 
   const line = (f: FlaggedOrder, suffix: string) =>
     `• ${f.order.orderCode} (${customerName(f.order.customer)}) — ${f.days} ngày ${suffix}`;
@@ -130,9 +141,30 @@ export async function runTatAlerts(opts: TatAlertsOptions): Promise<string> {
   if (stalled.length > 0) {
     sections.push("", `🟠 *Cần xử lý — im lặng quá lâu*`, ...stalled.map((f) => line(f, "quá hạn bước hiện tại")));
   }
-  const text = sections.join("\n");
+  // Vẫn gửi khi không có gì — như 1 nhịp "job còn sống", tránh im lặng mập mờ.
+  const text = nothingFlagged
+    ? `✅ *TAT ${now.toISOString().slice(0, 10)}* — ${orders.length} đơn đang chạy, không có đơn nào sắp hạn / trễ / kẹt bước.`
+    : sections.join("\n");
 
-  let groups: TelegramGroupDoc[] = [];
+  // Người nhận = mọi user đã từng chat với bot (DM) + group nào được tick
+  // tatAlertTarget. Gộp trùng theo chatId. Không bắt buộc phải có group.
+  const recipients = new Map<number, string>();
+
+  try {
+    const res = await payload.request<PayloadFindResponse<TelegramUserDoc>>("/api/telegram-users", {
+      query: {
+        where: { and: [{ isBot: { not_equals: true } }, { blocked: { not_equals: true } }] },
+        limit: 0,
+      },
+    });
+    for (const u of res.docs) {
+      const id = Number(u.telegramUserId);
+      if (Number.isFinite(id)) recipients.set(id, u.displayName || u.username || String(id));
+    }
+  } catch (e) {
+    logger.error("Cron", `tat-alerts: fetch telegram-users failed: ${e instanceof PayloadError ? e.message : e}`);
+  }
+
   try {
     const res = await payload.request<PayloadFindResponse<TelegramGroupDoc>>("/api/telegram-groups", {
       query: {
@@ -140,26 +172,29 @@ export async function runTatAlerts(opts: TatAlertsOptions): Promise<string> {
         limit: 0,
       },
     });
-    groups = res.docs;
+    for (const g of res.docs) {
+      const id = Number(g.telegramChatId);
+      if (Number.isFinite(id)) recipients.set(id, g.title || String(id));
+    }
   } catch (e) {
-    logger.error("Cron", `tat-alerts: fetch groups failed: ${e instanceof PayloadError ? e.message : e}`);
+    logger.error("Cron", `tat-alerts: fetch telegram-groups failed: ${e instanceof PayloadError ? e.message : e}`);
+  }
+
+  if (recipients.size === 0) {
+    logger.warn("Cron", "tat-alerts: no recipients (no telegram-users yet, no flagged groups) — digest not sent");
     return "";
   }
 
-  if (groups.length === 0) {
-    logger.warn("Cron", "tat-alerts: no telegram-groups with tatAlertTarget=true — digest not sent");
-    return "";
-  }
-
-  for (const g of groups) {
-    const chatId = Number(g.telegramChatId);
-    if (!Number.isFinite(chatId)) continue;
+  let sent = 0;
+  for (const [chatId, label] of recipients) {
     try {
       await telegram.sendMessage(chatId, text);
+      sent++;
     } catch (e) {
-      logger.error("Cron", `tat-alerts: send to ${g.telegramChatId} failed: ${e}`);
+      logger.error("Cron", `tat-alerts: send to ${label} (${chatId}) failed: ${e}`);
     }
   }
+  logger.info("Cron", `tat-alerts: digest sent to ${sent}/${recipients.size} recipients`);
 
   return "";
 }

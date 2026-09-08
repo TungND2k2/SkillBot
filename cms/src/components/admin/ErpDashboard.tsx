@@ -294,7 +294,9 @@ export const ErpDashboard: React.FC = () => {
                 style={{
                   fontSize: "20px",
                   fontWeight: 700,
-                  color: card.count > 0 ? card.color : "#f8fafc",
+                  // 0 vẫn phải nhìn thấy — trước đây dùng #f8fafc (trắng) trên nền
+                  // card trắng nên số bị "biến mất".
+                  color: card.count > 0 ? card.color : "var(--theme-text, #182230)",
                   fontVariantNumeric: "tabular-nums",
                   letterSpacing: "-0.02em",
                 }}

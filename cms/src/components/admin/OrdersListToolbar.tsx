@@ -114,8 +114,8 @@ export const OrdersListToolbar: React.FC = () => {
       hint: "Báo cáo Ban giám đốc",
     },
     {
-      title: "Kẹt Bước / Cần Xử Lý",
-      sub: "Quá 7 ngày không cập nhật",
+      title: "Kẹt Bước",
+      sub: "> 7 ngày không cập nhật",
       count: stats.stalledCount,
       color: "#fb923c",
       glow: "rgba(251, 146, 60, 0.2)",
@@ -202,11 +202,11 @@ export const OrdersListToolbar: React.FC = () => {
                     boxShadow: `0 0 6px ${card.glow}`,
                   }}
                 />
-                <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.02em", color: "#94a3b8" }}>
+                <span style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.02em", color: "#94a3b8", whiteSpace: "nowrap" }}>
                   {card.title}
                 </span>
               </div>
-              <span style={{ fontSize: "10px", color: "#475569" }}>{card.sub}</span>
+              <span style={{ fontSize: "10px", color: "#475569", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{card.sub}</span>
             </div>
 
             <div style={{ display: "flex", alignItems: "baseline", gap: "6px" }}>

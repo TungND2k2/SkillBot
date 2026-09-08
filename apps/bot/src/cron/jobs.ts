@@ -153,7 +153,8 @@ export function buildCronJobs(opts: BuildCronJobsOptions = {}): CronJob[] {
     });
     jobs.push({
       name: "daily-tat-digest",
-      schedule: "0 8 * * *", // 8h sáng mỗi ngày
+      // Server chạy UTC → 01:00 UTC = 08:00 giờ VN. (Trước để "0 8" nên bắn lúc 15h VN.)
+      schedule: "0 1 * * *",
       run: () => runTatAlerts({ telegram: tg }),
     });
   }
