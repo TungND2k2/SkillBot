@@ -81,11 +81,16 @@ export async function POST(req: Request, ctx: { params: Promise<{ slug: string }
   const form = await req.formData();
 
   const orderDate = str(form, "orderDate");
-  const brandCode = str(form, "brandCode") || "PE";
   const country = str(form, "country");
   const customerName = str(form, "customerName");
   const totalAmount = num(form, "totalAmount");
   const expectedDeliveryDate = str(form, "expectedDeliveryDate");
+  // Mã DA = mã mô tả đơn (Khách/Nước/SL/Sales). Người ngoài thường không biết
+  // mã sales → nếu để trống thì tự ghép 3 phần đầu; sales bổ sung sau trong CMS.
+  const qty = num(form, "totalQuantity");
+  const brandCode =
+    str(form, "brandCode") ||
+    [customerName, country, qty ? `${qty}pcs` : null].filter(Boolean).join("/");
 
   if (!orderDate || !country || !customerName || totalAmount === undefined || !expectedDeliveryDate) {
     return Response.json({ error: "missing-required-fields" }, { status: 400 });

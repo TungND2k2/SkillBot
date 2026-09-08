@@ -20,15 +20,15 @@ export const orderTools = createCrudTools({
     // 1. Ngày đặt
     orderDate: z.string().optional().describe("Ngày đặt YYYY-MM-DD (bỏ trống = hôm nay)"),
 
-    // 3. Composite Mã DA
+    // 3. Mã DA — mã MÔ TẢ đơn, tự do. Mã đơn (PE+số) sinh tự động, không liên quan.
     brandCode: z
       .string()
-      .regex(/^[A-Za-z0-9]{1,10}$/, "Mã DA phải là mã NGẮN (PE, VN, JP...) — KHÔNG phải tên khách hay mô tả đơn")
-      .default("PE")
+      .min(1)
+      .max(160)
       .describe(
-        "Mã thương hiệu/dự án NGẮN, tối đa 10 ký tự chữ+số (vd: PE, VN, JP). " +
-          "TUYỆT ĐỐI KHÔNG điền tên khách hàng, số hoá đơn, hay bất kỳ mô tả dài nào vào đây — " +
-          "cứ để mặc định 'PE' nếu không chắc.",
+        "Mã DA = mã mô tả đơn theo format: Tên khách / Nước / Số lượng+pcs / Mã sales. " +
+          "vd: \"Cici's closet 4/USA/198pcs/ANNTT\". Ghép từ thông tin user cung cấp; " +
+          "thiếu mã sales thì bỏ phần đó. KHÔNG phải mã đơn PE+số (cái đó hệ thống tự sinh).",
       ),
     country: z.string().describe("Quốc gia khách"),
     salesperson: z.string().optional().describe("ID user role salesperson"),

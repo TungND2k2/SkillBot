@@ -125,26 +125,59 @@ export async function runTatAlerts(opts: TatAlertsOptions): Promise<string> {
   const nothingFlagged =
     dueSoon.length === 0 && overdue.length === 0 && critical.length === 0 && stalled.length === 0;
 
-  const line = (f: FlaggedOrder, suffix: string) =>
-    `• ${f.order.orderCode} (${customerName(f.order.customer)}) — ${f.days} ngày ${suffix}`;
+  const fmtDate = (iso?: string) => {
+    if (!iso) return "—";
+    const d = new Date(iso);
+    return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`;
+  };
+  const today = fmtDate(now.toISOString()) + "/" + now.getFullYear();
 
-  const sections: string[] = [`📅 *Cảnh báo TAT ${now.toISOString().slice(0, 10)}*`];
+  /** "B4 Gửi NCC · ở bước 6/1 ngày" — bước hiện tại + đã ở đó bao lâu so với quy định. */
+  const stageInfo = (o: OrderDoc): string => {
+    const stage = getStage(o.status);
+    const label = stage ? `${stage.code.toUpperCase()} ${stage.name}` : o.status.toUpperCase();
+    if (!o.stageStartedAt || !stage) return label;
+    const inStage = daysBetween(now, new Date(o.stageStartedAt));
+    return `${label} · ở bước ${inStage}/${stage.durationDays} ngày`;
+  };
+
+  /** Hạn giao + còn/trễ bao nhiêu ngày. */
+  const deadlineInfo = (o: OrderDoc): string => {
+    if (!o.expectedDeliveryDate) return "chưa có hạn giao";
+    const diff = daysBetween(new Date(o.expectedDeliveryDate), now); // >0 = đã trễ
+    const rel = diff > 0 ? `trễ ${diff} ngày` : diff === 0 ? "hạn hôm nay" : `còn ${-diff} ngày`;
+    return `hạn ${fmtDate(o.expectedDeliveryDate)} (${rel})`;
+  };
+
+  const describe = (o: OrderDoc, extra?: string) =>
+    `• *${o.orderCode}* — ${customerName(o.customer)}\n   ${stageInfo(o)}\n   ${deadlineInfo(o)}${extra ? ` · ${extra}` : ""}`;
+
+  const sections: string[] = [`📅 *Cảnh báo TAT ${today}* — ${orders.length} đơn đang chạy`];
   if (critical.length > 0) {
-    sections.push("", `🔴 *Trễ nghiêm trọng (>14 ngày)*`, ...critical.map((f) => line(f, "trễ")));
+    sections.push("", `🔴 *Trễ nghiêm trọng (>14 ngày)* — ${critical.length} đơn`, ...critical.map((f) => describe(f.order)));
   }
   if (overdue.length > 0) {
-    sections.push("", `🔴 *Đơn muộn*`, ...overdue.map((f) => line(f, "trễ")));
+    sections.push("", `🔴 *Đơn muộn (1–14 ngày)* — ${overdue.length} đơn`, ...overdue.map((f) => describe(f.order)));
   }
   if (dueSoon.length > 0) {
-    sections.push("", `🟡 *Sắp đến hạn (≤7 ngày)*`, ...dueSoon.map((f) => line(f, "còn lại")));
+    sections.push("", `🟡 *Sắp đến hạn (≤7 ngày)* — ${dueSoon.length} đơn`, ...dueSoon.map((f) => describe(f.order)));
   }
   if (stalled.length > 0) {
-    sections.push("", `🟠 *Cần xử lý — im lặng quá lâu*`, ...stalled.map((f) => line(f, "quá hạn bước hiện tại")));
+    sections.push(
+      "",
+      `🟠 *Kẹt bước — không cập nhật* — ${stalled.length} đơn`,
+      ...stalled.map((f) => describe(f.order, `quá quy định bước ${f.days} ngày`)),
+    );
   }
-  // Vẫn gửi khi không có gì — như 1 nhịp "job còn sống", tránh im lặng mập mờ.
-  const text = nothingFlagged
-    ? `✅ *TAT ${now.toISOString().slice(0, 10)}* — ${orders.length} đơn đang chạy, không có đơn nào sắp hạn / trễ / kẹt bước.`
-    : sections.join("\n");
+  // Vẫn gửi khi không có gì — như 1 nhịp "job còn sống", kèm tình hình từng đơn.
+  const MAX_LIST = 20;
+  const allClear = [
+    `✅ *TAT ${today}* — ${orders.length} đơn đang chạy, không có đơn nào sắp hạn / trễ / kẹt bước.`,
+    "",
+    ...orders.slice(0, MAX_LIST).map((o) => describe(o)),
+    ...(orders.length > MAX_LIST ? [`… và ${orders.length - MAX_LIST} đơn khác`] : []),
+  ];
+  const text = nothingFlagged ? allClear.join("\n") : sections.join("\n");
 
   // Người nhận = mọi user đã từng chat với bot (DM) + group nào được tick
   // tatAlertTarget. Gộp trùng theo chatId. Không bắt buộc phải có group.

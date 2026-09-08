@@ -2,16 +2,23 @@ import React from "react";
 
 /**
  * Small brand mark used by Payload in the header / collapsed nav slot.
- * Mark only — the slot is ~32px wide, any text next to it gets clipped.
+ * The slot is only ~20px and clips overflow, so this is a bare SVG that
+ * scales to whatever box Payload gives it — background + mark drawn inside.
  * The full lockup (mark + name) lives in Logo.tsx (login screen).
  */
 export const Icon = () => (
-  <span className="skillbot-nav-brand__mark" aria-label="SkillBot ERP" role="img">
-    <svg viewBox="0 0 32 32" aria-hidden="true">
-      <path d="M7 8.5 16 4l9 4.5v10L16 28l-9-4.5v-15Z" />
-      <path d="m7 8.5 9 4.7 9-4.7M16 13.2V28" />
-    </svg>
-  </span>
+  <svg
+    viewBox="0 0 32 32"
+    role="img"
+    aria-label="SkillBot ERP"
+    style={{ display: "block", width: "100%", height: "100%" }}
+  >
+    <rect width="32" height="32" rx="8" fill="#175cd3" />
+    <g fill="none" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8.5 10.2 16 6.5l7.5 3.7v8.4L16 25.5l-7.5-3.9v-8.4Z" />
+      <path d="m8.5 10.2 7.5 3.9 7.5-3.9M16 14.1v11.4" />
+    </g>
+  </svg>
 );
 
 export default Icon;

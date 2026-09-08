@@ -257,12 +257,19 @@ export function IntakeForm({ slug }: { slug: string }) {
           </h3>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "14px" }}>
-            {/* Mã DA (PE/VN/JP...) là phân loại nội bộ — người ngoài điền form
-                không cần biết, dễ nhầm với "tên khách hàng" bên dưới nếu để
-                lộ ra. Gửi cố định "PE", backend cũng tự fallback "PE" nếu thiếu. */}
-            <input type="hidden" name="brandCode" value="PE" />
             <Field label="Ngày tạo đơn *">
               <input className="intake-input" type="date" name="orderDate" defaultValue={today} required />
+            </Field>
+            {/* Mã DA = mã mô tả đơn (Khách/Nước/SL/Sales). Để trống → backend tự
+                ghép từ tên khách + nước + số lượng. Mã đơn PE+số hệ thống tự sinh. */}
+            <Field label="Mã DA (mô tả đơn)">
+              <input
+                className="intake-input"
+                type="text"
+                name="brandCode"
+                maxLength={160}
+                placeholder="vd: Cici's closet 4/USA/198pcs/ANNTT — để trống sẽ tự ghép"
+              />
             </Field>
             <Field label="Quốc gia khách hàng *">
               <input className="intake-input" type="text" name="country" required placeholder="vd: USA, Nhật Bản, Đức..." />
