@@ -12,7 +12,7 @@ import type { TelegramChannel } from "../telegram/channel.js";
 import { runOrderReminders } from "./order-reminders.js";
 import { runCalendarReminders } from "./calendar-reminders.js";
 import { runMissingSupplierWarnings } from "./missing-suppliers.js";
-import { runTatAlerts } from "./tat-alerts.js";
+import { runDailyOrderReport } from "./tat-alerts.js";
 
 interface InventoryRow {
   id: string;
@@ -152,10 +152,10 @@ export function buildCronJobs(opts: BuildCronJobsOptions = {}): CronJob[] {
         runMissingSupplierWarnings({ telegram: tg, adminChatId: adminChat }),
     });
     jobs.push({
-      name: "daily-tat-digest",
+      name: "daily-order-report",
       // Server chạy UTC → 01:00 UTC = 08:00 giờ VN. (Trước để "0 8" nên bắn lúc 15h VN.)
       schedule: "0 1 * * *",
-      run: () => runTatAlerts({ telegram: tg }),
+      run: () => runDailyOrderReport({ telegram: tg }),
     });
   }
 

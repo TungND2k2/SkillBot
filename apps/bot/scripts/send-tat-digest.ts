@@ -11,7 +11,7 @@ setDefaultAutoSelectFamily(false); // cùng lý do như src/index.ts (IPv6 hỏn
 
 import { loadConfig } from "../src/config.js";
 import { TelegramChannel } from "../src/telegram/channel.js";
-import { runTatAlerts } from "../src/cron/tat-alerts.js";
+import { runDailyOrderReport } from "../src/cron/tat-alerts.js";
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 if (!token) {
@@ -20,6 +20,6 @@ if (!token) {
 }
 
 const telegram = new TelegramChannel(token, loadConfig());
-await runTatAlerts({ telegram });
+await runDailyOrderReport({ telegram });
 console.log("done");
 process.exit(0);
