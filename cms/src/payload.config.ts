@@ -6,7 +6,6 @@ import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { formBuilderPlugin } from "@payloadcms/plugin-form-builder";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { vi } from "@payloadcms/translations/languages/vi";
-import { en } from "@payloadcms/translations/languages/en";
 import sharp from "sharp";
 
 import { Users } from "./collections/Users";
@@ -33,7 +32,9 @@ const dirname = path.dirname(filename);
 export default buildConfig({
   i18n: {
     fallbackLanguage: "vi",
-    supportedLanguages: { vi, en },
+    // Chỉ cho phép tiếng Việt — nếu để thêm `en`, browser locale EN sẽ khiến
+    // trang login/admin render nhãn tiếng Anh (Email / Password / Login...).
+    supportedLanguages: { vi },
   },
   admin: {
     user: "users",
@@ -51,6 +52,8 @@ export default buildConfig({
         Logo: "/components/admin/Logo",
       },
       providers: ["/components/admin/ChatProvider"],
+      // Tiêu đề + mô tả ngay trên form login (trong card)
+      beforeLogin: ["/components/admin/LoginIntro"],
       // Banner thống kê KPI & lối tắt ERP trên trang chủ Admin
       beforeDashboard: ["/components/admin/ErpDashboard"],
       // Nav link "Quy trình" trên sidebar

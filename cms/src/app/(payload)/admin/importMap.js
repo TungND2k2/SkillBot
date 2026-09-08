@@ -31,6 +31,8 @@ import { default as default_workflow_overview_a7c5e8f3b2d1467890a3b1c2d3e4f506 }
 import { default as default_workflow_nav_link_b8d6f9e4c3e2578901b4c2d3e4f50617 } from '../../../components/admin/WorkflowNavLink'
 import { default as default_media_pdf_preview_c1e7f0a5b4f3689012c5d3e4f5061728 } from '../../../components/admin/MediaPdfPreview'
 import { default as default_orders_export_button_d2e8f1a6c5b4799123d6e7f80917283a } from '../../../components/admin/OrdersExportButton'
+import { default as default_login_intro_e3f9a2b7c4d5680912a3b4c5d6e7f809 } from '../../../components/admin/LoginIntro'
+import { default as default_media_link_importer_f4a0b3c8d5e6791023b4c5d6e7f8091b } from '../../../components/admin/MediaLinkImporter'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { FolderTableCell as FolderTableCell_folders } from '@payloadcms/next/rsc'
 import { FolderField as FolderField_folders } from '@payloadcms/next/rsc'
@@ -42,6 +44,8 @@ export const importMap = {
   "/components/admin/WorkflowDiagram#default": default_58e2c239282f21552c0a35e0a8db8a1a,
   "/components/admin/ErpDashboard#default": default_erp_dashboard_a1b2c3d4e5f6071829a3b4c5d6e7f809,
   "/components/admin/OrdersListToolbar#default": default_orders_list_toolbar_b2c3d4e5f6071829a3b4c5d6e7f8091a,
+  "/components/admin/LoginIntro#default": default_login_intro_e3f9a2b7c4d5680912a3b4c5d6e7f809,
+  "/components/admin/MediaLinkImporter#default": default_media_link_importer_f4a0b3c8d5e6791023b4c5d6e7f8091b,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
