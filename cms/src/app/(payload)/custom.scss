@@ -182,7 +182,17 @@ html[data-theme="dark"] .skillbot-login-brand__name { color: #f8fafc; }
   text-transform: uppercase;
 }
 .login .field-label .required { color: #ff7a7a; }
-.login input {
+/* Payload tô input bằng var(--theme-input-bg) (trắng) với selector cùng độ ưu
+   tiên và đứng sau → phải scope biến + tăng specificity ở đây. */
+.template-minimal {
+  --theme-input-bg: #0a0c12;
+  --theme-elevation-150: #22262f;
+  --theme-elevation-200: #2a2f3a;
+  --theme-text: #e9ecf3;
+  --theme-text-muted: #8b93a7;
+}
+.template-minimal .field-type input,
+.template-minimal .field-type__wrap input {
   min-height: 48px;
   padding: 0 16px;
   border: 1px solid #22262f;
@@ -191,8 +201,16 @@ html[data-theme="dark"] .skillbot-login-brand__name { color: #f8fafc; }
   color: #e9ecf3;
   font-size: 14.5px;
 }
-.login input::placeholder { color: #5b6478; }
-.login input:focus { border-color: #4a8dff; background: #0b0e15; box-shadow: 0 0 0 3px rgba(37,112,232,.25); }
+.template-minimal .field-type input::placeholder { color: #5b6478; }
+.template-minimal .field-type input:focus {
+  border-color: #4a8dff;
+  background: #0b0e15;
+  box-shadow: 0 0 0 3px rgba(37,112,232,.25);
+}
+.template-minimal input:-webkit-autofill {
+  -webkit-text-fill-color: #e9ecf3;
+  -webkit-box-shadow: 0 0 0 1000px #0a0c12 inset;
+}
 .login .form-submit { position: static; width: 100%; margin: 2px 0 0; }
 .login .form-submit .btn {
   width: 100%;
@@ -206,7 +224,8 @@ html[data-theme="dark"] .skillbot-login-brand__name { color: #f8fafc; }
   font-size: 15px;
   font-weight: 600;
 }
-.login .form-submit .btn::after { content: "→"; font-size: 16px; }
+/* Mũi tên gắn vào label (btn__content là flex block → ::after trên .btn bị rớt dòng) */
+.login .form-submit .btn__label::after { content: "→"; margin-left: 8px; font-size: 16px; }
 .login .form-submit .btn:hover { border-color: #1b5fd2; background: #1b5fd2; transform: none; }
 .login a { color: #8fb8ff; font-size: 13px; font-weight: 500; }
 .login form > a, .login__form > a { align-self: flex-end; margin-top: -8px; }
@@ -230,8 +249,10 @@ html[data-theme="dark"] .skillbot-login-brand__name { color: #f8fafc; }
   color: #4ade80;
   font-size: 12.5px;
 }
-/* Caption dưới card */
-.login::after {
+/* Caption dưới card — đặt trên wrap, KHÔNG phải .login: `.login` chính là
+   <section class="login template-minimal"> (flex container) nên ::after của
+   nó thành 1 flex item nằm bên phải card. */
+.template-minimal__wrap::after {
   content: "SkillBot ERP · Điều hành sản xuất may thêu xuất khẩu";
   display: block;
   margin-top: 22px;
@@ -404,14 +425,11 @@ input:-webkit-autofill { -webkit-text-fill-color: var(--theme-text); -webkit-box
 
 @media (max-width: 1024px) {
   :root { --gutter-h: 24px; }
-  .template-minimal::after { width: 38vw; font-size: 30px; }
 }
 @media (max-width: 768px) {
   :root { --gutter-h: 16px; }
-  .template-minimal { display: grid; place-items: center; padding: 20px; background: #eef3f9; }
-  .template-minimal::before { inset: 0; background-image: linear-gradient(160deg, #091426 0%, #15345f 100%); }
-  .template-minimal::after { display: none; }
-  .template-minimal__wrap { width: min(100%, 430px); margin: 0; padding: 32px 26px; }
+  .template-minimal { padding: 24px 16px; }
+  .template-minimal__wrap { width: min(100%, 430px); }
   .app-header { min-height: 56px; padding-inline: 16px; }
   .collection-list { padding-top: 20px; }
   .table tbody td, .table thead th { padding-inline: 11px; }
@@ -419,8 +437,7 @@ input:-webkit-autofill { -webkit-text-fill-color: var(--theme-text); -webkit-box
 }
 @media (max-width: 420px) {
   .template-minimal { padding: 12px; }
-  .template-minimal__wrap { padding: 28px 20px; border-radius: 14px; }
-  .skillbot-login-brand__mark { width: 46px; height: 46px; }
+  .skillbot-login-brand__mark { width: 52px; height: 52px; border-radius: 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
