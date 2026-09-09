@@ -158,6 +158,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ slug: string }
         briefFile: briefMedia.id,
         totalAmount,
         deposit: num(form, "deposit") ?? 0,
+        paymentMethod: str(form, "paymentMethod") || undefined,
         totalQuantity: num(form, "totalQuantity"),
         expectedDeliveryDate,
         shippingFee: num(form, "shippingFee") ?? 0,

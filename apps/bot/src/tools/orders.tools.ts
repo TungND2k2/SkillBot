@@ -20,6 +20,9 @@ export const orderTools = createCrudTools({
     // 1. Ngày đặt
     orderDate: z.string().optional().describe("Ngày đặt YYYY-MM-DD (bỏ trống = hôm nay)"),
 
+    // 2. Mã đơn — để trống thì hệ thống tự sinh PE+số; chỉ truyền khi user muốn mã riêng.
+    orderCode: z.string().max(40).optional().describe("Mã đơn tuỳ chỉnh (vd PE123). Để trống → tự sinh PE+số. Phải duy nhất."),
+
     // 3. Mã DA — mã MÔ TẢ đơn, tự do. Mã đơn (PE+số) sinh tự động, không liên quan.
     brandCode: z
       .string()
@@ -43,10 +46,15 @@ export const orderTools = createCrudTools({
 
     // 7-8
     totalAmount: z.number().nonnegative().describe("Tổng giá trị đơn (đ)"),
-    deposit: z.number().nonnegative().default(0).describe("Đặt cọc (đ)"),
+    deposit: z.number().nonnegative().default(0).describe("Đặt cọc ($)"),
+    paymentMethod: z
+      .enum(["bank_transfer", "cash", "paypal", "wise", "payoneer", "card", "other"])
+      .optional()
+      .describe("Phương thức thanh toán: bank_transfer (chuyển khoản), cash, paypal, wise, payoneer, card, other"),
+    paymentNote: z.string().optional().describe("Ghi chú thanh toán: mã giao dịch, ngân hàng, kỳ hạn..."),
 
     // 12-13
-    shippingFee: z.number().nonnegative().default(0).describe("Phí ship (đ)"),
+    shippingFee: z.number().nonnegative().default(0).describe("Phí ship ($)"),
     expectedWeightKg: z.number().nonnegative().optional().describe("Trọng lượng dự kiến (kg)"),
 
     // 14

@@ -137,8 +137,7 @@ export const Orders: CollectionConfig = {
                       unique: true,
                       admin: {
                         width: "33%",
-                        readOnly: true,
-                        description: "Tự sinh PE{seq}",
+                        description: "Để trống → tự sinh PE+số. Có thể tự điền hoặc sửa (phải duy nhất).",
                       },
                     },
                     {
@@ -345,6 +344,32 @@ export const Orders: CollectionConfig = {
                       type: "number",
                       min: 0,
                       admin: { width: "25%", description: "Số lượng (pcs) — tổng sản phẩm trong đơn" },
+                    },
+                  ],
+                },
+                {
+                  type: "row",
+                  fields: [
+                    {
+                      name: "paymentMethod",
+                      label: "Phương thức thanh toán",
+                      type: "select",
+                      options: [
+                        { label: "Chuyển khoản ngân hàng", value: "bank_transfer" },
+                        { label: "Tiền mặt", value: "cash" },
+                        { label: "PayPal", value: "paypal" },
+                        { label: "Wise", value: "wise" },
+                        { label: "Payoneer", value: "payoneer" },
+                        { label: "Thẻ (Visa/Master)", value: "card" },
+                        { label: "Khác", value: "other" },
+                      ],
+                      admin: { width: "33%" },
+                    },
+                    {
+                      name: "paymentNote",
+                      label: "Ghi chú thanh toán",
+                      type: "text",
+                      admin: { width: "67%", description: "Số tham chiếu giao dịch, ngân hàng, kỳ hạn thanh toán..." },
                     },
                   ],
                 },

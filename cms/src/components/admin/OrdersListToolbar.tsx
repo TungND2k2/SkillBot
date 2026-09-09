@@ -1,9 +1,52 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import OrdersExportButton from "./OrdersExportButton";
 import OrdersKanbanBoard from "./OrdersKanbanBoard";
 import { getOrderAlertStatus } from "../../lib/workflow-stages";
+
+type Period = "month" | "quarter" | "year" | "all" | "custom";
+
+interface OrderLite {
+  orderDate?: string;
+  totalAmount?: number;
+  owedAmount?: number;
+  status?: string;
+}
+
+/** Khoảng [start, end] theo kỳ đang chọn; null = không giới hạn. */
+function periodRange(p: Period, from: string, to: string): [Date | null, Date | null] {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth();
+  const endOf = (yy: number, mm: number) => new Date(yy, mm, 0, 23, 59, 59, 999); // ngày cuối tháng mm-1
+  if (p === "month") return [new Date(y, m, 1), endOf(y, m + 1)];
+  if (p === "quarter") {
+    const q = Math.floor(m / 3) * 3;
+    return [new Date(y, q, 1), endOf(y, q + 3)];
+  }
+  if (p === "year") return [new Date(y, 0, 1), endOf(y, 12)];
+  if (p === "custom") return [from ? new Date(from) : null, to ? new Date(`${to}T23:59:59.999`) : null];
+  return [null, null];
+}
+
+const PERIOD_LABEL: Record<Period, string> = {
+  month: "Tháng này",
+  quarter: "Quý này",
+  year: "Năm nay",
+  all: "Tất cả",
+  custom: "Tuỳ chỉnh",
+};
+
+const ctlStyle: React.CSSProperties = {
+  height: 26,
+  fontSize: 12,
+  borderRadius: 6,
+  border: "1px solid var(--theme-elevation-150, #e4e7ec)",
+  background: "var(--theme-input-bg, #fff)",
+  color: "var(--theme-text, #182230)",
+  padding: "0 6px",
+};
 
 export const OrdersListToolbar: React.FC = () => {
   const [viewMode, setViewMode] = useState<"table" | "kanban">("table");
@@ -17,6 +60,28 @@ export const OrdersListToolbar: React.FC = () => {
     totalRevenue: 0,
     totalOwed: 0,
   });
+
+  // Doanh số / công nợ lọc theo kỳ (theo orderDate) — tính client-side từ
+  // cùng 1 lần fetch, không gọi API thêm.
+  const [orders, setOrders] = useState<OrderLite[]>([]);
+  const [period, setPeriod] = useState<Period>("month");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const fin = useMemo(() => {
+    const [s, e] = periodRange(period, from, to);
+    let revenue = 0;
+    let owed = 0;
+    let count = 0;
+    for (const o of orders) {
+      const d = o.orderDate ? new Date(o.orderDate) : null;
+      if (s && (!d || d < s)) continue;
+      if (e && (!d || d > e)) continue;
+      revenue += o.totalAmount || 0;
+      owed += o.owedAmount || 0;
+      count++;
+    }
+    return { revenue, owed, count };
+  }, [orders, period, from, to]);
 
   useEffect(() => {
     let cancel = false;
@@ -54,6 +119,7 @@ export const OrdersListToolbar: React.FC = () => {
         }
 
         if (!cancel) {
+          setOrders(docs);
           setStats({
             totalOrders: docs.length,
             activePipeline: active,
@@ -312,7 +378,7 @@ export const OrdersListToolbar: React.FC = () => {
         </div>
 
         {/* Financial KPI & Export Actions */}
-        <div className="sb-orders-financial-wrap" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div className="sb-orders-financial-wrap" style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
           <div
             style={{
               display: "inline-flex",
@@ -323,17 +389,38 @@ export const OrdersListToolbar: React.FC = () => {
               borderRadius: "6px",
               background: "rgba(255, 255, 255, 0.02)",
               border: "1px solid rgba(255, 255, 255, 0.06)",
+              flexWrap: "wrap",
             }}
           >
+            <select
+              aria-label="Kỳ tính doanh số"
+              value={period}
+              onChange={(e) => setPeriod(e.target.value as Period)}
+              style={ctlStyle}
+            >
+              {(Object.keys(PERIOD_LABEL) as Period[]).map((p) => (
+                <option key={p} value={p}>
+                  {PERIOD_LABEL[p]}
+                </option>
+              ))}
+            </select>
+            {period === "custom" && (
+              <>
+                <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} style={ctlStyle} aria-label="Từ ngày" />
+                <span style={{ color: "#94a3b8" }}>→</span>
+                <input type="date" value={to} onChange={(e) => setTo(e.target.value)} style={ctlStyle} aria-label="Đến ngày" />
+              </>
+            )}
             <span style={{ color: "#64748b" }}>Doanh số</span>
             <span style={{ color: "#38bdf8", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
-              {fmtMoney(stats.totalRevenue)}
+              {fmtMoney(fin.revenue)}
             </span>
             <span style={{ color: "#334155" }}>•</span>
             <span style={{ color: "#64748b" }}>Công nợ</span>
             <span style={{ color: "#fbbf24", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
-              {fmtMoney(stats.totalOwed)}
+              {fmtMoney(fin.owed)}
             </span>
+            <span style={{ color: "#94a3b8" }}>· {fin.count} đơn</span>
           </div>
 
           <OrdersExportButton />

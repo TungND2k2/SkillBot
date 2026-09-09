@@ -339,6 +339,18 @@ export function IntakeForm({ slug }: { slug: string }) {
             <Field label="Tổng số lượng sản xuất (SP) *">
               <input className="intake-input" type="number" min={1} name="totalQuantity" required placeholder="vd: 500" />
             </Field>
+            <Field label="Phương thức thanh toán">
+              <select className="intake-input" name="paymentMethod" defaultValue="">
+                <option value="">— Chọn —</option>
+                <option value="bank_transfer">Chuyển khoản ngân hàng</option>
+                <option value="cash">Tiền mặt</option>
+                <option value="paypal">PayPal</option>
+                <option value="wise">Wise</option>
+                <option value="payoneer">Payoneer</option>
+                <option value="card">Thẻ (Visa/Master)</option>
+                <option value="other">Khác</option>
+              </select>
+            </Field>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "14px" }}>
