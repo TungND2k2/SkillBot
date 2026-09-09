@@ -275,7 +275,49 @@ html[data-theme="dark"] .skillbot-login-brand__name { color: #f8fafc; }
   backdrop-filter: blur(12px);
 }
 .nav { border-right: 1px solid #20334f; background: var(--sb-navy-950); }
-.nav__wrap { padding: 14px 12px 24px; }
+.nav__wrap { display: flex; flex-direction: column; min-height: 100%; padding: 14px 12px 0; }
+/* Khối logout dính đáy sidebar (mặc định nằm cuối danh sách dài, phải cuộn mới thấy) */
+.nav__controls {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  padding: 12px 0 16px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  background: var(--sb-navy-950);
+}
+.nav__log-out {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 11px;
+  border-radius: 7px;
+  color: #c1cde0;
+  font-size: 13px;
+  font-weight: 500;
+}
+.nav__log-out::after { content: "Đăng xuất"; }
+.nav__log-out:hover { color: #fff; background: rgba(255,255,255,.06); }
+.nav__log-out svg { width: 18px; height: 18px; flex: 0 0 auto; }
+/* Nút Đăng xuất trên header */
+.skillbot-header-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: var(--sb-radius-sm);
+  color: var(--theme-text);
+  background: var(--theme-elevation-0);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 120ms ease;
+}
+.skillbot-header-logout:hover { border-color: var(--sb-danger); color: var(--sb-danger); }
+.skillbot-header-logout svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .nav .skillbot-nav-brand { color: #fff; }
 .skillbot-nav-intro { margin: 0 0 18px; padding: 4px 2px 16px; border-bottom: 1px solid rgba(255,255,255,.09); }
 .skillbot-nav-home { display: flex; align-items: center; gap: 11px; margin: 0 2px 16px; padding: 5px 6px; color: #fff; text-decoration: none; }

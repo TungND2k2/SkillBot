@@ -52,6 +52,8 @@ export default buildConfig({
         Logo: "/components/admin/Logo",
       },
       providers: ["/components/admin/ChatProvider"],
+      // Nút Đăng xuất trên header — logout mặc định của Payload nằm cuối sidebar, khó thấy
+      actions: ["/components/admin/HeaderLogout"],
       // Banner thống kê KPI & lối tắt ERP trên trang chủ Admin
       beforeDashboard: ["/components/admin/ErpDashboard"],
       // Nav link "Quy trình" trên sidebar
