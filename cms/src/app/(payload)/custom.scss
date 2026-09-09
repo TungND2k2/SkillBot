@@ -95,115 +95,154 @@ body { letter-spacing: -.006em; }
 .skillbot-login-brand p { margin: 4px 0 0; color: var(--sb-slate-500); font-size: 13px; }
 html[data-theme="dark"] .skillbot-login-brand__name { color: #f8fafc; }
 
-/* Authentication — split layout: brand panel trái (nội dung qua pseudo-element
-   vì Payload không render gì ở đó), card login phải. */
+/* Authentication — "console" style: luôn nền tối, brand phát sáng phía trên,
+   card form ở giữa trên nền lưới. Card = chính <form> (wrap trong suốt) để
+   brand nằm NGOÀI card như thiết kế. */
 .template-minimal {
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: center;
   min-height: 100vh;
-  padding: 32px;
+  padding: 40px 20px;
   overflow: hidden;
-  background: #f3f6fb;
-}
-.template-minimal::before {
-  position: fixed;
-  inset: 0 44% 0 0;
-  content: "";
-  background-color: var(--sb-navy-950);
+  background-color: #07080c;
   background-image:
-    radial-gradient(circle at 20% 15%, rgba(37,112,232,.35), transparent 42%),
-    radial-gradient(circle at 85% 90%, rgba(37,112,232,.22), transparent 38%),
-    linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 44px 44px, 44px 44px;
-}
-/* Headline panel trái */
-.template-minimal::after {
-  position: fixed;
-  top: calc(50% - 150px);
-  left: 7vw;
-  z-index: 0;
-  width: min(38vw, 560px);
-  color: #fff;
-  content: "Vận hành tinh gọn.\A Dữ liệu rõ ràng.\A Quyết định nhanh hơn.";
-  white-space: pre-line;
-  font-size: clamp(34px, 3.4vw, 54px);
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -.04em;
-}
-/* Dòng phụ dưới headline */
-.template-minimal__wrap::before {
-  position: fixed;
-  top: calc(50% + 48px);
-  left: 7vw;
-  z-index: 0;
-  width: min(30vw, 400px);
-  color: #b9c6dc;
-  content: "Theo dõi đơn hàng B1 → B6, cảnh báo TAT tự động và trợ lý Telegram — tất cả ở một nơi.";
-  font-size: 15.5px;
-  font-weight: 450;
-  line-height: 1.6;
-}
-/* Footer panel trái */
-.template-minimal__wrap::after {
-  position: fixed;
-  bottom: 28px;
-  left: 7vw;
-  z-index: 0;
-  color: #6f83a4;
-  content: "SkillBot ERP · Điều hành sản xuất may thêu xuất khẩu";
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: .02em;
+    radial-gradient(ellipse 560px 340px at 50% 28%, rgba(37,112,232,.22), transparent 70%),
+    linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size: 100% 100%, 48px 48px, 48px 48px;
+  background-position: center top, center center, center center;
 }
 .template-minimal__wrap {
   position: relative;
   z-index: 1;
-  width: min(100%, 400px);
-  margin-left: calc(78% - 200px);
-  padding: 32px;
-  border: 1px solid #e4e7ec;
-  border-radius: var(--sb-radius-lg);
-  background: #fff;
-  box-shadow: 0 1px 2px rgba(16,24,40,.06), 0 20px 48px -12px rgba(16,24,40,.18);
+  width: min(100%, 460px);
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
-.login__brand { margin-bottom: 18px; }
-.skillbot-login-brand { flex-direction: row; gap: 10px; text-align: left; }
-.skillbot-login-brand__mark { width: 36px; height: 36px; border-radius: 9px; }
-.skillbot-login-brand svg { width: 20px; height: 20px; }
-.skillbot-login-brand__name { font-size: 15px; line-height: 1.15; }
-.skillbot-login-brand__name span { font-size: 10.5px; }
-.skillbot-login-brand p { margin: 1px 0 0; font-size: 12px; }
-.skillbot-login-intro { margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid #eef1f5; }
-.skillbot-login-intro h1 { margin: 0 0 4px; color: var(--sb-navy-950); font-size: 21px; font-weight: 700; letter-spacing: -.03em; }
-.skillbot-login-intro p { margin: 0; color: var(--sb-slate-500); font-size: 13px; line-height: 1.55; }
-.login form, .login__form { display: flex; flex-direction: column; gap: 14px; }
+
+/* Brand phía trên card */
+.login__brand { margin: 0 0 26px; }
+.skillbot-login-brand { flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+.skillbot-login-brand__mark {
+  width: 66px;
+  height: 66px;
+  border-radius: 18px;
+  color: #6ea8ff;
+  background: #0d1017;
+  border: 1px solid rgba(110,168,255,.35);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.6), 0 0 36px rgba(37,112,232,.45), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.skillbot-login-brand svg { width: 30px; height: 30px; }
+.skillbot-login-brand__copy { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.skillbot-login-brand__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 760;
+  letter-spacing: -.035em;
+}
+.skillbot-login-brand__name span {
+  padding: 3px 9px;
+  border-radius: 6px;
+  color: #8fb8ff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  background: rgba(37,112,232,.18);
+  border: 1px solid rgba(110,168,255,.35);
+}
+.skillbot-login-brand p { margin: 0; color: #8b93a7; font-size: 14px; }
+
+/* Card = form */
+.login form, .login__form {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 30px 32px 22px;
+  border: 1px solid #1d212b;
+  border-radius: 16px;
+  background: #0f1117;
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.04);
+}
 .login .field-type { margin: 0; }
-.login .field-label { margin-bottom: 6px; color: var(--sb-slate-700); font-size: 13px; font-weight: 600; }
-.login .field-label .required { color: var(--sb-danger); }
-.login input { min-height: 44px; border-radius: var(--sb-radius-sm); font-size: 14px; }
-.login input:focus { border-color: var(--sb-blue-600); box-shadow: 0 0 0 3px rgba(37,112,232,.18); }
-.login .form-submit { width: 100%; margin: 2px 0 0; }
-.login .form-submit .btn { width: 100%; min-height: 46px; justify-content: center; font-size: 14px; }
-.login a { color: var(--sb-blue-700); font-size: 13px; font-weight: 600; }
-.login form > a, .login__form > a { align-self: flex-end; margin-top: -4px; }
-.login .form__error { border-radius: var(--sb-radius-md); }
-@media (max-width: 900px) {
-  .template-minimal { padding: 20px; background: var(--sb-navy-950); }
-  .template-minimal::before,
-  .template-minimal::after,
-  .template-minimal__wrap::before,
-  .template-minimal__wrap::after { display: none; }
-  .template-minimal__wrap { width: min(100%, 440px); margin: 0 auto; padding: 28px 24px; }
+.login .field-label {
+  margin-bottom: 8px;
+  color: #cfd4e0;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
-html[data-theme="dark"] .template-minimal { background: #0b1423; }
-html[data-theme="dark"] .template-minimal__wrap { border-color: #25344a; background: #101d30; }
-html[data-theme="dark"] .login .field-label { color: #cbd5e1; }
-html[data-theme="dark"] .skillbot-login-intro { border-color: #25344a; }
-html[data-theme="dark"] .skillbot-login-intro h1 { color: #f8fafc; }
-html[data-theme="dark"] .skillbot-login-intro p { color: #94a3b8; }
+.login .field-label .required { color: #ff7a7a; }
+.login input {
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid #22262f;
+  border-radius: 10px;
+  background: #0a0c12;
+  color: #e9ecf3;
+  font-size: 14.5px;
+}
+.login input::placeholder { color: #5b6478; }
+.login input:focus { border-color: #4a8dff; background: #0b0e15; box-shadow: 0 0 0 3px rgba(37,112,232,.25); }
+.login .form-submit { position: static; width: 100%; margin: 2px 0 0; }
+.login .form-submit .btn {
+  width: 100%;
+  min-height: 48px;
+  justify-content: center;
+  gap: 8px;
+  border-color: var(--sb-blue-600);
+  border-radius: 10px;
+  color: #fff;
+  background: var(--sb-blue-600);
+  font-size: 15px;
+  font-weight: 600;
+}
+.login .form-submit .btn::after { content: "→"; font-size: 16px; }
+.login .form-submit .btn:hover { border-color: #1b5fd2; background: #1b5fd2; transform: none; }
+.login a { color: #8fb8ff; font-size: 13px; font-weight: 500; }
+.login form > a, .login__form > a { align-self: flex-end; margin-top: -8px; }
+.login .form__error { border-radius: 10px; }
+
+/* Hàng trạng thái dưới form: trái = form::after, phải = form-submit::after (absolute) */
+.login form::after, .login__form::after {
+  content: "🔒  Kết nối nội bộ bảo mật";
+  display: block;
+  margin-top: 6px;
+  padding-top: 16px;
+  border-top: 1px solid #1d212b;
+  color: #6b7488;
+  font-size: 12.5px;
+}
+.login .form-submit::after {
+  position: absolute;
+  right: 32px;
+  bottom: 22px;
+  content: "●  CMS sẵn sàng";
+  color: #4ade80;
+  font-size: 12.5px;
+}
+/* Caption dưới card */
+.login::after {
+  content: "SkillBot ERP · Điều hành sản xuất may thêu xuất khẩu";
+  display: block;
+  margin-top: 22px;
+  color: #5b6478;
+  font-size: 12.5px;
+  text-align: center;
+}
+@media (max-width: 480px) {
+  .login form, .login__form { padding: 24px 20px 20px; }
+  .login .form-submit::after { right: 20px; bottom: 20px; }
+}
 
 /* Shell */
 .app-header {

@@ -1,6 +1,6 @@
 import React from "react";
 
-/** Brand lockup used by Payload on authentication screens. */
+/** Brand lockup used by Payload on authentication screens (above the login card). */
 export const Logo = () => (
   <div className="skillbot-login-brand" aria-label="SkillBot ERP">
     <div className="skillbot-login-brand__mark" aria-hidden="true">
@@ -10,8 +10,10 @@ export const Logo = () => (
       </svg>
     </div>
     <div className="skillbot-login-brand__copy">
-      <div className="skillbot-login-brand__name">SkillBot <span>ERP</span></div>
-      <p>Hệ thống điều hành sản xuất</p>
+      <div className="skillbot-login-brand__name">
+        SkillBot <span>ERP</span>
+      </div>
+      <p>Hệ thống điều hành sản xuất may thêu xuất khẩu</p>
     </div>
   </div>
 );

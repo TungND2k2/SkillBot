@@ -52,8 +52,6 @@ export default buildConfig({
         Logo: "/components/admin/Logo",
       },
       providers: ["/components/admin/ChatProvider"],
-      // Tiêu đề + mô tả ngay trên form login (trong card)
-      beforeLogin: ["/components/admin/LoginIntro"],
       // Banner thống kê KPI & lối tắt ERP trên trang chủ Admin
       beforeDashboard: ["/components/admin/ErpDashboard"],
       // Nav link "Quy trình" trên sidebar
