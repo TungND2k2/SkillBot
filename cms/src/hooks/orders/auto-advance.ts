@@ -9,8 +9,9 @@ import type { CollectionBeforeChangeHook } from "payload";
  * Đồng thời tự stamp ngày duyệt (allowanceApprovedAt, embroideryApprovedAt,
  * sewingApprovedAt) khi checkbox vừa được tick — để track ai/khi nào duyệt.
  *
- * Logic ngầm: chỉ auto-advance lên 1 bước/lần save. Nếu user fill nhiều
- * bước cùng lúc thì lần save sau sẽ đẩy tiếp.
+ * Mỗi lần save đi tiếp qua mọi bước liên tiếp đã xong (đủ bằng chứng hoặc
+ * Quản lý tích "Xong Bx"), dừng ở bước đầu tiên chưa xong. Nếu user tự đổi
+ * Status trong lần save đó thì tôn trọng lựa chọn của user, không auto.
  */
 
 interface OrderData {
@@ -167,10 +168,21 @@ export const autoAdvanceStage: CollectionBeforeChangeHook = ({
   const userChangedStatus = d.status !== undefined && d.status !== o.status;
   if (userChangedStatus) return data;
 
-  const rule = ADVANCE_RULES.find((r) => r.from === current);
-  if (!rule) return data;
-  if (rule.check(d, o)) {
-    d.status = rule.to;
+  // Một bước coi là XONG khi đủ bằng chứng (rule.check) HOẶC Quản lý tích
+  // "Xong Bx" (b{x}ManagerConfirmed). Đi tiếp qua mọi bước liên tiếp đã xong,
+  // dừng ở bước đầu tiên chưa xong — nên tích Xong B2 + Xong B3 trong 1 lần lưu
+  // sẽ đưa đơn B2 → B4. (Trước đây ô tích của Quản lý không làm đơn chuyển bước.)
+  const managerDone = (stage: string) =>
+    (d as Record<string, unknown>)[`${stage}ManagerConfirmed`] ??
+    (o as Record<string, unknown>)[`${stage}ManagerConfirmed`];
+
+  let cursor = current;
+  for (let guard = 0; guard < ADVANCE_RULES.length; guard++) {
+    const rule = ADVANCE_RULES.find((r) => r.from === cursor);
+    if (!rule) break;
+    if (!(rule.check(d, o) || managerDone(rule.from) === true)) break;
+    cursor = rule.to;
   }
+  if (cursor && cursor !== current) d.status = cursor;
   return data;
 };

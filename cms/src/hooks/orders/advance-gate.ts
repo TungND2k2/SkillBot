@@ -21,32 +21,32 @@ function stageIssues(stage: string, get: (k: string) => unknown): string[] {
     case "b1": {
       if (on("b1ManagerConfirmed")) return [];
       const out: string[] = [];
-      if (!on("accountantConfirmed")) out.push("B1: Kế toán chưa xác nhận đặt cọc");
-      if (!has("invoiceFile") && !has("briefFile")) out.push("B1: Thiếu file Hóa đơn / Đề bài");
-      if (get("confirmationVerified") !== "valid") out.push("B1: Chưa có ảnh xác nhận hợp lệ từ khách");
+      if (!on("accountantConfirmed")) out.push("B1 – kế toán chưa tích «Kế toán đã nhận cọc» (tab B1 › Dòng tiền & Tài chính)");
+      if (!has("invoiceFile") && !has("briefFile")) out.push("B1 – thiếu file Hoá đơn / Đề bài (tab B1 › Hoá đơn & Đề bài kỹ thuật)");
+      if (get("confirmationVerified") !== "valid") out.push("B1 – chưa có ảnh khách xác nhận hợp lệ (tab B1 › Xác nhận khách hàng)");
       return out;
     }
     case "b2":
       return on("b2ManagerConfirmed") || on("allowanceApproved") || has("fabricSheetUrl")
         ? []
-        : ["B2: Chưa có bảng định mức BOM vải"];
+        : ["B2 – thiếu link bảng định mức (tab Tiến độ › mục 1 Định mức vải)"];
     case "b3":
       return on("b3ManagerConfirmed") || has("fabricCheckPhoto")
         ? []
-        : ["B3: Chưa có ảnh/phiếu nhập vải & NPL"];
+        : ["B3 – thiếu ảnh vải đã mua (tab Tiến độ › mục 2 Duyệt vải – chỉ hiện khi đơn đã ở B3)"];
     case "b4":
       return on("b4ManagerConfirmed") || has("supplierHandoverPhoto") || has("embroideryPhoto")
         ? []
-        : ["B4: Chưa có ảnh bàn giao NCC / bắt đầu thêu"];
+        : ["B4 – thiếu ảnh thêu (tab Tiến độ › mục 3 Ảnh thêu – chỉ hiện khi đơn đã ở B4)"];
     case "b5":
       return on("b5ManagerConfirmed") ||
         (on("embroideryApproved") && on("sewingApproved")) ||
         has("sewingPhoto") ||
         has("embroideryPhoto")
         ? []
-        : ["B5: Chưa có ảnh sản phẩm hoàn thiện"];
+        : ["B5 – thiếu ảnh hoàn thiện (tab Tiến độ › mục 4 Ảnh hoàn thiện – chỉ hiện khi đơn đã ở B5)"];
     case "b6":
-      return on("b6ManagerConfirmed") || has("qcShipPhoto") ? [] : ["B6: Chưa có ảnh QC / đóng gói"];
+      return on("b6ManagerConfirmed") || has("qcShipPhoto") ? [] : ["B6 – thiếu ảnh QC / đóng gói (tab Tiến độ › mục 5 QC – chỉ hiện khi đơn đã ở B6)"];
     default:
       return [];
   }
@@ -80,9 +80,12 @@ export const validateOrderAdvance: CollectionBeforeChangeHook = ({ data, origina
 
   const errors = STAGE_ORDER.slice(prevIdx, nextIdx).flatMap((s) => stageIssues(s, get));
   if (errors.length > 0) {
+    // Định dạng "<intro>: <mục>, <mục>" — toast của Payload tách ở dấu ":" đầu
+    // tiên rồi tách bullet theo dấu "," nên mỗi mục KHÔNG được chứa ":" hay ",".
+    const skipped = STAGE_ORDER.slice(prevIdx, nextIdx).map((s) => `«Xong ${s.toUpperCase()}»`).join(" + ");
     throw new APIError(
-      `Không thể chuyển ${prevStatus.toUpperCase()} → ${nextStatus.toUpperCase()}. ` +
-        `${errors.join("; ")}. Bổ sung ảnh/file, hoặc Quản lý tích "Duyệt" các bước này (hoặc "Duyệt toàn bộ").`,
+      `Chưa chuyển được ${prevStatus.toUpperCase()} → ${nextStatus.toUpperCase()}: ` +
+        [...errors, `Cách nhanh – Quản lý tích ${skipped} ở cột phải rồi Lưu`].join(", "),
       400,
       null,
       true,

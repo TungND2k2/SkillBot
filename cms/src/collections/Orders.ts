@@ -803,7 +803,7 @@ export const Orders: CollectionConfig = {
       defaultValue: "b1",
       admin: {
         position: "sidebar",
-        description: "Tự đổi theo tiến độ hoàn thành hoặc Quản lý chuyển bước.",
+        description: "Tự chuyển khi bước hiện tại xong (đủ ảnh/file ở tab Tiến độ, hoặc Quản lý tích «Xong Bx» bên dưới).",
       },
       options: STATUS_SELECT_OPTIONS,
     },
@@ -817,52 +817,53 @@ export const Orders: CollectionConfig = {
     // ── Quyền Quản Lý Xác Nhận Chuyển Bước (Manager Override) ──
     {
       type: "collapsible",
-      label: "Quyền Quản Lý Xác Nhận Chuyển Bước",
+      label: "Quản lý xác nhận XONG bước",
       admin: {
         position: "sidebar",
-        initCollapsed: true,
-        description: "Tích chọn để bỏ qua yêu cầu bắt buộc ảnh/file và cho phép chuyển bước.",
+        initCollapsed: false,
+        description:
+          "Tích «Xong Bx» = Quản lý xác nhận bước đó đã hoàn thành (không cần ảnh/file). Bấm Lưu → đơn tự chuyển sang bước kế tiếp chưa xong. Vd đơn đang B2: tích Xong B2 + Xong B3 → Lưu → đơn sang B4.",
       },
       fields: [
         {
           name: "managerConfirmed",
-          label: "Duyệt toàn bộ (Master Override)",
+          label: "Bỏ qua mọi điều kiện (khi tự chọn Status)",
           type: "checkbox",
           defaultValue: false,
         },
         {
           name: "b1ManagerConfirmed",
-          label: "Duyệt B1 (Nhận đơn)",
+          label: "Xong B1 — Nhận đơn → sang B2",
           type: "checkbox",
           defaultValue: false,
         },
         {
           name: "b2ManagerConfirmed",
-          label: "Duyệt B2 (Định mức BOM)",
+          label: "Xong B2 — Định mức → sang B3",
           type: "checkbox",
           defaultValue: false,
         },
         {
           name: "b3ManagerConfirmed",
-          label: "Duyệt B3 (Duyệt vải & Mua NPL)",
+          label: "Xong B3 — Mua NPL / duyệt vải → sang B4",
           type: "checkbox",
           defaultValue: false,
         },
         {
           name: "b4ManagerConfirmed",
-          label: "Duyệt B4 (Gửi NCC)",
+          label: "Xong B4 — Gửi NCC → sang B5",
           type: "checkbox",
           defaultValue: false,
         },
         {
           name: "b5ManagerConfirmed",
-          label: "Duyệt B5 (Thêu & May)",
+          label: "Xong B5 — Thêu & May → sang B6",
           type: "checkbox",
           defaultValue: false,
         },
         {
           name: "b6ManagerConfirmed",
-          label: "Duyệt B6 (QC & Đóng gói)",
+          label: "Xong B6 — QC & Đóng gói → Hoàn tất",
           type: "checkbox",
           defaultValue: false,
         },
