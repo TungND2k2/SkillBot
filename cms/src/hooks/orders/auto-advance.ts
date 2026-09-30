@@ -9,9 +9,13 @@ import type { CollectionBeforeChangeHook } from "payload";
  * Đồng thời tự stamp ngày duyệt (allowanceApprovedAt, embroideryApprovedAt,
  * sewingApprovedAt) khi checkbox vừa được tick — để track ai/khi nào duyệt.
  *
- * Mỗi lần save đi tiếp qua mọi bước liên tiếp đã xong (đủ bằng chứng hoặc
- * Quản lý tích "Xong Bx"), dừng ở bước đầu tiên chưa xong. Nếu user tự đổi
- * Status trong lần save đó thì tôn trọng lựa chọn của user, không auto.
+ * Mỗi lần save:
+ *  1. Quản lý tích "Duyệt vào Bx" (b{x}ManagerConfirmed) → đơn chuyển THẲNG tới
+ *     Bx cao nhất được tích (không cần ảnh/file các bước trước). Đây là cách
+ *     khách thực tế dùng ô tích: tích B4 = cho đơn vào B4.
+ *  2. Từ đó đi tiếp qua các bước đã đủ bằng chứng (ảnh/file + duyệt).
+ * Nếu user tự đổi Status trong lần save đó thì tôn trọng lựa chọn của user;
+ * lùi bước thì bỏ tích các bước phía sau để lần lưu kế không bị đẩy ngược lên.
  */
 
 interface OrderData {
@@ -162,27 +166,40 @@ export const autoAdvanceStage: CollectionBeforeChangeHook = ({
 
   stampApprovalDates(d, o, (req?.user as { id?: string } | undefined)?.id);
 
-  const current = d.status ?? o.status;
-  // Manual override: nếu user đổi status sang giá trị khác (paused/cancelled
-  // hoặc lùi bước), tôn trọng. Chỉ advance khi status đang ở từ b1-b6.
+  const STAGES = ["b1", "b2", "b3", "b4", "b5", "b6", "done"];
+  const rec = d as Record<string, unknown>;
+  const orig = o as Record<string, unknown>;
+  const ticked = (stage: string) => (rec[`${stage}ManagerConfirmed`] ?? orig[`${stage}ManagerConfirmed`]) === true;
+
   const userChangedStatus = d.status !== undefined && d.status !== o.status;
-  if (userChangedStatus) return data;
+  if (userChangedStatus) {
+    const ni = STAGES.indexOf(d.status ?? "");
+    const oi = STAGES.indexOf(o.status ?? "");
+    if (ni !== -1 && oi !== -1 && ni < oi) {
+      for (const st of STAGES.slice(ni + 1, 6)) rec[`${st}ManagerConfirmed`] = false;
+    }
+    return data;
+  }
 
-  // Một bước coi là XONG khi đủ bằng chứng (rule.check) HOẶC Quản lý tích
-  // "Xong Bx" (b{x}ManagerConfirmed). Đi tiếp qua mọi bước liên tiếp đã xong,
-  // dừng ở bước đầu tiên chưa xong — nên tích Xong B2 + Xong B3 trong 1 lần lưu
-  // sẽ đưa đơn B2 → B4. (Trước đây ô tích của Quản lý không làm đơn chuyển bước.)
-  const managerDone = (stage: string) =>
-    (d as Record<string, unknown>)[`${stage}ManagerConfirmed`] ??
-    (o as Record<string, unknown>)[`${stage}ManagerConfirmed`];
+  const current = d.status ?? o.status;
+  let idx = STAGES.indexOf(current ?? "");
+  if (idx === -1 || idx > 5) return data; // paused / cancelled / done
 
-  let cursor = current;
+  // 1) Quản lý duyệt vào bước cao hơn → nhảy thẳng tới đó.
+  for (let i = 5; i > idx; i--) {
+    if (ticked(STAGES[i])) {
+      idx = i;
+      break;
+    }
+  }
+
+  // 2) Đi tiếp theo bằng chứng.
+  let cursor = STAGES[idx];
   for (let guard = 0; guard < ADVANCE_RULES.length; guard++) {
     const rule = ADVANCE_RULES.find((r) => r.from === cursor);
-    if (!rule) break;
-    if (!(rule.check(d, o) || managerDone(rule.from) === true)) break;
+    if (!rule || !rule.check(d, o)) break;
     cursor = rule.to;
   }
-  if (cursor && cursor !== current) d.status = cursor;
+  if (cursor !== current) d.status = cursor;
   return data;
 };
